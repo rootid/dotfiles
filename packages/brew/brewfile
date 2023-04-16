@@ -1,0 +1,42 @@
+# https://github.com/Homebrew/homebrew-bundle#usage
+
+# set arguments for all 'brew install --cask' commands
+cask_args appdir: "~/Applications", require_sha: true
+
+# Security
+brew 'git-crypt'
+brew 'gpg2'
+
+# Applications
+cask 'slack'
+cask 'vlc'
+cask 'dropbox'
+# cask 'google-drive' # brew install --cask google-drive
+
+# Tools
+#brew 'googler'
+brew 'newsboat'
+
+## Video
+brew 'youtube-dl'
+cask 'vlc'
+
+## Text 
+brew 'jq'
+brew 'par'
+
+## Programming
+brew 'exercism'
+
+#brew 'emacs'
+brew 'stow'
+
+# Capture Tools
+cask 'notion'
+cask 'emacs'
+cask 'zotero'
+
+brew 'wget'
+brew 'youtube-dl'
+
+brew 'stow'

@@ -11,21 +11,22 @@ brew 'gpg2'
 cask 'slack'
 cask 'vlc'
 cask 'dropbox'
+# cask 'toggl'
 # cask 'google-drive' # brew install --cask google-drive
 
 # Tools
 #brew 'googler'
 brew 'newsboat'
 
-## Video
+# Video Tools
 brew 'youtube-dl'
 cask 'vlc'
 
-## Text 
+# Text Utilities
 brew 'jq'
 brew 'par'
 
-## Programming
+# Programming Tools
 brew 'exercism'
 
 #brew 'emacs'
@@ -40,3 +41,20 @@ brew 'wget'
 brew 'youtube-dl'
 
 brew 'stow'
+brew 'tmux'
+brew 'sqlite3'
+
+brew 'autoenv'
+
+# Security Tools
+brew 'git-crypt'
+brew 'gpg2'
+
+# Search Tools
+brew 'ack'
+brew 'fzf'
+brew 'ripgrep'
+brew 'fd'
+
+
+brew 'rename'

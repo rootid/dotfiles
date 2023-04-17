@@ -1,0 +1,15 @@
+# Sourcing aliases
+ROOT_DIR=~
+
+source $ROOT_DIR/git/functions.sh
+source $ROOT_DIR/git/aliases.sh
+
+source $ROOT_DIR/brew/functions.sh
+
+source $ROOT_DIR/rg/aliases.sh
+
+# GIT Crypt
+source $ROOT_DIR/git-crypt/functions.sh
+
+CUSTOM_BIN=$HOME/dotfiles/bin
+export PATH=$CUSTOM_BIN:$PATH

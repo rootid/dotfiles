@@ -45,126 +45,128 @@
   # a.k.a. ‘delete merged’
   dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
 
-  # Find branches containing commit
-  fb = "!f() { git branch -a --contains $1; }; f"
+## TODO : DO clean up
 
-  # Find tags containing commit
-  ft = "!f() { git describe --always --contains $1; }; f"
-
-  # Find commits by source code
-  fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
-
-  # Find commits by commit message
-  fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
-
-  # Local branch operations
-
-  # Amend the currently staged files to the latest commit
-  amd = commit --amend --reuse-message=HEAD
-
-  # Custom mesage
-  c = commit
-  cm = commit --amend --date=now
-  #cm = !git add -A && git commit -m
-
-  save = !git add -A && git commit -m "SAVEPOINT"
-  wip = !git add -u && git commit -m "WIP"
-  arc = commit -m \"Addressed review comments\"
-  arm = commit --amend --date=now -m \"Addressed review comments\"
-  undo = reset HEAD~1 --mixed
-
-  st = status -s
-  who = shortlog -s --
-
-  # Diffing
-  dc = diff --cached
-  df = diff
-  diff = diff --word-diff
-
-  # Raise PR
-  bclean = "!f() { git branch --merged ${1-develop} | grep -v " ${1-develop}$" | xargs git branch -d; }; f"
-  bdone = "!f() { git checkout ${1-master} && git up && git bclean ${1-master}; }; f"
-
-  # lg = log -p
-  lg = log --oneline --decorate
-  cf = "!git status --porcelain | awk '{print $2}'"
-  g = log --graph --topo-order --decorate --oneline --all
-
-  # Fetch all submodules
-  #up = !git pull --rebase --prune $@ && git submodule update --init --recursive
-  mu = "!f() { git pull && git submodule init && git submodule update --init --recursive; }; f"
-
-  # Resolve conflict
-  gte = checkout --theirs
-  gto = checkout --ours
-  cp = cherry-pick
-  #}
-
-  del = "git status | grep 'deleted' | cut -d ':' -f2 | xargs git rm"
-  # Git commited files with username
-  lf = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
-  # Git log with dates eg git lds -4
-  lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
-
-  # List all aliases
-  la = "!git config -l | grep alias | cut -c 7-"
-  dl = "!git ll -1"
-  fl = log -u
-
-  # rebase git interactively
-  rb =  rebase -i
-  # Reset branches
-  r = reset
-  r1 = reset HEAD^
-
-  # Merge diff
-  accept-ours = "!f() { [ -z \"$@\" ] && set - '.'; git checkout --ours -- \"$@\"; git add -u -- \"$@\"; }; f"
-  accept-theirs = "!f() { [ -z \"$@\" ] && set - '.'; git checkout --theirs -- \"$@\"; git add -u -- \"$@\"; }; f"
-
-  # list files which have changed since REVIEW_BASE
-  # (REVIEW_BASE defaults to 'master' in my zshrc)
-  files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
-
-  # Same as above, but with a diff stat instead of just names
-  # (better for interactive use)
-  stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
-
-  # NOTE: These aliases depend on the `git files` alias from
-  # a few sections ago!
-
-  # Open all files changed since REVIEW_BASE in Vim tabs
-  # Then, run fugitive's :Gdiff in each tab, and finally
-  # tell vim-gitgutter to show +/- for changes since REVIEW_BASE
-  review = !vim -p $(git files) +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
-
-  # Same as the above, except specify names of files as arguments,
-  # instead of opening all files:
-  # git reviewone foo.js bar.js
-  reviewone = !vim -p +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
-
-  # git-crypt
-  # Usage - git gca rootid
-  gca = "!f() { git-crypt add-gpg-user $1; }; f"
-  gci = "!f() { git-crypt init; }; f"
-  gcs = "!f() { git-crypt status | grep -v ^not; }; f"
-  gcl = "!f() { git-crypt lock; }; f"
-
-[gitflow "prefix"]
-  feature = feature-
-  #release = release-
-  hotfix = hotfix-
-  support = support-
-  versiontag = v
-
-[hub]
-  protocol = https
-
-[filter "lfs"]
-  clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
-  process = git-lfs filter-process
-  required = true
-
-[user]
-  name = rootid
-  email = vsinhsawant@gmail.com
+#  # Find branches containing commit
+#  fb = "!f() { git branch -a --contains $1; }; f"
+#
+#  # Find tags containing commit
+#  ft = "!f() { git describe --always --contains $1; }; f"
+#
+#  # Find commits by source code
+#  fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+#
+#  # Find commits by commit message
+#  fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+#
+#  # Local branch operations
+#
+#  # Amend the currently staged files to the latest commit
+#  amd = commit --amend --reuse-message=HEAD
+#
+#  # Custom mesage
+#  c = commit
+#  cm = commit --amend --date=now
+#  #cm = !git add -A && git commit -m
+#
+#  save = !git add -A && git commit -m "SAVEPOINT"
+#  wip = !git add -u && git commit -m "WIP"
+#  arc = commit -m \"Addressed review comments\"
+#  arm = commit --amend --date=now -m \"Addressed review comments\"
+#  undo = reset HEAD~1 --mixed
+#
+#  st = status -s
+#  who = shortlog -s --
+#
+#  # Diffing
+#  dc = diff --cached
+#  df = diff
+#  diff = diff --word-diff
+#
+#  # Raise PR
+#  bclean = "!f() { git branch --merged ${1-develop} | grep -v " ${1-develop}$" | xargs git branch -d; }; f"
+#  bdone = "!f() { git checkout ${1-master} && git up && git bclean ${1-master}; }; f"
+#
+#  # lg = log -p
+#  lg = log --oneline --decorate
+#  cf = "!git status --porcelain | awk '{print $2}'"
+#  g = log --graph --topo-order --decorate --oneline --all
+#
+#  # Fetch all submodules
+#  #up = !git pull --rebase --prune $@ && git submodule update --init --recursive
+#  mu = "!f() { git pull && git submodule init && git submodule update --init --recursive; }; f"
+#
+#  # Resolve conflict
+#  gte = checkout --theirs
+#  gto = checkout --ours
+#  cp = cherry-pick
+#  #}
+#
+#  del = "git status | grep 'deleted' | cut -d ':' -f2 | xargs git rm"
+#  # Git commited files with username
+#  lf = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+#  # Git log with dates eg git lds -4
+#  lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
+#
+#  # List all aliases
+#  la = "!git config -l | grep alias | cut -c 7-"
+#  dl = "!git ll -1"
+#  fl = log -u
+#
+#  # rebase git interactively
+#  rb =  rebase -i
+#  # Reset branches
+#  r = reset
+#  r1 = reset HEAD^
+#
+#  # Merge diff
+#  accept-ours = "!f() { [ -z \"$@\" ] && set - '.'; git checkout --ours -- \"$@\"; git add -u -- \"$@\"; }; f"
+#  accept-theirs = "!f() { [ -z \"$@\" ] && set - '.'; git checkout --theirs -- \"$@\"; git add -u -- \"$@\"; }; f"
+#
+#  # list files which have changed since REVIEW_BASE
+#  # (REVIEW_BASE defaults to 'master' in my zshrc)
+#  files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
+#
+#  # Same as above, but with a diff stat instead of just names
+#  # (better for interactive use)
+#  stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
+#
+#  # NOTE: These aliases depend on the `git files` alias from
+#  # a few sections ago!
+#
+#  # Open all files changed since REVIEW_BASE in Vim tabs
+#  # Then, run fugitive's :Gdiff in each tab, and finally
+#  # tell vim-gitgutter to show +/- for changes since REVIEW_BASE
+#  review = !vim -p $(git files) +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
+#
+#  # Same as the above, except specify names of files as arguments,
+#  # instead of opening all files:
+#  # git reviewone foo.js bar.js
+#  reviewone = !vim -p +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
+#
+#  # git-crypt
+#  # Usage - git gca rootid
+#  gca = "!f() { git-crypt add-gpg-user $1; }; f"
+#  gci = "!f() { git-crypt init; }; f"
+#  gcs = "!f() { git-crypt status | grep -v ^not; }; f"
+#  gcl = "!f() { git-crypt lock; }; f"
+#
+#[gitflow "prefix"]
+#  feature = feature-
+#  #release = release-
+#  hotfix = hotfix-
+#  support = support-
+#  versiontag = v
+#
+#[hub]
+#  protocol = https
+#
+#[filter "lfs"]
+#  clean = git-lfs clean -- %f
+#  smudge = git-lfs smudge -- %f
+#  process = git-lfs filter-process
+#  required = true
+#
+#[user]
+#  name = rootid
+#  email = vsinhsawant@gmail.com

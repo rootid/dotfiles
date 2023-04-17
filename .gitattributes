@@ -1,0 +1,16 @@
+tools/gcalcli/functions.sh filter=git-crypt diff=git-crypt
+tools/.newsboat/urls filter=git-crypt diff=git-crypt
+config/.gcalclirc filter=git-crypt diff=git-crypt
+config/.local/** filter=git-crypt diff=git-crypt
+config/.gitconfig filter=git-crypt diff=git-crypt
+tools/work/** filter=git-crypt diff=git-crypt
+tools/workflow/** filter=git-crypt diff=git-crypt
+tools/toggl/** filter=git-crypt diff=git-crypt
+tools/task-war-data/** filter=git-crypt diff=git-crypt
+tools/task-war/** filter=git-crypt diff=git-crypt
+data/** filter=git-crypt diff=git-crypt
+TODO-new-place/* filter=git-crypt diff=git-crypt
+config/.taskrc filter=git-crypt diff=git-crypt
+config/.togglrc filter=git-crypt diff=git-crypt
+data/leisure_tasks.txt filter=git-crypt diff=git-crypt
+data/todo.txt filter=git-crypt diff=git-crypt

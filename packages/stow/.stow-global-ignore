@@ -1,0 +1,7 @@
+# Files to skip during the stow
+
+.+~          # emacs backup files
+\#.*\#       # emacs autosave files
+
+\.git
+

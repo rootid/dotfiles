@@ -11,6 +11,7 @@ brew 'gpg2'
 cask 'slack'
 cask 'vlc'
 cask 'dropbox'
+cask 'flux'
 # cask 'toggl'
 # cask 'google-drive' # brew install --cask google-drive
 

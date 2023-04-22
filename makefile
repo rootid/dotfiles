@@ -1,4 +1,4 @@
-.PHONY: install_homebrew install_omz update_brew_bundle dry_run_stow link_config_files link_tools unlink_tools
+.PHONY: install_homebrew install_omz update_brew_bundle dry_run_stow link_config_files link_tools unlink_tools link_vim unlink_vim init_vim_packages
 
 HOME_DIR = /Users/vmat
 SHELL := /bin/zsh
@@ -15,15 +15,15 @@ install_omz:
 
 update_brew_bundle:
 	@echo "Adding Apps/Install using brewfile"
-	brew bundle --file=packages/brew/brewfile
+	@brew bundle --file=packages/brew/brewfile
 
 dry_run_stow:
-	stow --simulate zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=5
+	@stow --simulate zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=5
 
 link_config_files:
-	stow stow --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
-	stow git --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
-	stow zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
+	@stow stow --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
+	@stow git --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
+	@stow zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 
 link_tools:
 	@echo "Updating tools shortcuts"
@@ -32,6 +32,27 @@ link_tools:
 unlink_tools:
 	@echo "unlinking tools shortcuts"
 	@stow -D tools --verbose=5 --simulate
+
+link_vim :
+	#stow --simulate vim -t ~ --dir=$(HOME_DIR)/dotfiles/packages/ --no-folding --verbose=3
+	#stow --simulate vim -t ~ --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=3
+	@stow vim --target=$(HOME_DIR) --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=3
+
+unlink_vim :
+	#@stow --simulate --delete vim --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5
+	@stow --delete vim --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5
+
+init_vim_packages:
+	@echo "Move the latest repo @ top"
+	# TODO - Fix the error handling by checking not continue if dir exists
+	#
+	#
+	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-obsession.git  
+	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-repeat.git  
+	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-abolish.git  
+	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-fugitive.git  
+	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-commentary.git  
+	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-surround.git 
 
 #install_python_bins:
 #	@echo "Installing python bins"
@@ -59,8 +80,6 @@ unlink_tools:
 #	@stow -t ~ vim --no-folding -vvv
 #	mkdir -p $(HOME)/.vim-plug/plugged
 #
-#unlink_vim:
-#	@stow -D vim
 
 # stow test the changes first eg. stow -n -t ~ ssh -vvv
 # vim: noexpandtab

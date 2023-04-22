@@ -1,0 +1,11 @@
+:au FileType java :iabbrev ice in case of any exception
+:au FileType java :iabbrev dpr @DataProvider <CR> public static Object[][] todoDataProvider() { <CR> return new Object[][] { <CR> {}, <CR> }; <CR> }
+:au FileType java :iabbrev ut Unit tests for {@link }
+:au FileType java :iabbrev ft Functional test for {@link }
+:au FileType java :iabbrev cd {@code }
+:au FileType java :iabbrev lk {@link }
+:au FileType java :iabbrev tdo //TODO
+:au FileType java :iabbrev cls Class
+:au FileType java :iabbrev ctor The Constructor
+:au FileType java :iabbrev ins instance
+:au FileType java :iabbrev toa the object array

@@ -10,4 +10,3 @@ function go_os_get_no_of_cores() {
   sysctl -n hw.ncpu
 }
 
-

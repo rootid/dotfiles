@@ -370,7 +370,6 @@ set tabstop=2
 " Invoke StripTrailingWhitespace for all below files types
 autocmd FileType c,cpp,java,go,javascript,python,rst,ruby,rust,yml,perl autocmd BufWritePre <buffer> call StripTrailingWhitespace()
 
-
 autocmd FileType make setlocal noexpandtab
 
 " }

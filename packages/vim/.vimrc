@@ -362,10 +362,14 @@ command -range=% KSB :<line1>,<line2>s/\n\{3,}/\r\r/e
 " Fast formatting pretty print line > 100
 nmap ,f1 :g/.\{100,\}/ .!par w100<CR>
 
+set expandtab 
+set shiftwidth=2 
+set softtabstop=2
+set tabstop=2
+
 " Invoke StripTrailingWhitespace for all below files types
 autocmd FileType c,cpp,java,go,javascript,python,rst,ruby,rust,yml,perl autocmd BufWritePre <buffer> call StripTrailingWhitespace()
 
-autocmd FileType haskell,python,ruby,yml setlocal expandtab shiftwidth=2 softtabstop=2
 
 autocmd FileType make setlocal noexpandtab
 

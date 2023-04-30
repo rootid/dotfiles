@@ -24,6 +24,7 @@ link_config_files:
 	@stow stow --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 	@stow git --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 	@stow zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
+	@stow tmux  --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 
 link_tools:
 	@echo "Updating tools shortcuts"
@@ -46,7 +47,7 @@ init_vim_packages:
 	@echo "Move the latest repo @ top"
 	# TODO - Fix the error handling by checking not continue if dir exists
 	#
-	#
+	mkdir -p $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/{colors,syntax,others}/{start,opt} 
 	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-obsession.git  
 	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-repeat.git  
 	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-abolish.git  

@@ -1,15 +1,50 @@
+# zshrc workflow - 
+# Never pollute the ~/.zshrc
+# 1. Create the directory for the function and aliases to /tools dir 
+# 2. Source the functions and aliases here
+# 3. Run make link_tools
+# Always put the config files in the package directory
+
 # Sourcing aliases
 ROOT_DIR=~
 
+# zshrc
+source $ROOT_DIR/zsh/aliases.sh
+
+# Brew
+source $ROOT_DIR/brew/functions.sh
+
+# Git
 source $ROOT_DIR/git/functions.sh
 source $ROOT_DIR/git/aliases.sh
 
-source $ROOT_DIR/brew/functions.sh
+# Git Crypt
+source $ROOT_DIR/git-crypt/functions.sh
 
+# rg
 source $ROOT_DIR/rg/aliases.sh
 
-# GIT Crypt
-source $ROOT_DIR/git-crypt/functions.sh
+# ACK
+source $ROOT_DIR/ack/aliases.sh
+
+# Java
+source $ROOT_DIR/java/aliases.sh
+source $ROOT_DIR/java/functions.sh
+
+# VLC
+source $ROOT_DIR/vlc/functions.sh
+
+# GPG
+source $ROOT_DIR/gpg/functions.sh
+
+# OS utils
+source $ROOT_DIR/os_utils/functions.sh
+
+# Toggle
+source $ROOT_DIR/toggl/functions.sh
+
+# Tmux
+source $ROOT_DIR/tmux/aliases.sh
 
 CUSTOM_BIN=$HOME/dotfiles/bin
 export PATH=$CUSTOM_BIN:$PATH

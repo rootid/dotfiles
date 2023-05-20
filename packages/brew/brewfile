@@ -35,7 +35,8 @@ brew 'stow'
 
 # Capture Tools
 cask 'notion'
-cask 'emacs'
+#cask 'emacs'
+brew 'emacs'
 cask 'zotero'
 
 brew 'wget'

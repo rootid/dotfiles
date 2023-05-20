@@ -46,5 +46,9 @@ source $ROOT_DIR/toggl/functions.sh
 # Tmux
 source $ROOT_DIR/tmux/aliases.sh
 
+# Emacs
+source $ROOT_DIR/emacs/aliases.sh
+source $ROOT_DIR/emacs/functions.sh
+
 CUSTOM_BIN=$HOME/dotfiles/bin
 export PATH=$CUSTOM_BIN:$PATH

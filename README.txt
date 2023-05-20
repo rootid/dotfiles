@@ -1,7 +1,7 @@
 # 
 
 Install homebrew
-- make install
+- make install_homebrew 
 
 # Install apps/cli tools using homebrew
 - make update

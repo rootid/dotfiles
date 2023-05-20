@@ -1,4 +1,4 @@
-.PHONY: install_homebrew install_omz update_brew_bundle dry_run_stow link_config_files link_tools unlink_tools link_vim unlink_vim init_vim_packages
+.PHONY: install_homebrew install_omz update_brew_bundle dry_run_stow link_config_files unlink_config_files link_tools unlink_tools link_vim unlink_vim init_vim_packages
 
 HOME_DIR = /Users/vmat
 SHELL := /bin/zsh
@@ -24,7 +24,13 @@ link_config_files:
 	@stow stow --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 	@stow git --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 	@stow zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
-	@stow tmux  --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
+	@stow tmux --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
+	@stow emacs --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
+
+unlink_config_files:
+	@echo "unlinking selected config files"
+	@stow --delete emacs --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5 
+	#@stow --delete emacs --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5 --simulate 
 
 link_tools:
 	@echo "Updating tools shortcuts"
@@ -44,6 +50,7 @@ unlink_vim :
 	@stow --delete vim --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5
 
 init_vim_packages:
+	# To add any vim package add to either start(regular) or opt(experimental) dir 
 	@echo "Move the latest repo @ top"
 	# TODO - Fix the error handling by checking not continue if dir exists
 	#

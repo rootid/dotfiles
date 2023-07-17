@@ -30,6 +30,7 @@ link_config_files:
 unlink_config_files:
 	@echo "unlinking selected config files"
 	@stow --delete emacs --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5 
+	@stow --delete emacs-templates --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5 
 	#@stow --delete emacs --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5 --simulate 
 
 link_tools:

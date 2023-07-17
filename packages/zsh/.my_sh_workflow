@@ -50,5 +50,8 @@ source $ROOT_DIR/tmux/aliases.sh
 source $ROOT_DIR/emacs/aliases.sh
 source $ROOT_DIR/emacs/functions.sh
 
+# Utils
+source $ROOT_DIR/utils/functions.sh
+
 CUSTOM_BIN=$HOME/dotfiles/bin
 export PATH=$CUSTOM_BIN:$PATH

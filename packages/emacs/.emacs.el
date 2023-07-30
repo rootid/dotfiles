@@ -22,8 +22,27 @@
 
 ;; org mode is installed already if you use Emacs version >= 24
 (require 'org)
-(add-hook 'org-mode-hook 'org-babel-mode)
-(setq org-babel-default-language "emacs-lisp")
-(setq org-babel-load-languages '((emacs-lisp . t) (python . t)))
+
+;;(use-package org-babel
+;;  :ensure t
+;;  :config
+;;  (org-babel-mode))
+;;(org-babel-mode)
+;;(add-hook 'org-mode-hook 'org-babel-mode)
+;;(setq org-babel-default-language "emacs-lisp")
+;;(setq org-babel-load-languages '((emacs-lisp . t) (python . t)))
 
 (org-babel-load-file (expand-file-name "~/emacs_config/basic.org"))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(org-babel which-key use-package rainbow-delimiters ivy-rich iodine-theme helpful general evil elisp-format counsel command-log-mode)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-habit ((t (:foreground "green")))))

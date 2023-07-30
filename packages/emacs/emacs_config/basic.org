@@ -15,7 +15,7 @@ Used as a minimal setup configuration (No additional plugins), with UI adjustmen
 
 ;; Fix backup files and directories
 ;; (setq auto-save-default nil) ;; Do not create autosave (filename~) files
-(setq auto-save-file-name-transforms `((".*" "~/.emacs.d/autosaves/" t))) ; store autosave files in autosave directory, Prereq - make sure dir is created
+;;(setq auto-save-file-name-transforms `((".*" "~/.emacs.d/autosaves/" t))) ; store autosave files in autosave directory, Prereq - make sure dir is created
 #+END_SRC
 
 * Customizations
@@ -67,60 +67,60 @@ Different packages are organized as per the categories.
 ** Helper Packages (Man/Help packes)
 #+BEGIN_SRC emacs-lisp
 
-;; To view the commands executed on right panel 
-;; TODO : Fix me - looks like it's not working as expected
-(use-package 
-  command-log-mode 
-  :ensure t)
+  ;; To view the commands executed on right panel 
+  ;; TODO : Fix me - looks like it's not working as expected
+  (use-package 
+    command-log-mode 
+    :ensure t)
 
-;; Package for command completion, different packges can be used with ivy e.g. counsel and other alterntives are helm, ido (TODO: Explore these packages)
-(use-package 
-  ivy 
-  :ensure t
-  ;;:diminish
-  :bind 
-   (("C-s" . swiper) :map ivy-minibuffer-map ("TAB" . ivy-alt-done) 
-	 ("C-l" . ivy-alt-done) 
-	 ("C-j" . ivy-next-line) 
-	 ("C-k" . ivy-previous-line) 
-	 :map ivy-switch-buffer-map ("C-k" . ivy-previous-line) 
-	 ("C-l" . ivy-done) 
-	 ("C-d" . ivy-switch-buffer-kill) 
-	 :map ivy-reverse-i-search-map ("C-k" . ivy-previous-line) 
-	 ("C-d" . ivy-reverse-i-search-kill)) 
-  :config (ivy-mode 1))
+  ;; Package for command completion, different packges can be used with ivy e.g. counsel and other alterntives are helm, ido (TODO: Explore these packages)
+  (use-package 
+    ivy 
+    :ensure t
+    ;;:diminish
+    :bind 
+     (("C-s" . swiper) :map ivy-minibuffer-map ("TAB" . ivy-alt-done) 
+	   ("C-l" . ivy-alt-done) 
+	   ("C-j" . ivy-next-line) 
+	   ("C-k" . ivy-previous-line) 
+	   :map ivy-switch-buffer-map ("C-k" . ivy-previous-line) 
+	   ("C-l" . ivy-done) 
+	   ("C-d" . ivy-switch-buffer-kill) 
+	   :map ivy-reverse-i-search-map ("C-k" . ivy-previous-line) 
+	   ("C-d" . ivy-reverse-i-search-kill)) 
+    :config (ivy-mode 1))
 
-;; on-the-fly keybinding suggestions in the minibuffer
-(use-package 
-  which-key 
-  :ensure t 
-  :init (which-key-mode) 
-  :diminish which-key-mode 
-  :config (setq which-key-idle-delay 1))
+  ;; on-the-fly keybinding suggestions in the minibuffer
+  (use-package 
+    which-key 
+    :ensure t 
+    :init (which-key-mode) 
+    :diminish which-key-mode 
+    :config (setq which-key-idle-delay 1))
 
-;; Enhances the visual appearance of Ivy completion and selection menus.
-(use-package 
-  ivy-rich 
-  :ensure t 
-  :init (ivy-rich-mode 1)
-  :config
-  (setq ivy-rich-display-transformers-list
-      '(counsel-M-x
-        (:columns
-         ((counsel-M-x-transformer (:width 40))
-          (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))))
-)
+  ;; Enhances the visual appearance of Ivy completion and selection menus.
+  (use-package 
+    ivy-rich 
+    :ensure t 
+    :init (ivy-rich-mode 1)
+    :config
+    (setq ivy-rich-display-transformers-list
+	'(counsel-M-x
+	  (:columns
+	   ((counsel-M-x-transformer (:width 40))
+	    (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))))
+  )
 
-;; collection of enhanced completion and selection utilities for Emacs
-(use-package 
-  counsel 
-  :ensure t 
-  :bind (
-	 ;("M-x" . counsel-M-x)
-   ("C-x b" . counsel-ibuffer) 
-	 ("C-x C-f" . counsel-find-file) 
-	 :map minibuffer-local-map ("C-r" . 'counsel-minibuffer-history)) 
-  :config (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with 
+  ;; collection of enhanced completion and selection utilities for Emacs
+  (use-package 
+    counsel 
+    :ensure t 
+    :bind (
+     ;("M-x" . counsel-M-x)
+     ("C-x b" . counsel-ibuffer) 
+     ("C-x C-f" . counsel-find-file) 
+     :map minibuffer-local-map ("C-r" . 'counsel-minibuffer-history)) 
+     :config (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with 
 
 #+END_SRC
 
@@ -132,6 +132,8 @@ Different packages are organized as per the categories.
 ;; key binding types
 (global-set-key (kbd "C-c C-f") 'find-file) ;; global
 (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'eval-buffer) ;; use keymap
+;;(global-set-key (kbd "C-c t") 'toggle-evil-mode)
+;;(define-key global-map (kbd "C-c c") 'org-capture)
 #+END_SRC 
 
 *** Evil package
@@ -215,6 +217,7 @@ Different packages are organized as per the categories.
          )))
 
 (setq org-agenda-custom-commands
+
       '(("t" "Next Day's Habits"
          ((agenda ""
                   ((org-agenda-span 1)
@@ -230,6 +233,9 @@ Different packages are organized as per the categories.
                       (org-agenda-skip-function
                        '(org-agenda-skip-entry-if 'notregexp ":STYLE:"))))
           ))))
+
+(define-key global-map (kbd "C-c c") 'org-capture)
+
 #+END_SRC 
 ** Docs Packages (To manage Smart Notes)
 *** Org-roam package

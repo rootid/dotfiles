@@ -125,6 +125,63 @@ Different packages are organized as per the categories.
 #+END_SRC
 
 ** Utilities Packages
+
+*** Org-roam package
+#+BEGIN_SRC emacs-lisp
+(use-package org-roam
+:ensure t
+:custom
+(org-roam-directory "~/plain_docs/notes/pvt")
+:bind (
+  ("C-c n l" . 'org-roam-buffer-toggle)
+  ("C-c n i" . 'org-roam-node-insert)
+  ("C-c n f" . 'org-roam-node-find)
+)
+:config
+(org-roam-setup))
+
+;; Optionally, you can add keybindings for Org-roam commands
+;;(global-set-key (kbd "C-c n r") 'org-roam-buffer-toggle)
+;;(global-set-key (kbd "C-c n f") 'org-roam-node-find)
+
+(defun vs_org_roam/org_id_update_org_roam_files ()
+  "Update Org-ID locations for all Org-roam files."
+  (interactive)
+  (org-id-update-id-locations (org-roam--list-all-files)))
+
+(defun vs_org_roam/org_id_update_id_current_file ()
+  "Scan the current buffer for Org-ID locations and update them."
+  (interactive)
+  (org-id-update-id-locations (list (buffer-file-name (current-buffer)))))
+
+#+END_SRC 
+
+*** Org-roam-server package
+#+BEGIN_SRC emacs-lisp
+
+
+(use-package org-roam-ui
+  :ensure t
+  :after org-roam
+  :config
+  (org-roam-ui-mode))
+
+;;(use-package org-roam-ui
+;;  :straight
+;;    (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+;;    :after org-roam
+;;;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;;;         a hookable mode anymore, you're advised to pick something yourself
+;;;;         if you don't care about startup time, use
+;;;;  :hook (after-init . org-roam-ui-mode)
+;;    :config
+;;    (setq org-roam-ui-sync-theme t
+;;          org-roam-ui-follow t
+;;          org-roam-ui-update-on-save t
+;;          org-roam-ui-open-on-start t))
+;;
+#+END_SRC 
+
 *** Key-binding package
 
 #+BEGIN_SRC emacs-lisp
@@ -238,7 +295,6 @@ Different packages are organized as per the categories.
 
 #+END_SRC 
 ** Docs Packages (To manage Smart Notes)
-*** Org-roam package
 ** Ivy and Counsel
 
 * Keybindings

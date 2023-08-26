@@ -2,7 +2,7 @@
 
 * Introduction
 
-This is my Emacs configuration file, where I define customizations, packages, and keybindings to suit my workflows.
+This is my Emacs configuration file, where I maintain packages, keybindings and routines/functions to suit my workflows.
 
 * Basic configuration
 Used as a minimal setup configuration (No additional plugins), with UI adjustments
@@ -158,28 +158,31 @@ Different packages are organized as per the categories.
 
 *** Org-roam-server package
 #+BEGIN_SRC emacs-lisp
+  (use-package org-roam-ui
+    :ensure t
+    :after org-roam
+    :config
+    ;;(org-roam-ui-mode)
+    (setq org-roam-ui-sync-theme t
+	   org-roam-ui-follow t
+	   org-roam-ui-update-on-save t
+	   org-roam-ui-open-on-start nil))
 
+  (defun vs_org_roam_ui/start_server()
+    "starting roam ui server."
+    (interactive)
+    (org-roam-ui-open))
 
-(use-package org-roam-ui
-  :ensure t
-  :after org-roam
-  :config
-  (org-roam-ui-mode))
+  (defun vs_org_roam_ui/stop_server()
+    "starting roam ui server."
+    (interactive)
+    (progn
+    (if org-roam-ui-mode (setq org-roam-ui-mode -1))
+    (if org-roam-ui-follow (setq org-roam-ui-follow -1))
+    ))
 
-;;(use-package org-roam-ui
-;;  :straight
-;;    (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
-;;    :after org-roam
-;;;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;;;         a hookable mode anymore, you're advised to pick something yourself
-;;;;         if you don't care about startup time, use
-;;;;  :hook (after-init . org-roam-ui-mode)
-;;    :config
-;;    (setq org-roam-ui-sync-theme t
-;;          org-roam-ui-follow t
-;;          org-roam-ui-update-on-save t
-;;          org-roam-ui-open-on-start t))
-;;
+    ;;(setq org-roam-ui-mode nil)
+    ;;(setq org-roam-ui-follow -1)
 #+END_SRC 
 
 *** Key-binding package
@@ -238,11 +241,12 @@ Different packages are organized as per the categories.
   ;; Set the default capture template
   ;; format for org file mmm_weekno_sprint
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/gtd/jul_28_1.org" "Tasks")
+        '(("t" "Todo" entry (file+headline "~/gtd/aug_32_5_23.org" "Tasks")
            "* TODO %?\n %U\n %a\n %i")))
 
   ;; Set the default agenda files
   (setq org-agenda-files '("~/gtd/scratch_backlog.org"
+                          "~/gtd/aug_32_5_23.org"
                           "~/gtd/jul_27_0.org"
                           "~/gtd/jul_28_1.org"
                           "~/gtd/backlog.org"

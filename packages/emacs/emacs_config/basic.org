@@ -8,15 +8,16 @@ This is my Emacs configuration file, where I maintain packages, keybindings and 
 Used as a minimal setup configuration (No additional plugins), with UI adjustments
 
 #+BEGIN_SRC emacs-lisp
-;; Customize the UI
+;; UI Customization
 (setq inhibit-startup-message t) ; Disable startup message
 (tooltip-mode -1) ; Disable tooltips
 (menu-bar-mode -1) ; Disable the menu bar
 
-;; Fix backup files and directories
+;; TODO: Fix backup files and directories
 ;; (setq auto-save-default nil) ;; Do not create autosave (filename~) files
 ;;(setq auto-save-file-name-transforms `((".*" "~/.emacs.d/autosaves/" t))) ; store autosave files in autosave directory, Prereq - make sure dir is created
 #+END_SRC
+
 
 * Customizations
 Additional UI cutomization like theme, status bar configuration
@@ -60,11 +61,19 @@ Used to write/add custom function
 
 #+END_SRC
 
+* Basic Key Setup 
+setup Keys without any additional packages 
+
+#+BEGIN_SRC emacs-lisp
+; Key bindings for eshell
+(global-set-key (kbd "C-c e") 'eshell)
+#+END_SRC
+
 * Package Setup
 Different packages are organized as per the categories.
 
 ** Package Managers
-** Helper Packages (Man/Help packes)
+** Helper Packages (Man/Help packages)
 #+BEGIN_SRC emacs-lisp
 
   ;; To view the commands executed on right panel 

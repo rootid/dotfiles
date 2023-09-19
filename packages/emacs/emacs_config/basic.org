@@ -250,11 +250,13 @@ Different packages are organized as per the categories.
   ;; Set the default capture template
   ;; format for org file mmm_weekno_sprint
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/gtd/aug_32_5_23.org" "Tasks")
+        '(("t" "Todo" entry (file+headline "~/gtd/sep_38_11_23.org" "Tasks")
            "* TODO %?\n %U\n %a\n %i")))
 
   ;; Set the default agenda files
   (setq org-agenda-files '("~/gtd/scratch_backlog.org"
+                          "~/gtd/sep_38_11_23.org"
+                          "~/gtd/sep_37_10_23.org"
                           "~/gtd/aug_32_5_23.org"
                           "~/gtd/jul_27_0.org"
                           "~/gtd/jul_28_1.org"

@@ -21,7 +21,7 @@ function go_nix_install_macos() {
 # https://github.com/tweag/jupyenv`
   # Nix Flakes - https://dev.to/deciduously/workspace-management-with-nix-flakes-jupyter-notebook-example-2kke
   # https://discourse.nixos.org/t/error-experimental-nix-feature-nix-command-is-disabled/18089/6:x
-  #
+  # https://github.com/jwiegley/nix-config/tree/master
 
 # To start nix shell
 # nix-shell -p nix-info --run "nix-info -m"

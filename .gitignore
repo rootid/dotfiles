@@ -4,3 +4,4 @@ packages/emacs/emacs_config/basic.el
 *~
 bkup
 result
+tmp/

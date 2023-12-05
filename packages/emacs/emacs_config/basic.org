@@ -71,6 +71,22 @@ setup Keys without any additional packages
 * Package Setup
 Different packages are organized as per the categories.
 
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives
+	     '("melpa" . "https://melpa.org/packages/"))
+
+;;(package-initialize)
+
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+	(package-refresh-contents)
+	(package-install 'use-package))
+#+END_SRC
+
+#+RESULTS:
+
 ** Package Managers
 ** Helper Packages (Man/Help packages)
 #+BEGIN_SRC emacs-lisp
@@ -130,6 +146,62 @@ Different packages are organized as per the categories.
      :map minibuffer-local-map ("C-r" . 'counsel-minibuffer-history)) 
      :config (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with 
 
+;(use-package 
+;  ivy-bibtex 
+;  :ensure t)
+;;;(autoload 'ivy-bibtex "ivy-bibtex" "" t)
+;;; ivy-bibtex requires ivy's `ivy--regex-ignore-order` regex builder, which
+;;; ignores the order of regexp tokens when searching for matching candidates.
+;;; Add something like this to your init file:
+;(setq ivy-re-builders-alist
+;      '((ivy-bibtex . ivy--regex-ignore-order)
+;        (t . ivy--regex-plus)))
+;
+;(setq bibtex-completion-bibliography '("~/plain_docs/notes/reference/biblio-1.bib"))
+
+(use-package org-ref
+  :ensure t
+  ;:config
+  ;(setq reftex-default-bibliography '("~/plain_docs/notes/reference/biblio-1.bib"))
+  ; Add other org-ref configuration options as needed
+)
+(setq reftex-default-bibliography '("~/plain_docs/notes/reference/biblio-1.bib"))
+(setq org-ref-default-bibliography '("~/plain_docs/notes/reference/biblio-1.bib")
+      org-ref-pdf-directory "~/plain_docs")
+(setq org-ref-default-citation-link "citep")
+(setq bibtex-dialect 'biblatex)
+(defun my/org-ref-open-pdf-at-point ()
+  "Open the pdf for bibtex key under point if it exists."
+  (interactive)
+  (let* ((results (org-ref-get-bibtex-key-and-file))
+         (key (car results))
+         (pdf-file (car (bibtex-completion-find-pdf key))))
+    (if (file-exists-p pdf-file)
+        (org-open-file pdf-file)
+      (message "No PDF found for %s" key))))
+(setq org-ref-open-pdf-function 'my/org-ref-open-pdf-at-point)
+(setq bibtex-completion-pdf-field "file")
+(setq bibtex-autokey-year-length 4
+      bibtex-autokey-name-year-separator ""
+      bibtex-autokey-year-title-separator ""
+      bibtex-autokey-titleword-separator ""
+      bibtex-autokey-titlewords 0
+      bibtex-autokey-titlewords-stretch 0
+      bibtex-autokey-titleword-length 0)
+(setq org-ref-notes-function 'orb-edit-notes)
+(setq org-ref-note-title-format
+  "* TODO %y -%t
+ :PROPERTIES:
+  :Custom_ID: %k
+  :AUTHOR: %9a
+  :JOURNAL: %j
+  :VOLUME: %v
+  :DOI: %D
+  :URL: %U
+ :END:
+
+")
+
 #+END_SRC
 
 ** Utilities Packages
@@ -137,16 +209,26 @@ Different packages are organized as per the categories.
 *** Org-roam package
 #+BEGIN_SRC emacs-lisp
 (use-package org-roam
-:ensure t
-:custom
-(org-roam-directory "~/plain_docs/notes/pvt")
-:bind (
+  :ensure t
+  :custom
+  (org-roam-directory "~/plain_docs/notes/pvt")
+  :bind (
   ("C-c n l" . 'org-roam-buffer-toggle)
   ("C-c n i" . 'org-roam-node-insert)
   ("C-c n f" . 'org-roam-node-find)
-)
-:config
-(org-roam-setup))
+  :map org-mode-map
+  ("C-M-i" . completion-at-point)
+  :map org-roam-dailies-map
+  ("Y" . org-roam-dailies-capture-yesterday)
+  ("T" . org-roam-dailies-capture-tomorrow))
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)
+  :config
+  (require 'org-roam-dailies) ;; Ensure the keymap is available
+  (org-roam-db-autosync-mode)
+  (org-roam-setup))
+
+(setq org-roam-dailies-directory "~/plain_docs/journal")
 
 ;; Optionally, you can add keybindings for Org-roam commands
 ;;(global-set-key (kbd "C-c n r") 'org-roam-buffer-toggle)
@@ -161,6 +243,46 @@ Different packages are organized as per the categories.
   "Scan the current buffer for Org-ID locations and update them."
   (interactive)
   (org-id-update-id-locations (list (buffer-file-name (current-buffer)))))
+
+(defun jethro/org-roam-node-from-cite (keys-entries)
+    (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
+    (let ((title (citar--format-entry-no-widths (cdr keys-entries)
+                                                "${author editor} :: ${title}")))
+      (org-roam-capture- :templates
+                         '(("r" "reference" plain "%?" :if-new
+                            (file+head "~/plain_docs/notes/reference/${citekey}.org"
+                                       ":PROPERTIES:
+:ROAM_REFS: [cite:@${citekey}]
+:END:
+#+title: ${title}\n")
+                            :immediate-finish t
+                            :unnarrowed t))
+                         :info (list :citekey (car keys-entries))
+                         :node (org-roam-node-create :title title)
+                         :props '(:finalize find-file))))
+
+
+(setq-default bibtex-completion-bibliography "~/plain_docs/notes/reference/biblio-1.bib")
+(setq bibtex-completion-pdf-field "File")
+(setq bibtex-completion-notes-path "~/plain_docs")
+(setq bibtex-completion-notes-template-multiple-files
+ (concat
+  " ${title}\n"
+  "#+ROAM_KEY: cite:${=key=}\n\n\n"
+  "- tags ::\n"
+  "- keywords :: ${keywords}\n\n"
+  "* Meta information\n"
+  ":PROPERTIES:\n"
+  ":Custom_ID: ${=key=}\n"
+  ":INTERLEAVE_PDF: %(orb-process-file-field \"${=key=}\")\n"
+  ":AUTHOR: ${author-abbrev}\n"
+  ":JOURNAL: ${journaltitle}\n"
+  ":DATE: ${date}\n"
+  ":YEAR: ${year}\n"
+  ":DOI: ${doi}\n"
+  ":URL: ${url}\n"
+  ":END:\n\n"
+  ))
 
 #+END_SRC 
 
@@ -249,7 +371,7 @@ Different packages are organized as per the categories.
   ;; Set the default capture template
   ;; format for org file mmm_weekno_sprint
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/gtd/sep_38_11_23.org" "Tasks")
+        '(("t" "Todo" entry (file+headline "~/gtd/scratch_backlog.org" "Tasks")
            "* TODO %?\n %U\n %a\n %i")))
 
   ;; Set the default agenda files
@@ -306,6 +428,7 @@ Different packages are organized as per the categories.
           ))))
 
 (define-key global-map (kbd "C-c c") 'org-capture)
+(define-key global-map (kbd "C-c a") 'org-agenda)
 
 #+END_SRC 
 ** Docs Packages (To manage Smart Notes)

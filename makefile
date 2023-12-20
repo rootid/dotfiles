@@ -21,6 +21,7 @@ dry_run_stow:
 	@stow --simulate zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=5
 
 link_config_files:
+	@stow config --dir=$(HOME_DIR)/dotfiles/ --target=$(HOME_DIR) --verbose=3 # the base config file only for non packaged apps
 	@stow stow --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 	@stow git --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 	@stow zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3

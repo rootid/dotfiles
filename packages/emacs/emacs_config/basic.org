@@ -42,6 +42,8 @@ To Test theme use M-X cutomize-themes and then test all themes
   iodine-theme 
   :config (load-theme 'iodine t))
 
+(set-face-attribute 'default nil :height 155 :family "Monospace")
+
 #+END_SRC
 
 * Custom Macros/Functions 
@@ -206,6 +208,18 @@ Different packages are organized as per the categories.
 
 ** Utilities Packages
 
+
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-download
+  :after org
+  :bind
+  (:map org-mode-map
+        (("s-Y" . org-download-screenshot)
+         ("s-y" . org-download-yank))))
+
+#+END_SRC 
+
 *** Org-roam package
 #+BEGIN_SRC emacs-lisp
 (use-package org-roam
@@ -361,76 +375,6 @@ Different packages are organized as per the categories.
 #+END_SRC 
 ** Planners Packages
 
-*** Org mode package
-#+BEGIN_SRC emacs-lisp
-;; Define a function
-(defun vs/org_mode_config()
-  ;; Set the directory where your Org files are stored
-  (setq org-directory "~/gtd")
-
-  ;; Set the default capture template
-  ;; format for org file mmm_weekno_sprint
-  (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/gtd/scratch_backlog.org" "Tasks")
-           "* TODO %?\n %U\n %a\n %i")))
-
-  ;; Set the default agenda files
-  (setq org-agenda-files '("~/gtd/scratch_backlog.org"
-                          "~/gtd/sep_38_11_23.org"
-                          "~/gtd/sep_37_10_23.org"
-                          "~/gtd/aug_32_5_23.org"
-                          "~/gtd/jul_27_0.org"
-                          "~/gtd/jul_28_1.org"
-                          "~/gtd/backlog.org"
-                          "~/gtd/tickler.org"
-                          "~/gtd/habits.org")
-
-))
-
-(use-package org
-  :ensure t
-  :config
-  ;; Call the function defined outside of `use-package`
-  (vs/org_mode_config))
-
-(setq org-modules '(org-habit))
-
-(custom-set-faces
- '(org-habit ((t (:foreground "green")))))
-
-(setq org-log-into-drawer t)
-(setq org-agenda-log-mode-items '(closed clock state))
-(setq org-agenda-skip-scheduled-if-done nil)
-;; TODO : Fix the agenda 
-(setq org-agenda-custom-commands
-      '(("v" "Next 3 Days"
-         ((agenda ""
-                  ((org-agenda-span 3)
-                   (org-agenda-start-day "+0d"))))
-         )))
-
-(setq org-agenda-custom-commands
-
-      '(("t" "Next Day's Habits"
-         ((agenda ""
-                  ((org-agenda-span 1)
-                   (org-agenda-start-day "+1d")
-                   (org-agenda-show-all-dates nil)
-                   (org-agenda-start-with-log-mode nil)
-                   (org-agenda-skip-scheduled-if-done nil)
-                   (org-agenda-skip-deadline-if-done nil)
-                   (org-agenda-skip-timestamp-if-done nil)
-                   (org-agenda-skip-tag-todo "HOLD/INACTIVE")))
-          (tags-todo "STYLE=\"habit\""
-                     ((org-agenda-overriding-header "Habits")
-                      (org-agenda-skip-function
-                       '(org-agenda-skip-entry-if 'notregexp ":STYLE:"))))
-          ))))
-
-(define-key global-map (kbd "C-c c") 'org-capture)
-(define-key global-map (kbd "C-c a") 'org-agenda)
-
-#+END_SRC 
 ** Docs Packages (To manage Smart Notes)
 ** Ivy and Counsel
 

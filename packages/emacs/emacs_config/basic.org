@@ -225,28 +225,63 @@ Different packages are organized as per the categories.
 (use-package org-roam
   :ensure t
   :custom
-  (org-roam-directory "~/plain_docs/notes/pvt")
-  :bind (
-  ("C-c n l" . 'org-roam-buffer-toggle)
-  ("C-c n i" . 'org-roam-node-insert)
-  ("C-c n f" . 'org-roam-node-find)
-  :map org-mode-map
-  ("C-M-i" . completion-at-point)
-  :map org-roam-dailies-map
-  ("Y" . org-roam-dailies-capture-yesterday)
-  ("T" . org-roam-dailies-capture-tomorrow))
-  :bind-keymap
-  ("C-c n d" . org-roam-dailies-map)
+  (org-roam-directory "~/notes")
+  ;;:bind (
+  ;;("C-c n l" . 'org-roam-buffer-toggle)
+  ;;("C-c n i" . 'org-roam-node-insert)
+  ;;("C-c n f" . 'org-roam-node-find)
+  ;;:map org-mode-map
+  ;;("C-M-i" . completion-at-point)
+  ;;:map org-roam-dailies-map
+  ;;("Y" . org-roam-dailies-capture-yesterday)
+  ;;("T" . org-roam-dailies-capture-tomorrow))
+  ;;:bind-keymap
+  ;;("C-c n d" . org-roam-dailies-map)
   :config
   (require 'org-roam-dailies) ;; Ensure the keymap is available
   (org-roam-db-autosync-mode)
   (org-roam-setup))
 
-(setq org-roam-dailies-directory "~/plain_docs/journal")
+(defun jethro/tag-new-node-as-draft()
+  (interactive)
+  (org-roam-tag-add '("draft")))
+
+;;(add-hook 'org-roam-capture-new-node-hook #'jethro/tag-new-node-as-draft)
+
+(setq org-roam-dailies-directory "~/journal")
+
+
+(defun jethro/org-roam-node-from-cite-1 (keys-entries)
+    (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
+    (let ((title (citar--format-entry-no-widths (cdr keys-entries)
+                                                "${author editor} :: ${title}")))
+      (org-roam-capture- :templates
+                         '(("r" "reference" plain "%?" :if-new
+                            (file+head "~/plain_docs/reference/${citekey}.org"
+                                       ":PROPERTIES:
+:ROAM_REFS: [cite:@${citekey}]
+:END:
+#+title: ${title}\n")
+                            :immediate-finish t
+                            :unnarrowed t))
+                         :info (list :citekey (car keys-entries))
+                         :node (org-roam-node-create :title title)
+                         :props '(:finalize find-file))))
 
 ;; Optionally, you can add keybindings for Org-roam commands
 ;;(global-set-key (kbd "C-c n r") 'org-roam-buffer-toggle)
 ;;(global-set-key (kbd "C-c n f") 'org-roam-node-find)
+
+(global-set-key (kbd "C-c n l") 'org-roam-buffer-toggle)
+(global-set-key (kbd "C-c n f") 'org-roam-node-find)
+(global-set-key (kbd "C-c n i") 'org-roam-node-insert)
+(global-set-key (kbd "C-c n c") 'org-roam-capture)
+(global-set-key (kbd "C-c n g") 'org-roam-graph)
+(global-set-key (kbd "C-c n j") 'org-roam-dailies-capture-today)
+(global-set-key (kbd "C-c n t") 'org-roam-tag-add)
+
+;;(setq org-roam-node-display-template
+;;      (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
 (defun vs_org_roam/org_id_update_org_roam_files ()
   "Update Org-ID locations for all Org-roam files."
@@ -258,7 +293,7 @@ Different packages are organized as per the categories.
   (interactive)
   (org-id-update-id-locations (list (buffer-file-name (current-buffer)))))
 
-(defun jethro/org-roam-node-from-cite (keys-entries)
+(defun jethro/org-roam-node-from-cite-2 (keys-entries)
     (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
     (let ((title (citar--format-entry-no-widths (cdr keys-entries)
                                                 "${author editor} :: ${title}")))

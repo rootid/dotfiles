@@ -1,4 +1,4 @@
-.PHONY: install_homebrew install_omz update_brew_bundle dry_run_stow link_config_files unlink_config_files link_tools unlink_tools link_vim unlink_vim init_vim_packages link_gtd
+.PHONY: install_homebrew install_omz update_brew_bundle dry_run_stow link_config_files unlink_config_files link_tools unlink_tools link_vim unlink_vim init_vim_packages link_org_sys
 
 HOME_DIR = /Users/vmat
 SHELL := /bin/zsh
@@ -64,10 +64,13 @@ init_vim_packages:
 	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-commentary.git  
 	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-surround.git 
 
-link_gtd:
-	# Prreq - first clone the plain_docs directory
-	@stow planner --dir=$(HOME_DIR)/plain_docs --target=$(HOME_DIR) --verbose=3 
-	@stow planner --dir=$(HOME_DIR)/plain_docs --target=$(HOME_DIR) --verbose=3 --simulate
+link_org_sys:
+	# PreReq - first clone the plain_docs directory
+	@stow projects --dir=$(HOME_DIR)/plain_docs --target=$(HOME_DIR) --verbose=3 
+	@stow area --dir=$(HOME_DIR)/plain_docs --target=$(HOME_DIR) --verbose=3 
+	@stow archives --dir=$(HOME_DIR)/plain_docs --target=$(HOME_DIR) --verbose=3 
+	@stow publish --dir=$(HOME_DIR)/plain_docs --target=$(HOME_DIR) --verbose=3 
+	#@stow --delete projects --dir=$(HOME_DIR)/plain_docs --verbose=3 --simulate
 
 #install_python_bins:
 #	@echo "Installing python bins"

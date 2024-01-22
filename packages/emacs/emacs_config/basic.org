@@ -433,7 +433,9 @@ Different packages are organized as per the categories.
 (global-set-key (kbd "C-c w") 'save-buffer)
 #+END_SRC
 
+
 * yasnippet package
+- How to use it?
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure t

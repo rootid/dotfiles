@@ -170,3 +170,6 @@
 #[user]
 #  name = rootid
 #  email = vsinhsawant@gmail.com
+[user]
+	name = rootid
+	email = vsinhsawant@gmail.com

@@ -8,14 +8,25 @@ This is my Emacs configuration file, where I maintain packages, keybindings and 
 Used as a minimal setup configuration (No additional plugins), with UI adjustments
 
 #+BEGIN_SRC emacs-lisp
-;; UI Customization
-(setq inhibit-startup-message t) ; Disable startup message
-(tooltip-mode -1) ; Disable tooltips
-(menu-bar-mode -1) ; Disable the menu bar
+  ;; UI Customization
+  (setq inhibit-startup-message t) ; Disable startup message
+  (tooltip-mode -1) ; Disable tooltips
+  (menu-bar-mode -1) ; Disable the menu bar
 
-;; TODO: Fix backup files and directories
-;; (setq auto-save-default nil) ;; Do not create autosave (filename~) files
-;;(setq auto-save-file-name-transforms `((".*" "~/.emacs.d/autosaves/" t))) ; store autosave files in autosave directory, Prereq - make sure dir is created
+  ;; Disable emacs automatic backup~ file
+  (setq make-backup-files nil)
+
+  ;; Disable creating those #auto-save# files
+  (setq auto-save-default nil)
+
+  ;; Disable locking
+  (setq create-lockfiles nil)
+
+  (setq-default indent-tabs-mode nil)
+  (setq-local lisp-indent-function nil)
+  (setq-local lisp-indent-offset 2)
+  (setq eval-expression-print-level nil)
+(setq eval-expression-print-length nil)
 #+END_SRC
 
 * Customizations
@@ -87,9 +98,9 @@ Different packages are organized as per the categories.
 	(package-install 'use-package))
 #+END_SRC
 
-#+RESULTS:
 
 ** Package Managers
+
 ** Helper Packages (Man/Help packages)
 #+BEGIN_SRC emacs-lisp
 
@@ -208,7 +219,11 @@ Different packages are organized as per the categories.
 
 ** Utilities Packages
 
-
+#+BEGIN_SRC emacs-lisp
+(use-package lispy
+  :ensure t)
+(add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+#+END_SRC 
 
 #+BEGIN_SRC emacs-lisp
 (use-package org-download
@@ -337,31 +352,30 @@ Different packages are organized as per the categories.
 
 *** Org-roam-server package
 #+BEGIN_SRC emacs-lisp
-  (use-package org-roam-ui
-    :ensure t
-    :after org-roam
-    :config
-    ;;(org-roam-ui-mode)
-    (setq org-roam-ui-sync-theme t
-	   org-roam-ui-follow t
-	   org-roam-ui-update-on-save t
-	   org-roam-ui-open-on-start nil))
+(use-package org-roam-ui
+  :ensure t
+  :after org-roam
+  :config
+  ;;(org-roam-ui-mode)
+  (setq org-roam-ui-sync-theme t
+	org-roam-ui-follow t
+	org-roam-ui-update-on-save t
+	org-roam-ui-open-on-start nil))
+(defun vs_org_roam_ui/start_server()
+  "starting roam ui server."
+  (interactive)
+  (org-roam-ui-open))
 
-  (defun vs_org_roam_ui/start_server()
-    "starting roam ui server."
-    (interactive)
-    (org-roam-ui-open))
+    (defun vs_org_roam_ui/stop_server()
+      "starting roam ui server."
+      (interactive)
+      (progn
+      (if org-roam-ui-mode (setq org-roam-ui-mode -1))
+      (if org-roam-ui-follow (setq org-roam-ui-follow -1)))
+    )
 
-  (defun vs_org_roam_ui/stop_server()
-    "starting roam ui server."
-    (interactive)
-    (progn
-    (if org-roam-ui-mode (setq org-roam-ui-mode -1))
-    (if org-roam-ui-follow (setq org-roam-ui-follow -1))
-    ))
-
-    ;;(setq org-roam-ui-mode nil)
-    ;;(setq org-roam-ui-follow -1)
+      ;;(setq org-roam-ui-mode nil)
+      ;;(setq org-roam-ui-follow -1)
 #+END_SRC 
 
 *** Key-binding package
@@ -437,16 +451,16 @@ Different packages are organized as per the categories.
 * yasnippet package
 - How to use it?
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-    :ensure t
-    :hook ((text-mode
-	    prog-mode
-	    conf-mode
-	    snippet-mode) . yas-minor-mode-on)
-    :init
-    (setq yas-snippet-dirs '("~/emacs_snippets"))
-    :config 
-    (yas-global-mode 1))
+(use-package yasnippet
+  :ensure t
+  :hook ((text-mode
+	  prog-mode
+	  conf-mode
+	  snippet-mode) . yas-minor-mode-on)
+  :init
+  (setq yas-snippet-dirs '("~/emacs_snippets"))
+  :config 
+  (yas-global-mode 1))
 #+END_SRC
 
 * Conclusion

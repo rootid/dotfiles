@@ -22,6 +22,11 @@ function go_block_dns() {
   done < $dns_file
 }
 
+function go_block_twitter() {
+   go_block_dns $HOME/.dns-block-media
+   default_block
+}
+
 function go_free_my_time() {
    go_block_dns $HOME/.dns-block-media
    go_block_dns $HOME/.dns-block-leisure

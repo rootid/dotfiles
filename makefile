@@ -73,6 +73,9 @@ unlink_org_sys:
 
 link_org_sys:
 	# PreReq - first clone the plain_docs directory
+	# To add any project 
+	# mkdir ~/Dropbox/projects/<project_name>
+	# make link_org_sys
 	@stow projects --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
 	@stow area --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
 	@stow archives --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 

@@ -1,0 +1,20 @@
+#name : PARA
+# --
+** $0 [/]
+:PROPERTIES:
+:CATEGORY: $1
+:VISIBILITY: folded
+:COOKIE_DATA: recursive todo
+:END:
+*** Area                :notes:
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+*** Resources           :info:
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+*** Tasks               :tasks:
+:PROPERTIES:
+:VISIBILITY: content
+:END:

@@ -41,7 +41,7 @@ source $ROOT_DIR/gpg/functions.sh
 source $ROOT_DIR/os_utils/functions.sh
 
 # Toggle
-source $ROOT_DIR/toggl/functions.sh
+#source $ROOT_DIR/toggl/functions.sh
 
 # Tmux
 source $ROOT_DIR/tmux/aliases.sh

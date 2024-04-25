@@ -1,0 +1,15 @@
+#name : BOOK_REVIEW_NONFICTION
+* Title
+:PROPERTIES:
+:ID:       `(shell-command-to-string "uuidgen")`:CREATED: `(with-temp-buffer (org-insert-time-stamp (current-time) t t))`
+:Links:    $0
+:Author:   Liu Cixin
+:Genre:    non-fiction
+:Idea:     $1 
+:Pages:    302
+:END:
+* Introduction
+* Summary
+* Key Takeaways (3)
+* Action Items
+* Questions

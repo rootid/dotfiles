@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       `(shell-command-to-string "uuidgen")`:CREATED: `(with-temp-buffer (org-insert-time-stamp (current-time) t t))`
+:Links:    $0
+:Author:   $1
+:Genre:    non-fiction
+:Idea:     $2
+:Pages:    42
+:END:

@@ -6,6 +6,10 @@
 :VISIBILITY: folded
 :COOKIE_DATA: recursive todo
 :END:
+*** Tasks               :tasks:
+:PROPERTIES:
+:VISIBILITY: content
+:END:
 *** Area                :notes:
 :PROPERTIES:
 :VISIBILITY: folded
@@ -13,8 +17,4 @@
 *** Resources           :info:
 :PROPERTIES:
 :VISIBILITY: folded
-:END:
-*** Tasks               :tasks:
-:PROPERTIES:
-:VISIBILITY: content
 :END:

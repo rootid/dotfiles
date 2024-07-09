@@ -33,20 +33,10 @@ function go_free_my_time() {
    default_block
 }
 
-function go_slave_mode() {
-  sudo sed -i -e "/0.0.0.0/d" /etc/hosts
-  default_block
-}
-
 function default_block() {
    go_block_dns $HOME/.dns-block-adult
 }
 
 function go_freedom_youtube() {
    go_block_dns $HOME/.dns-block-youtube
-}
-
-function go_slave_leisure() {
-   go_slave_mode
-   go_block_dns $HOME/.dns-block-media
 }

@@ -7,6 +7,20 @@ function go_get_week_number() {
   ${PYTHON} ${TOP_DIR}/go_get_week_number.py
 }
 
+function go_setup_java_project() {
+
+# Prereq - setup mvn envriorment
+
+# Set follwing values in .envrc
+#GROUP_ID=com.coffee
+#PROJECT_NAME=hello-world
+
+mvn archetype:generate -DgroupId=$GROUP_ID \
+-DartifactId=$PROJECT_NAME \
+-DarchetypeArtifactId=maven-archetype-quickstart \
+ -DinteractiveMode=false
+}
+
 # Copied from Freedom 
 # TODO: Firefox persist the cached DNS records, so update the DNS records using firefox "open about:networking#dns"
 # Set up the cron job

@@ -104,3 +104,4 @@ source $HOME/.my_sh_workflow
 export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home
 export PATH="$JAVA_HOME/bin:$PATH"
+eval "$(direnv hook zsh)"

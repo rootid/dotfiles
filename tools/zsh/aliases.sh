@@ -5,4 +5,4 @@ function go_show_disk_usage() {
 alias lr='ls -ltr'
 alias vi='vim -u NONE'
 alias vlc=/Applications/VLC.app/Contents/MacOS/VLC
-alias python=/usr/local/bin/python3
+alias python=`which python3` 

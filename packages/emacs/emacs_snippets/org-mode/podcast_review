@@ -1,0 +1,12 @@
+* Episode Name
+:PROPERTIES:
+:ID:       `(shell-command-to-string "uuidgen")`:CREATED: `(with-temp-buffer (org-insert-time-stamp (current-time) t t))`
+:Links:    $0
+:Genre:    health
+:Idea:     $1 
+:END:
+** Action Items
+** Key Takeaways (3)
+** Summary
+** Questions
+** Things TODO

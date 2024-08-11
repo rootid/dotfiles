@@ -64,12 +64,20 @@ init_vim_packages:
 	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-commentary.git  
 	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-surround.git 
 
-unlink_org_sys:
 	#@stow --delete publish --dir=$(HOME_DIR)/plain_docs --verbose=3
 	#@stow --delete projects --dir=$(HOME_DIR)/plain_docs --verbose=3
-	#@stow --delete area --dir=$(HOME_DIR)/plain_docs --verbose=3
 	#@stow --delete archives --dir=$(HOME_DIR)/plain_docs --verbose=3
 	#@stow --delete publish --dir=$(HOME_DIR)/plain_docs --verbose=3 --simulate
+
+unlink_org_sys:
+	#@stow --delete area --dir=$(HOME_DIR)/Dropbox/plain_docs --verbose=3
+	#@stow --delete others  --dir=$(HOME_DIR)/Dropbox/plain_docs/area --verbose=3
+	#@stow --delete books   --dir=$(HOME_DIR)/Dropbox/plain_docs/area --verbose=3
+	#@stow --delete courses  --dir=$(HOME_DIR)/Dropbox/plain_docs/area --verbose=3
+	@stow --simulate area --target=$(HOME_DIR) --dir=$(HOME_DIR)/Dropbox/plain_docs --ignore='v1|journal|books|course' --verbose=3  
+	#--no-folding
+
+#courses -> Dropbox/plain_docs/area/courses
 
 link_org_sys:
 	# PreReq - first clone the plain_docs directory
@@ -77,9 +85,11 @@ link_org_sys:
 	# mkdir ~/Dropbox/projects/<project_name>
 	# make link_org_sys
 	@stow projects --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
-	@stow area --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
 	@stow archives --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
 	@stow publish --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
+	# Keep only first level stow directories 
+	#@stow --target=$(HOME_DIR) --dir=$(HOME_DIR)/Dropbox/plain_docs --ignore='jour*' area --verbose=3  
+	ln -s $(HOME_DIR)/Dropbox/plain_docs/area ~/area
 
 #install_python_bins:
 #	@echo "Installing python bins"

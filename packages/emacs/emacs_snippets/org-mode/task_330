@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: task_330
+# key: task_330
+# --
+*** TODO ${1:Task Name} :problem_solving:
+SCHEDULED: `(format-time-string "<%Y-%m-%d %a ")>`3:30>
+:PROPERTIES:
+:CREATED: `(format-time-string "<%Y-%m-%d %a %H:%M>")`
+:ESTIMATED_TIME: ${2:30}min
+:END:
+$0

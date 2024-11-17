@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: leet
+# key: leet
+# --
+** ${7:ADD_LINK}
+:PROPERTIES:
+:LEVEL:${1:$$(yas-choose-value '(" Easy" " Medium" " Hard"))} 
+:EFFORT:${2:$$(yas-choose-value '(" 15:00" " 30:00" " 45:00" " 60:00" " 90:00"))}
+:SHORT_COMMENT: ${3:SHORT_CMT}
+:COMMENT: ${4:SHORT_CMT}
+:WHEN: `(format-time-string " [%Y-%m-%d %a")`]
+:END:
+$0

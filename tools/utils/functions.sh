@@ -3,8 +3,22 @@
 TOP_DIR=${HOME}/utils
 PYTHON=python3.11
 
+CURSOR_HOME=/Applications/Cursor.app/Contents/MacOS
+export PATH="$CURSOR_HOME:$PATH"
+
+IDEA_HOME_DUP=/Applications/IntelliJ_IDEA_CE.app/Contents/MacOS
+export PATH="$IDEA_HOME_DUP:$PATH"
+
 function go_get_week_number() {
   ${PYTHON} ${TOP_DIR}/go_get_week_number.py
+}
+
+function go_open_ide_intellij() {
+  idea
+}
+
+function go_open_ide_cursor() {
+  Cursor
 }
 
 function go_setup_java_project() {

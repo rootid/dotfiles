@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: word
+# key: word
+# --
+** ${2:WORD}
+:PROPERTIES:
+:POS:${1:$$(yas-choose-value '(" N" " V" " ADJ" " ADV" " PHR"))} 
+:STATUS: TODO
+:SOURCE: ${3:SRC}
+:CONTEXT: ${4:CON}
+:SYN: ${5:SYN}
+:ANT: ${6:ANT}
+:WHEN: `(format-time-string " [%Y-%m-%d %a")`]
+:END:
+
+*** Usage                :notes:
+$0

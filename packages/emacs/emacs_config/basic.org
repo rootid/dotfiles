@@ -1,8 +1,3 @@
-* Errors
-⛔ Error (use-package): org-roam/:config: Opening directory: No such file or directory, /Users/vmat/org-roam-notes
-⛔ Warning (emacs): The package embark-consult should be installed if you use both Embark and Consult
-⛔ Warning (emacs): The package embark-consult should be installed if you use both Embark and Consul
-
 * Expt
 ;;#+begin_src emacs-lisp
 ;;(use-package org-ql
@@ -140,7 +135,8 @@ Includes modeline configuration, file save configuration, 2 spaces
   (setq-local lisp-indent-offset 2)
 #+END_SRC
 
-* Shortcuts to Open Browser - TODO - Create different types of workflows with one click and Hydra
+* Shortcuts to Open Browser
+TODO - Create different types of workflows with one click and Hydra
 TODO Use the Hydra to automate the workflows 
 Open all applications and web pages and different types web application
 #+BEGIN_SRC emacs-lisp
@@ -307,35 +303,9 @@ Open all applications and web pages and different types web application
              (file+headline "~/idea_marketplace/ideas.org" "Idea MarketPlace")
              (file "~/templates/tpl_idea.txt")
                :empty-lines-before 1)
-            ("t" "Self Instrumentation Entry") 
-            ("tc" "Craving Tracker" table-line (file+headline "~/tracker/tracker.org" "Craving Tracker") 
-             (file "~/templates/tpl_craving.txt") :kill-buffer t)
-            ("tp" "Pain,Pleasure Tracker" table-line (file+headline "~/tracker/tracker.org" "Pain,Pleasure Tracker") 
-             (file "~/templates/tpl_pain_pleasure.txt") :kill-buffer t)
-            ("tb" "Self Binding Tracker" table-line (file+headline "~/tracker/tracker.org" "Self Binding Tracker") 
-             (file "~/templates/tpl_dopamine.txt") :kill-buffer t)
-            ("te" "Energy Tracker" table-line (file+headline "~/tracker/tracker.org" "Energy Tracker") 
-             (file "~/templates/tpl_energy_tracker.txt") :kill-buffer t)
-            ("tw" "Water Tracker" table-line (file+headline "~/tracker/tracker.org" "Water Tracker") 
-             (file "~/templates/tpl_water_tracker.txt") :kill-buffer t)
-            ("ts" "Typing Speed" table-line (file+headline "~/tracker/tracker.org" "Typing Speed Tracker") 
-             (file "~/templates/tpl_typing_speed_tracker.txt") :kill-buffer t)
-            ("j" "Create Journal Entry") 
-            ("jd" "Daily Journal Entry" entry (file+olp+datetree "~/tracker/journal.org") "* %?\nEntered on %U\n  %i\n  %a")
-            ("jq" "Daily Journal Entry" table-line (file+headline "~/tracker/tracker.org" "Craving Tracker") 
-             (file "~/templates/tpl_craving.txt") :kill-buffer t)
-            ("p" "Create a daily plan") 
-            ("pr" "Daily plan" DailyPlan 
-             (file+function "~/review/daily_review.org" org-reverse-datetree-goto-date-in-file) 
-             (file "~/templates/tpl_dailyplan.txt") 
-             :clock-in t :clock-resume t :prepend t :empty-lines-after 2)))
+            ("j" "Create Daily Journal" entry 
+            (file+function "~/area/v1/denote/notes/20241201T173755--Journal__daily_journal.org" org-reverse-datetree-goto-date-in-file) "* %?\nEntered on %U\n  %i\n  %a")))
 
-    ;; Refile using - C-c C-w
-    ;;(setq org-refile-targets
-    ;;      '((("~/gtd/projects.org") :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)") ;; Deleted archieved
-    ;;        (("~/done/done_projects.org") :maxlevel . 3)))
-
-    ;;(setq org-refile-use-outline-path t)
     (setq org-refile-use-outline-path 'file)
     (setq org-outline-path-complete-in-steps nil)
 
@@ -352,26 +322,6 @@ Open all applications and web pages and different types web application
             (todo   . " ")
             (tags   . " %i %-12:c")
             (search . " %i %-12:c")))
-
-  ;;(setq org-agenda-custom-commands
-  ;;     ((org-agenda-files
-  ;;     (directory-files-recursively
-  ;;      "/Users/vmat/Dropbox/plain_docs/area/v1/denote/books" "\\.org$"))
-  ;;     (org-overriding-columns-format
-  ;;     "%40item %10todo %10author %20Links")
-  ;;     ;;(org-agenda-cmp-user-defined
-  ;;     ;;(cmp-date-property-stamp "Start")
-  ;;      ;;)
-  ;;     (org-agenda-sorting-strategy
-  ;;    '(user-defined-down))
-  ;;       (org-agenda-overriding-header "C-u r to re-run Type={.}")
-  ;;       (org-agenda-mode-hook
-  ;;     (lambda ()
-  ;;       (visual-line-mode -1)
-  ;;       (setq truncate-lines 1)
-  ;;       (setq display-line-numbers-offset -1)
-  ;;       (display-line-numbers-mode 1)))
-  ;;    (org-agenda-view-columns-initially t)))
 
     ;; Automatic saving after refilling
     (setq org-agenda-files 
@@ -399,21 +349,70 @@ Open all applications and web pages and different types web application
 
 #+BEGIN_SRC emacs-lisp
 
-(defun vs_org/opened_buffer_files ()
-  "Return the list of files currently opened in emacs"
-  (delq nil
-        (mapcar (lambda (x)
-                  (if (and (buffer-file-name x)
-                           (string-match "\\.org$"
-                                         (buffer-file-name x)))
-                      (buffer-file-name x)))
-                (buffer-list))))
+  (defun vs_org/opened_buffer_files ()
+    "Return the list of files currently opened in emacs"
+    (delq nil
+          (mapcar (lambda (x)
+                    (if (and (buffer-file-name x)
+                             (string-match "\\.org$"
+                                           (buffer-file-name x)))
+                        (buffer-file-name x)))
+                  (buffer-list))))
 
-(defun vs_org/switch_refile_to_buffers() "Show Projects in Pipeline." 
-  (interactive)
-  (setq org-refile-targets '((vs_org/opened_buffer_files :maxlevel . 9)))
-  (setq org-refile-use-outline-path 'file))
+  (defun vs_org/switch_refile_to_buffers() "Show Projects in Pipeline." 
+         (interactive)
+         (setq org-refile-targets '((vs_org/opened_buffer_files :maxlevel . 9)))
+         (setq org-refile-use-outline-path 'file))
 
+
+  (defun vs_org/archive_cancelled_tasks ()
+    "Archive all cancelled tasks in the current buffer or region. A cancelled task is one with a CANCELLED keyword state."
+    (interactive)
+    (let ((count 0))
+      (if (region-active-p)
+          (org-map-entries
+           (lambda ()
+             (when (string= (org-get-todo-state) "CANCELLED")
+               (setq count (1+ count))
+               (org-archive-subtree)))
+           nil 'region)
+        (org-map-entries
+         (lambda ()
+           (when (string= (org-get-todo-state) "CANCELLED")
+             (setq count (1+ count))
+             (org-archive-subtree)))))
+      (message "Archived %d cancelled task%s"
+               count (if (= count 1) "" "s"))))
+
+  ;; Optional: Add a key binding
+  (global-set-key (kbd "C-c C-x C-a") 'vs_org/archive_cancelled_tasks)
+
+  (defun vs_org/schedule_task (days-ahead start-time duration)
+    "Schedule an interval in Org mode DAYS-AHEAD from today, at START-TIME, for DURATION minutes.
+  DAYS-AHEAD is number of days from today (0 = today)
+  START-TIME should be in 'HH:MM' format
+  DURATION should be in minutes"
+    (interactive 
+     (list 
+      (read-number "Days ahead (0 for today): ")
+      (read-string "Start time (HH:MM): ")
+      (read-number "Duration (minutes): ")))
+
+    (let* ((date (format-time-string "%Y-%m-%d" 
+                                     (time-add (current-time) 
+                                               (days-to-time days-ahead))))
+           (time-parts (split-string start-time ":"))
+           (hours (string-to-number (car time-parts)))
+           (minutes (string-to-number (cadr time-parts)))
+           (end-minutes (+ minutes duration))
+           (end-hours (+ hours (/ end-minutes 60)))
+           (end-minutes-final (mod end-minutes 60))
+           (end-time (format "%02d:%02d" end-hours end-minutes-final)))
+
+      (org-schedule nil (format "%s %s-%s" date start-time end-time))
+
+      (org-set-property "SCHEDULED_INTERVAL" 
+                        (format "%s %s-%s" date start-time end-time))))
 #+END_SRC 
 
 * Org Mode Helper Packages
@@ -427,14 +426,19 @@ Open all applications and web pages and different types web application
 ** Reverse Date Tree
 Use this package to log the journal and review entries in descending date order
 #+BEGIN_SRC emacs-lisp
-  (use-package org-reverse-datetree
+;;  (use-package org-reverse-datetree
+;;    :ensure t)
+;;  (setq-default org-reverse-datetree-level-formats
+;;                '("%Y"                    ; year
+;;                  (lambda (time) (format-time-string "W%W/%m" (org-reverse-datetree-sunday time))) ; month
+;;                  "%d-%A"  ; date))
+
+(use-package org-reverse-datetree
     :ensure t)
-  (setq-default org-reverse-datetree-level-formats
-                '("%Y"                    ; year
-                  (lambda (time) (format-time-string "%Y-%m %B" (org-reverse-datetree-monday time))) ; month
-                  "%Y W%W"                ; week
-                  "%Y-%m-%d %A"           ; date
-                  ))
+(setq-default org-reverse-datetree-level-formats
+              '("%Y"                    ; year
+                (lambda (time) (format-time-string "W%W/%m" (org-reverse-datetree-sunday time))) ; month
+                "%d-%A"))  
 
 #+END_SRC 
 
@@ -450,7 +454,7 @@ Use this package to log the journal and review entries in descending date order
 ;;(global-set-key (kbd "C-c r") 'my/org-refile-within-file)
 #+END_SRC 
 
-** yasnippet package
+** Yasnippet package
 - Why? 
 Org mode template to add structured content
 - How to use it?
@@ -468,73 +472,6 @@ Verify the sub directory path to copy the path
     :config 
     (yas-global-mode 1))
 #+END_SRC
-
-** Emacs Theme
-- Why?
-Limited number of themes are avaiable
-- How?
-Go to page to view the avaiable theme and try one at a time
-#+BEGIN_SRC emacs-lisp
-;;(use-package gruvbox-theme
-;;  :ensure t
-;;  :config (load-theme 'gruvbox t))
-;;
-;;(custom-set-faces
-;; '(default ((t (:background "black" :foreground "white")))))
-;;
-;;(set-face-attribute 'default nil :height 155 :family "Monospace")
-
-#+END_SRC 
-
-#+begin_src emacs-lisp
-
-(global-set-key (kbd "C-c n c") #'org-id-get-create)
-
-(use-package org-roam
-  :ensure t
-  :init
-  (setq org-roam-v2-ack t)
-  :custom
-  (org-roam-directory (file-truename "~/Dropbox/plain_docs/area/v1/roam/projects")
-  (org-roam-completion-everywhere t))
-  :bind (("C-h l" . org-roam-buffer-toggle)
-         ("C-h d" . org-roam-find-directory)
-         ("C-h /" . org-roam-node-find)
-         ("C-h 0" . org-roam-capture)
-         ("C-h i" . org-roam-node-insert)
-         ("C-h g" . org-roam-graph)
-         ;; Dailies
-         ("C-c n j" . org-roam-dailies-capture-today)
-         :map org-mode-map
-         ("C-M-i"    . completion-at-point))
-  :config
-  ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-  (org-roam-db-autosync-mode) ;; Create/build org roam cache 
-  (org-roam-setup)
-  ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
-
-;; Resolve symlink, impacts performance
-(setq find-file-visit-truename t)
-#+END_SRC 
-
-** Helper method to switch the directories
-
-#+begin_src emacs-lisp
-(defun vs_org_roam/switch_project ()
-    "Switch org roam to project"
-    (interactive)
-    (setq org-roam-directory "~/Dropbox/plain_docs/area/v1/roam/projects")  
-    (setq org-roam-db-location "~/Dropbox/plain_docs/area/v1/roam/projects/org-roam.db"))
-
-(defun vs_org_roam/switch_notes ()
-    "Switch org roam to project"
-    (interactive)
-    (setq org-roam-directory "~/Dropbox/plain_docs/area/v1/roam/draft")  
-    (setq org-roam-db-location "~/Dropbox/plain_docs/area/v1/roam/draft/org-roam.db"))
-#+end_src
-
 ** Denote package
 Use the package to capture the notes
 #+begin_src emacs-lisp
@@ -608,21 +545,20 @@ Use the package to capture the notes
 
 ** Deft package
 #+begin_src emacs_lisp
-(use-package deft
-  :ensure t
-  )
-    (setq deft-default-extension "md")
-    (setq deft-extensions '("md"))
-    (setq deft-directory "~/tutorial/org-mode-source/Podcasts")
-    (setq deft-recursive t)
-    (setq deft-use-filename-as-title nil)
-    (setq deft-use-filter-string-for-filename t)
-    (setq deft-file-naming-rules '((noslash . "-")
-                                   (nospace . "-")
-                                   (case-fn . downcase)))
-    (setq deft-text-mode 'org-mode)
-    (global-set-key (kbd "C-M-S-s-d") 'deft)
-    (global-set-key (kbd "C-x C-g") 'deft-find-file)
+ (use-package deft
+  :ensure t)
+ (setq deft-default-extension "md")
+ (setq deft-extensions '("md"))
+ (setq deft-directory "~/tutorial/org-mode-source/Podcasts")
+ (setq deft-recursive t)
+ (setq deft-use-filename-as-title nil)
+ (setq deft-use-filter-string-for-filename t)
+ (setq deft-file-naming-rules '((noslash . "-")
+                                (nospace . "-")
+                                (case-fn . downcase)))
+ (setq deft-text-mode 'org-mode)
+ (global-set-key (kbd "C-M-S-s-d") 'deft)
+ (global-set-key (kbd "C-x C-g") 'deft-find-file)
 #+end_src
 
 ** Navigation packages
@@ -757,7 +693,9 @@ Use the package to capture the notes
           ("Notes"  ?n "~/Dropbox/plain_docs/area/v1/denote/notes")))
 #+end_src
 
-* Startup
+
+
+* Header
 #+STARTUP: hidestars overview
 #+ARCHIVE: ~/org_archive/%s_archive::
 #+AUTHOR: Vikram 

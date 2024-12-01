@@ -1,17 +1,130 @@
-#+TITLE: Emacs Configuration
+* Errors
+⛔ Error (use-package): org-roam/:config: Opening directory: No such file or directory, /Users/vmat/org-roam-notes
+⛔ Warning (emacs): The package embark-consult should be installed if you use both Embark and Consult
+⛔ Warning (emacs): The package embark-consult should be installed if you use both Embark and Consul
 
-* Introduction
+* Expt
+;;#+begin_src emacs-lisp
+;;(use-package org-ql
+;;  :ensure t)
+;;
+;;#+end_src
 
-This is my Emacs configuration file, where I maintain packages, keybindings and routines/functions to suit my workflows.
+* Basic Key Bindings
+Use key strokes economically. Refer - [[https://sites.google.com/site/steveyegge2/effective-emacs][Efffective Emacs From Yegge]] 
 
-* Basic configuration
-Used as a minimal setup configuration (No additional plugins), with UI adjustments
+#+begin_src emacs-lisp
+  ;; M-x alternative
+  (global-set-key (kbd "C-x C-m") 'execute-extended-command)
+  ;; Open shell 
+  (global-set-key (kbd "C-c e") 'eshell)
+  
+  ;; Todo Verify usefulness o/w delete it
+  (global-set-key (kbd "C-c f") 'find-file)
+  (global-set-key (kbd "C-c b") 'switch-to-buffer)
+  (global-set-key (kbd "C-c w") 'save-buffer)
+#+end_src
+
+* Emacs Code Formatter
+Format elisp code in Org mode file
 
 #+BEGIN_SRC emacs-lisp
-  ;; UI Customization
-  (setq inhibit-startup-message t) ; Disable startup message
-  (tooltip-mode -1) ; Disable tooltips
-  (menu-bar-mode -1) ; Disable the menu bar
+  ;; No tabs
+  (setq-default tab-always-indent t) 
+
+  (defun vs_utils/indent_org_block_automatically ()
+    (interactive)
+    (when (org-in-src-block-p)
+      (org-edit-special)
+      (indent-region (point-min) (point-max))
+      (org-edit-src-exit)))
+
+  (define-key org-mode-map
+              (kbd "C-c C-i") #'vs_utils/indent_org_block_automatically)
+
+#+END_SRC
+
+** Use of Nano
+#+BEGIN_SRC emacs-lisp
+
+  (straight-use-package
+   '(nano :type git :host github :repo "rougier/nano-emacs"))
+
+  ;;(use-package nano
+  ;;  :ensure t)
+
+  ;;(set-face-attribute 'bold nil :weight 'bold :height 160)
+  (setq nano-font-family-monospaced "Roboto Mono")
+  (set-face-attribute 'default nil :height 148)
+
+#+END_SRC
+
+* Emacs Helper Packages 
+** Why? - Use Vim Modal editing keystorkes.
+#+BEGIN_SRC emacs-lisp
+  (use-package 
+    evil 
+    :ensure t 
+    :config 
+    (evil-mode 1) 
+    )
+#+END_SRC
+** To learn Emacs key maps.
+** How? - Adds a completion panel for commands.
+
+#+begin_src emacs-lisp
+(use-package which-key
+  :defer 0
+  :diminish which-key-mode
+  :config
+  (which-key-mode)
+  (setq which-key-idle-delay 1))
+#+end_src
+
+** Hydra package
+- To quickly open directories and files
+- Reduce context switching time
+
+#+begin_src emacs-lisp
+
+  (use-package hydra
+    :ensure t)
+
+  (defhydra hydra-zoom (global-map "<f2>")
+    "zoom"
+    ("g" text-scale-increase "in")
+    ("l" text-scale-decrease "out"))
+
+  (defhydra hydra-dired (:exit t)
+    "dired navigation"
+    ("g" (dired "~/gtd") "GTD")
+    ("c" (dired "~/backlog") "Capture")
+    ("r" (dired "~/review") "Review")
+    ("w" (dired "~/Downloads") "Downloads")
+    ("d" (dired "~/Documents") "Documents"))
+
+  (global-set-key (kbd "C-c d") 'hydra-dired/body)
+
+#+end_src
+
+* Emacs Helper Functions
+#+begin_src emacs-lisp
+  (defun reload-init-file ()
+    (interactive)
+    (load-file user-init-file))
+
+  (global-set-key (kbd "<f5>") 'reload-init-file)
+
+#+end_src
+
+* Basic configuration
+
+Includes modeline configuration, file save configuration, 2 spaces
+
+#+BEGIN_SRC emacs-lisp
+  (display-time-mode 1)
+  (setq display-time-24hr-format t)
+  (setq display-time-format "%H:%M")
 
   ;; Disable emacs automatic backup~ file
   (setq make-backup-files nil)
@@ -25,444 +138,632 @@ Used as a minimal setup configuration (No additional plugins), with UI adjustmen
   (setq-default indent-tabs-mode nil)
   (setq-local lisp-indent-function nil)
   (setq-local lisp-indent-offset 2)
-  (setq eval-expression-print-level nil)
-(setq eval-expression-print-length nil)
 #+END_SRC
 
-* Customizations
-Additional UI cutomization like theme, status bar configuration
-
-** Theme
-How to evaluate themes quickly and iteratively? 
-To Test theme use M-X cutomize-themes and then test all themes
+* Shortcuts to Open Browser - TODO - Create different types of workflows with one click and Hydra
+TODO Use the Hydra to automate the workflows 
+Open all applications and web pages and different types web application
 #+BEGIN_SRC emacs-lisp
-;; TODO - how to pull all the theme to test/evaluate?
-;;(use-package doom-themes
-;;    :config
-;;    (load-theme 'doom-wilmersdorf t))
+  (defun open-web-page (url)
+    "Open a web page in the default browser."
+    (interactive "sEnter URL: ")
+    (browse-url url))
 
-;; Fix all icon issue
-;;(use-package all-the-icons
-;;  :ensure t)
-;;(use-package doom-modeline
-;;    :ensure t
-;;    :init (doom-modeline-mode 1)
-;;    :custom ((doom-modeline-height 15)))
+  (defun go_open_ymusic ()
+    (interactive)
+  (open-web-page "https://music.youtube.com"))
 
-(use-package 
-  iodine-theme 
-  :config (load-theme 'iodine t))
+  (global-set-key (kbd "C-c y") 'go_open_ymusic)
+#+END_SRC 
 
-(set-face-attribute 'default nil :height 155 :family "Monospace")
+* Org mode configuration
+** Org mode packages
+
+#+BEGIN_SRC emacs-lisp
+    (use-package org
+      :ensure t)
+  
+    (use-package ox-twbs
+      :ensure t
+      :after org)
+
+    (use-package org-bullets
+      :ensure t
+      :config
+      (setq org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●"))
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+    (setq org-babel-python-command "python3")
+    (setq org-plantuml-jar-path (expand-file-name "~/projects/org_mode/org-mode-test/plantuml-1.2024.5.jar"))
+    (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (python . t)
+       (shell . t)
+       (java . t)
+       (C . t)
+       (ruby . t)
+       (R . t)
+       (dot . t)
+       (plantuml . t)
+       (org . t)))
+
+    ;; Set Org directory
+    (setq org-directory "~/gtd")
+    ;;(setq org-agenda-files '("backlog.org" "projects.org" "tickler.org"))
+
+    (setq org-attach-id-dir "~/org_attach/")
+
+    (setq org-modules '(org-habit))
+    (setq org-habit-graph-column 70)
+    (setq org-habit-show-habits-only-for-today nil) ;; To display if we're on track for habit
+    (setq org-agenda-skip-scheduled-if-done nil)
+    ;; TODO use these
+    ;;(ol-bbdb ol-bibtex ol-docview ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m)))
+    (setq org-export-backends '(ascii beamer html icalendar latex odt))
+
+    (use-package ox-epub
+      :after org
+      :commands (org-export-dispatch))
+
+    (defun move-cancelled-tasks-to-archive ()
+    "Move cancelled tasks to the archive."
+    (interactive)
+    (save-mark-and-excursion
+      (org-map-entries
+       (lambda ()
+         (when (string= (org-get-todo-state) "CANCELLED")
+           (org-archive-subtree))))
+       "/+CANCELLED" 'file))
+
+    ;; Bind the function to a key
+    (global-set-key (kbd "C-c C-x a") 'move-cancelled-tasks-to-archive)
+
+    ;; FixME
+    ;; Define a function to export Org files to HTML
+    ;;(defun my-export-to-html ()
+    ;;  "Export the current Org file to HTML."
+    ;;  (interactive)
+    ;;  (org-export-to-file 'html (concat (buffer-file-name) ".html") nil))
+    ;;
+           ;;;; Customize key binding for HTML export
+    ;;(global-set-key (kbd "C-c e h") 'my-export-to-html)
+
+    (defun vs/gtd_copy_id_to_clipboard() "Copy an ID link with the
+             headline to killring, if no ID is there then create a new unique
+           ID.  This function works only in org-mode or org-agenda buffers. 
+           The purpose of this function is to easily construct id:-links to 
+           org-mode items. If its assigned to a key it saves you marking the
+           text and copying to the killring."
+           (interactive)
+           (when (eq major-mode 'org-agenda-mode) ;if we are in agenda mode we switch to orgmode
+             (org-agenda-show)
+             (org-agenda-goto))       
+           (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+             (setq mytmphead (nth 4 (org-heading-components)))
+             (setq mytmpid (funcall 'org-id-get-create))
+             (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
+             (kill-new mytmplink)
+             (message "Copied %s to killring (clipboard)" mytmplink)))
+    (global-set-key (kbd "C-c i") 'vs/gtd_copy_id_to_clipboard)
+    (global-set-key (kbd "C-c c") 'org-capture)
+    (global-set-key (kbd "C-c a") 'org-agenda)
+    (define-key org-mode-map (kbd "C-c o") 'org-open-at-point)
+
+    (evil-define-key 'normal org-mode-map (kbd "TAB") 'org-cycle) ;; C-h k <TAB> to confirm override
+
+    (setq org-log-into-drawer t) ;; C-c C-z - start notes
+    (setq org-clock-into-drawer "CLOCKING")
+    (setq org-log-reschedule 'time) ;; To disable - (setq org-log-reschedule nil)
+    (setq org-log-done 'note) ;; To disable - (setq org-log-done nil)
+    (setq org-clock-sound t)
+
+    (defun vs_org/gtd_show_mobile() "Show tasks from Mobile." 
+           (interactive)
+           (setq org-agenda-files '("~/beorg/inbox.org")))
+
+    (defun vs_org/open_inbox()
+          (interactive)
+          (find-file "~/beorg/inbox.org")) 
+
+    (defun vs_org/org_show_scratch() "Show Scratch Org." 
+           (interactive)
+           (setq org-agenda-files '("task.org")))
+
+    ;; Org capture template
+    (setq org-capture-templates
+          '(("c" "Capture Task, Book, Media")
+            ("ct" "TODO entry" entry
+             (file+headline "~/backlog/backlog.org" "Backlog")
+             (file "~/templates/tpl_todo.txt")
+              :empty-lines-before 1)
+            ("cb" "Add Book to Read/Listen" entry
+             (file+headline "~/backlog/books.org" "Books To Read/Listen")
+             (file "~/templates/tpl_book.txt")
+              :empty-lines-before 1)
+            ("cm" "Media to Watch/Listen" entry
+             (file+headline "~/backlog/media.org" "Media to Watch/Listen")
+             (file "~/templates/tpl_media.txt")
+               :empty-lines-before 1)
+            ("cl" "Bookmark" entry
+             (file+headline "~/backlog/bookmark.org" "Bookmarks")
+             (file "~/templates/tpl_bookmark.txt")
+               :empty-lines-before 1)
+            ("cy" "Things to Buy" entry
+             (file+headline "~/backlog/things_to_buy.org" "Things To Buy")
+             (file "~/templates/tpl_buy.txt")
+               :empty-lines-before 1)
+            ("ce" "Errands" entry
+             (file+headline "~/backlog/errands.org" "Errands")
+             (file "~/templates/tpl_errands.txt")
+               :empty-lines-before 1)
+            ("n" "TidBits/Ideas")
+            ("nq" "Quotes Tidbits One-liner" entry
+             (file"~/motivation/quotes.org")
+             (file "~/templates/tpl_quote.txt"))
+            ("ni" "Add Idea to Marketplace" entry
+             (file+headline "~/idea_marketplace/ideas.org" "Idea MarketPlace")
+             (file "~/templates/tpl_idea.txt")
+               :empty-lines-before 1)
+            ("t" "Self Instrumentation Entry") 
+            ("tc" "Craving Tracker" table-line (file+headline "~/tracker/tracker.org" "Craving Tracker") 
+             (file "~/templates/tpl_craving.txt") :kill-buffer t)
+            ("tp" "Pain,Pleasure Tracker" table-line (file+headline "~/tracker/tracker.org" "Pain,Pleasure Tracker") 
+             (file "~/templates/tpl_pain_pleasure.txt") :kill-buffer t)
+            ("tb" "Self Binding Tracker" table-line (file+headline "~/tracker/tracker.org" "Self Binding Tracker") 
+             (file "~/templates/tpl_dopamine.txt") :kill-buffer t)
+            ("te" "Energy Tracker" table-line (file+headline "~/tracker/tracker.org" "Energy Tracker") 
+             (file "~/templates/tpl_energy_tracker.txt") :kill-buffer t)
+            ("tw" "Water Tracker" table-line (file+headline "~/tracker/tracker.org" "Water Tracker") 
+             (file "~/templates/tpl_water_tracker.txt") :kill-buffer t)
+            ("ts" "Typing Speed" table-line (file+headline "~/tracker/tracker.org" "Typing Speed Tracker") 
+             (file "~/templates/tpl_typing_speed_tracker.txt") :kill-buffer t)
+            ("j" "Create Journal Entry") 
+            ("jd" "Daily Journal Entry" entry (file+olp+datetree "~/tracker/journal.org") "* %?\nEntered on %U\n  %i\n  %a")
+            ("jq" "Daily Journal Entry" table-line (file+headline "~/tracker/tracker.org" "Craving Tracker") 
+             (file "~/templates/tpl_craving.txt") :kill-buffer t)
+            ("p" "Create a daily plan") 
+            ("pr" "Daily plan" DailyPlan 
+             (file+function "~/review/daily_review.org" org-reverse-datetree-goto-date-in-file) 
+             (file "~/templates/tpl_dailyplan.txt") 
+             :clock-in t :clock-resume t :prepend t :empty-lines-after 2)))
+
+    ;; Refile using - C-c C-w
+    ;;(setq org-refile-targets
+    ;;      '((("~/gtd/projects.org") :regexp . "\\(?:\\(?:Note\\|Task\\)s\\)") ;; Deleted archieved
+    ;;        (("~/done/done_projects.org") :maxlevel . 3)))
+
+    ;;(setq org-refile-use-outline-path t)
+    (setq org-refile-use-outline-path 'file)
+    (setq org-outline-path-complete-in-steps nil)
+
+    ;; Add a hook that will log when we activate a task by creating an "ACTIVATED" property the first time the task enters the NEXT state
+    (defun log-todo-next-creation-date (&rest ignore)
+      "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
+      (when (and (string= (org-get-todo-state) "NEXT")
+                 (not (org-entry-get nil "ACTIVATED")))
+        (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
+    (add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
+
+    (setq org-agenda-prefix-format
+          '((agenda . " %i %-12:c%?-12t% s")
+            (todo   . " ")
+            (tags   . " %i %-12:c")
+            (search . " %i %-12:c")))
+
+  ;;(setq org-agenda-custom-commands
+  ;;     ((org-agenda-files
+  ;;     (directory-files-recursively
+  ;;      "/Users/vmat/Dropbox/plain_docs/area/v1/denote/books" "\\.org$"))
+  ;;     (org-overriding-columns-format
+  ;;     "%40item %10todo %10author %20Links")
+  ;;     ;;(org-agenda-cmp-user-defined
+  ;;     ;;(cmp-date-property-stamp "Start")
+  ;;      ;;)
+  ;;     (org-agenda-sorting-strategy
+  ;;    '(user-defined-down))
+  ;;       (org-agenda-overriding-header "C-u r to re-run Type={.}")
+  ;;       (org-agenda-mode-hook
+  ;;     (lambda ()
+  ;;       (visual-line-mode -1)
+  ;;       (setq truncate-lines 1)
+  ;;       (setq display-line-numbers-offset -1)
+  ;;       (display-line-numbers-mode 1)))
+  ;;    (org-agenda-view-columns-initially t)))
+
+    ;; Automatic saving after refilling
+    (setq org-agenda-files 
+          (mapcar 'file-truename 
+                  (file-expand-wildcards "~/gtd/*.org")))
+
+    ;; Save the corresponding buffers
+    (defun gtd-save-org-buffers ()
+      "Save `org-agenda-files' buffers without user confirmation.  See also `org-save-all-org-buffers'"
+      (interactive)
+      (message "Saving org-agenda-files buffers...")
+      (save-some-buffers t (lambda () 
+                             (when (member (buffer-file-name) org-agenda-files) 
+                               t)))
+      (message "Saving org-agenda-files buffers... done"))
+
+    ;; Add it after refile
+    (advice-add 'org-refile :after
+                (lambda (&rest _)
+                  (gtd-save-org-buffers)))
 
 #+END_SRC
 
-* Custom Macros/Functions 
-Used to write/add custom function 
+** Org mode helper script
 
 #+BEGIN_SRC emacs-lisp
-;;(column-number-mode) ; Show colum number 
-;;(global-display-line-numbers-mode t) ; display line number 
-;; Example of interactive command
-(defun my-greet-user (name) 
-  "Greet the user by name." 
-  (interactive "sEnter your name: ") 
-  (message "Hello, %s!" name))
 
-(global-set-key (kbd "C-c g") 'my-greet-user)
+(defun vs_org/opened_buffer_files ()
+  "Return the list of files currently opened in emacs"
+  (delq nil
+        (mapcar (lambda (x)
+                  (if (and (buffer-file-name x)
+                           (string-match "\\.org$"
+                                         (buffer-file-name x)))
+                      (buffer-file-name x)))
+                (buffer-list))))
 
-#+END_SRC
-
-* Basic Key Setup 
-setup Keys without any additional packages 
-
-#+BEGIN_SRC emacs-lisp
-; Key bindings for eshell
-(global-set-key (kbd "C-c e") 'eshell)
-#+END_SRC
-
-* Package Setup
-Different packages are organized as per the categories.
-
-#+BEGIN_SRC emacs-lisp
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
-
-;;(package-initialize)
-
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-	(package-refresh-contents)
-	(package-install 'use-package))
-#+END_SRC
-
-
-** Package Managers
-
-** Helper Packages (Man/Help packages)
-#+BEGIN_SRC emacs-lisp
-
-  ;; To view the commands executed on right panel 
-  ;; TODO : Fix me - looks like it's not working as expected
-  (use-package 
-    command-log-mode 
-    :ensure t)
-
-  ;; Package for command completion, different packges can be used with ivy e.g. counsel and other alterntives are helm, ido (TODO: Explore these packages)
-  (use-package 
-    ivy 
-    :ensure t
-    ;;:diminish
-    :bind 
-     (("C-s" . swiper) :map ivy-minibuffer-map ("TAB" . ivy-alt-done) 
-	   ("C-l" . ivy-alt-done) 
-	   ("C-j" . ivy-next-line) 
-	   ("C-k" . ivy-previous-line) 
-	   :map ivy-switch-buffer-map ("C-k" . ivy-previous-line) 
-	   ("C-l" . ivy-done) 
-	   ("C-d" . ivy-switch-buffer-kill) 
-	   :map ivy-reverse-i-search-map ("C-k" . ivy-previous-line) 
-	   ("C-d" . ivy-reverse-i-search-kill)) 
-    :config (ivy-mode 1))
-
-  ;; on-the-fly keybinding suggestions in the minibuffer
-  (use-package 
-    which-key 
-    :ensure t 
-    :init (which-key-mode) 
-    :diminish which-key-mode 
-    :config (setq which-key-idle-delay 1))
-
-  ;; Enhances the visual appearance of Ivy completion and selection menus.
-  (use-package 
-    ivy-rich 
-    :ensure t 
-    :init (ivy-rich-mode 1)
-    :config
-    (setq ivy-rich-display-transformers-list
-	'(counsel-M-x
-	  (:columns
-	   ((counsel-M-x-transformer (:width 40))
-	    (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))))
-  )
-
-  ;; collection of enhanced completion and selection utilities for Emacs
-  (use-package 
-    counsel 
-    :ensure t 
-    :bind (
-     ;("M-x" . counsel-M-x)
-     ("C-x b" . counsel-ibuffer) 
-     ("C-x C-f" . counsel-find-file) 
-     :map minibuffer-local-map ("C-r" . 'counsel-minibuffer-history)) 
-     :config (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with 
-
-;(use-package 
-;  ivy-bibtex 
-;  :ensure t)
-;;;(autoload 'ivy-bibtex "ivy-bibtex" "" t)
-;;; ivy-bibtex requires ivy's `ivy--regex-ignore-order` regex builder, which
-;;; ignores the order of regexp tokens when searching for matching candidates.
-;;; Add something like this to your init file:
-;(setq ivy-re-builders-alist
-;      '((ivy-bibtex . ivy--regex-ignore-order)
-;        (t . ivy--regex-plus)))
-;
-;(setq bibtex-completion-bibliography '("~/plain_docs/notes/reference/biblio-1.bib"))
-
-(use-package org-ref
-  :ensure t
-  ;:config
-  ;(setq reftex-default-bibliography '("~/plain_docs/notes/reference/biblio-1.bib"))
-  ; Add other org-ref configuration options as needed
-)
-(setq reftex-default-bibliography '("~/plain_docs/notes/reference/biblio-1.bib"))
-(setq org-ref-default-bibliography '("~/plain_docs/notes/reference/biblio-1.bib")
-      org-ref-pdf-directory "~/plain_docs")
-(setq org-ref-default-citation-link "citep")
-(setq bibtex-dialect 'biblatex)
-(defun my/org-ref-open-pdf-at-point ()
-  "Open the pdf for bibtex key under point if it exists."
+(defun vs_org/switch_refile_to_buffers() "Show Projects in Pipeline." 
   (interactive)
-  (let* ((results (org-ref-get-bibtex-key-and-file))
-         (key (car results))
-         (pdf-file (car (bibtex-completion-find-pdf key))))
-    (if (file-exists-p pdf-file)
-        (org-open-file pdf-file)
-      (message "No PDF found for %s" key))))
-(setq org-ref-open-pdf-function 'my/org-ref-open-pdf-at-point)
-(setq bibtex-completion-pdf-field "file")
-(setq bibtex-autokey-year-length 4
-      bibtex-autokey-name-year-separator ""
-      bibtex-autokey-year-title-separator ""
-      bibtex-autokey-titleword-separator ""
-      bibtex-autokey-titlewords 0
-      bibtex-autokey-titlewords-stretch 0
-      bibtex-autokey-titleword-length 0)
-(setq org-ref-notes-function 'orb-edit-notes)
-(setq org-ref-note-title-format
-  "* TODO %y -%t
- :PROPERTIES:
-  :Custom_ID: %k
-  :AUTHOR: %9a
-  :JOURNAL: %j
-  :VOLUME: %v
-  :DOI: %D
-  :URL: %U
- :END:
+  (setq org-refile-targets '((vs_org/opened_buffer_files :maxlevel . 9)))
+  (setq org-refile-use-outline-path 'file))
 
-")
+#+END_SRC 
 
+* Org Mode Helper Packages
+** Graphwiz/Dot install
+#+begin_src emacs-lisp
+  (use-package graphviz-dot-mode
+    :ensure t
+    :config
+    (setq graphviz-dot-indent-width 4))
+#+end_src
+** Reverse Date Tree
+Use this package to log the journal and review entries in descending date order
+#+BEGIN_SRC emacs-lisp
+  (use-package org-reverse-datetree
+    :ensure t)
+  (setq-default org-reverse-datetree-level-formats
+                '("%Y"                    ; year
+                  (lambda (time) (format-time-string "%Y-%m %B" (org-reverse-datetree-monday time))) ; month
+                  "%Y W%W"                ; week
+                  "%Y-%m-%d %A"           ; date
+                  ))
+
+#+END_SRC 
+
+** Org Refile Helper Functions
+#+begin_src emacs-lisp
+(defun vs_org/go_use_same_refile()
+  "Refile the current heading within the same file."
+  (interactive)
+  (let ((org-refile-targets '((nil :maxlevel . 3)))) ; Adjust maxlevel as needed
+    (org-refile)))
+
+;; Bind the custom refile function to a key
+;;(global-set-key (kbd "C-c r") 'my/org-refile-within-file)
+#+END_SRC 
+
+** yasnippet package
+- Why? 
+Org mode template to add structured content
+- How to use it?
+store file with name to expand under emacs_snippets directory
+Verify the sub directory path to copy the path
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :hook ((text-mode
+     prog-mode
+     conf-mode
+     snippet-mode) . yas-minor-mode-on)
+    :init
+    (setq yas-snippet-dirs '("~/emacs_snippets"))
+    :config 
+    (yas-global-mode 1))
 #+END_SRC
 
-** Utilities Packages
-
+** Emacs Theme
+- Why?
+Limited number of themes are avaiable
+- How?
+Go to page to view the avaiable theme and try one at a time
 #+BEGIN_SRC emacs-lisp
-(use-package lispy
-  :ensure t)
-(add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+;;(use-package gruvbox-theme
+;;  :ensure t
+;;  :config (load-theme 'gruvbox t))
+;;
+;;(custom-set-faces
+;; '(default ((t (:background "black" :foreground "white")))))
+;;
+;;(set-face-attribute 'default nil :height 155 :family "Monospace")
+
 #+END_SRC 
 
-#+BEGIN_SRC emacs-lisp
-(use-package org-download
-  :after org
-  :bind
-  (:map org-mode-map
-        (("s-Y" . org-download-screenshot)
-         ("s-y" . org-download-yank))))
+#+begin_src emacs-lisp
 
-#+END_SRC 
+(global-set-key (kbd "C-c n c") #'org-id-get-create)
 
-*** Org-roam package
-#+BEGIN_SRC emacs-lisp
 (use-package org-roam
   :ensure t
+  :init
+  (setq org-roam-v2-ack t)
   :custom
-  (org-roam-directory "~/notes")
-  ;;:bind (
-  ;;("C-c n l" . 'org-roam-buffer-toggle)
-  ;;("C-c n i" . 'org-roam-node-insert)
-  ;;("C-c n f" . 'org-roam-node-find)
-  ;;:map org-mode-map
-  ;;("C-M-i" . completion-at-point)
-  ;;:map org-roam-dailies-map
-  ;;("Y" . org-roam-dailies-capture-yesterday)
-  ;;("T" . org-roam-dailies-capture-tomorrow))
-  ;;:bind-keymap
-  ;;("C-c n d" . org-roam-dailies-map)
+  (org-roam-directory (file-truename "~/Dropbox/plain_docs/area/v1/roam/projects")
+  (org-roam-completion-everywhere t))
+  :bind (("C-h l" . org-roam-buffer-toggle)
+         ("C-h d" . org-roam-find-directory)
+         ("C-h /" . org-roam-node-find)
+         ("C-h 0" . org-roam-capture)
+         ("C-h i" . org-roam-node-insert)
+         ("C-h g" . org-roam-graph)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today)
+         :map org-mode-map
+         ("C-M-i"    . completion-at-point))
   :config
-  (require 'org-roam-dailies) ;; Ensure the keymap is available
-  (org-roam-db-autosync-mode)
-  (org-roam-setup))
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode) ;; Create/build org roam cache 
+  (org-roam-setup)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
 
-(defun jethro/tag-new-node-as-draft()
-  (interactive)
-  (org-roam-tag-add '("draft")))
-
-;;(add-hook 'org-roam-capture-new-node-hook #'jethro/tag-new-node-as-draft)
-
-(setq org-roam-dailies-directory "~/journal")
-
-
-(defun jethro/org-roam-node-from-cite-1 (keys-entries)
-    (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
-    (let ((title (citar--format-entry-no-widths (cdr keys-entries)
-                                                "${author editor} :: ${title}")))
-      (org-roam-capture- :templates
-                         '(("r" "reference" plain "%?" :if-new
-                            (file+head "~/plain_docs/reference/${citekey}.org"
-                                       ":PROPERTIES:
-:ROAM_REFS: [cite:@${citekey}]
-:END:
-#+title: ${title}\n")
-                            :immediate-finish t
-                            :unnarrowed t))
-                         :info (list :citekey (car keys-entries))
-                         :node (org-roam-node-create :title title)
-                         :props '(:finalize find-file))))
-
-;; Optionally, you can add keybindings for Org-roam commands
-;;(global-set-key (kbd "C-c n r") 'org-roam-buffer-toggle)
-;;(global-set-key (kbd "C-c n f") 'org-roam-node-find)
-
-(global-set-key (kbd "C-c n l") 'org-roam-buffer-toggle)
-(global-set-key (kbd "C-c n f") 'org-roam-node-find)
-(global-set-key (kbd "C-c n i") 'org-roam-node-insert)
-(global-set-key (kbd "C-c n c") 'org-roam-capture)
-(global-set-key (kbd "C-c n g") 'org-roam-graph)
-(global-set-key (kbd "C-c n j") 'org-roam-dailies-capture-today)
-(global-set-key (kbd "C-c n t") 'org-roam-tag-add)
-
-;;(setq org-roam-node-display-template
-;;      (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-
-(defun vs_org_roam/org_id_update_org_roam_files ()
-  "Update Org-ID locations for all Org-roam files."
-  (interactive)
-  (org-id-update-id-locations (org-roam--list-all-files)))
-
-(defun vs_org_roam/org_id_update_id_current_file ()
-  "Scan the current buffer for Org-ID locations and update them."
-  (interactive)
-  (org-id-update-id-locations (list (buffer-file-name (current-buffer)))))
-
-(defun jethro/org-roam-node-from-cite-2 (keys-entries)
-    (interactive (list (citar-select-ref :multiple nil :rebuild-cache t)))
-    (let ((title (citar--format-entry-no-widths (cdr keys-entries)
-                                                "${author editor} :: ${title}")))
-      (org-roam-capture- :templates
-                         '(("r" "reference" plain "%?" :if-new
-                            (file+head "~/plain_docs/notes/reference/${citekey}.org"
-                                       ":PROPERTIES:
-:ROAM_REFS: [cite:@${citekey}]
-:END:
-#+title: ${title}\n")
-                            :immediate-finish t
-                            :unnarrowed t))
-                         :info (list :citekey (car keys-entries))
-                         :node (org-roam-node-create :title title)
-                         :props '(:finalize find-file))))
-
-
-(setq-default bibtex-completion-bibliography "~/plain_docs/notes/reference/biblio-1.bib")
-(setq bibtex-completion-pdf-field "File")
-(setq bibtex-completion-notes-path "~/plain_docs")
-(setq bibtex-completion-notes-template-multiple-files
- (concat
-  " ${title}\n"
-  "#+ROAM_KEY: cite:${=key=}\n\n\n"
-  "- tags ::\n"
-  "- keywords :: ${keywords}\n\n"
-  "* Meta information\n"
-  ":PROPERTIES:\n"
-  ":Custom_ID: ${=key=}\n"
-  ":INTERLEAVE_PDF: %(orb-process-file-field \"${=key=}\")\n"
-  ":AUTHOR: ${author-abbrev}\n"
-  ":JOURNAL: ${journaltitle}\n"
-  ":DATE: ${date}\n"
-  ":YEAR: ${year}\n"
-  ":DOI: ${doi}\n"
-  ":URL: ${url}\n"
-  ":END:\n\n"
-  ))
-
+;; Resolve symlink, impacts performance
+(setq find-file-visit-truename t)
 #+END_SRC 
 
-*** Org-roam-server package
-#+BEGIN_SRC emacs-lisp
-(use-package org-roam-ui
+** Helper method to switch the directories
+
+#+begin_src emacs-lisp
+(defun vs_org_roam/switch_project ()
+    "Switch org roam to project"
+    (interactive)
+    (setq org-roam-directory "~/Dropbox/plain_docs/area/v1/roam/projects")  
+    (setq org-roam-db-location "~/Dropbox/plain_docs/area/v1/roam/projects/org-roam.db"))
+
+(defun vs_org_roam/switch_notes ()
+    "Switch org roam to project"
+    (interactive)
+    (setq org-roam-directory "~/Dropbox/plain_docs/area/v1/roam/draft")  
+    (setq org-roam-db-location "~/Dropbox/plain_docs/area/v1/roam/draft/org-roam.db"))
+#+end_src
+
+** Denote package
+Use the package to capture the notes
+#+begin_src emacs-lisp
+
+  (defun vs_denote/dired_open ()
+    "Short cut to open the notes folder in dired."
+    (interactive)
+    (dired denote-directory))
+
+  (use-package denote
+    :ensure t)
+  (setq denote-directory (expand-file-name "~/Dropbox/plain_docs/area/v1/denote/notes"))
+  (setq denote-save-buffer-after-creation nil)
+  (setq denote-known-keywords '("emacs" "philosophy" "economics" "orgmode" "functionalProgramming" "project"))
+
+  (add-hook 'dired-mode-hook #'denote-dired-mode)
+
+  (let ((map global-map))
+    (define-key map (kbd "C-c n n") #'denote)
+    (define-key map (kbd "C-c n l") #'vs_denote/dired_open)
+    (define-key map (kbd "C-c n r") #'denote-dired-rename-file))
+
+ (defvar my-denote-silo-directories
+  `("~/scratch/Readwise/Podcasts"
+    "~/Dropbox/plain_docs/area/v1/denote/books"
+    "~/Dropbox/plain_docs/area/v1/denote/notes"
+    "~/Dropbox/plain_docs/area/v1/denote/essays"
+    ;;"~/Dropbox/plain_docs/area/v1/denote/podcast"
+    ;; You don't actually need to include the `denote-directory' here
+    ;; if you use the regular commands in their global context.  I am
+    ;; including it for completeness.
+    ,denote-directory)
+  "List of file paths pointing to my Denote silos.
+  This is a list of strings.")
+
+  (defvar my-denote-commands-for-silos
+    '(denote
+      denote-date
+      denote-subdirectory
+      denote-template
+      denote-type)
+    "List of Denote commands to call after selecting a silo.
+    This is a list of symbols that specify the note-creating
+    interactive functions that Denote provides.")
+  
+  (defun my-denote-pick-silo-then-command (silo command)
+    "Select SILO and run Denote COMMAND in it.
+    SILO is a file path from `my-denote-silo-directories', while
+    COMMAND is one among `my-denote-commands-for-silos'."
+    (interactive
+     (list (completing-read "Select a silo: " my-denote-silo-directories nil t)
+           (intern (completing-read
+                    "Run command in silo: "
+                    my-denote-commands-for-silos nil t))))
+    (let ((denote-directory silo))
+      (call-interactively command)))
+
+;; Our variant of the above, which does the same thing except from
+;; downcasing the string.
+(defun my-denote-sluggify-title (str)
+  "Make STR an appropriate slug for title."
+  (denote--slug-hyphenate (denote--slug-no-punct str)))
+
+;; Now we use our function to sluggify titles without affecting their
+;; letter casing.
+(setq denote-file-name-slug-functions
+      '((title . my-denote-sluggify-title) ; our function here
+        (signature . denote-sluggify-signature)
+        (keyword . identity)))
+#+end_src
+
+** Deft package
+#+begin_src emacs_lisp
+(use-package deft
   :ensure t
-  :after org-roam
-  :config
-  ;;(org-roam-ui-mode)
-  (setq org-roam-ui-sync-theme t
-	org-roam-ui-follow t
-	org-roam-ui-update-on-save t
-	org-roam-ui-open-on-start nil))
-(defun vs_org_roam_ui/start_server()
-  "starting roam ui server."
-  (interactive)
-  (org-roam-ui-open))
+  )
+    (setq deft-default-extension "md")
+    (setq deft-extensions '("md"))
+    (setq deft-directory "~/tutorial/org-mode-source/Podcasts")
+    (setq deft-recursive t)
+    (setq deft-use-filename-as-title nil)
+    (setq deft-use-filter-string-for-filename t)
+    (setq deft-file-naming-rules '((noslash . "-")
+                                   (nospace . "-")
+                                   (case-fn . downcase)))
+    (setq deft-text-mode 'org-mode)
+    (global-set-key (kbd "C-M-S-s-d") 'deft)
+    (global-set-key (kbd "C-x C-g") 'deft-find-file)
+#+end_src
 
-    (defun vs_org_roam_ui/stop_server()
-      "starting roam ui server."
-      (interactive)
-      (progn
-      (if org-roam-ui-mode (setq org-roam-ui-mode -1))
-      (if org-roam-ui-follow (setq org-roam-ui-follow -1)))
-    )
+** Navigation packages
 
-      ;;(setq org-roam-ui-mode nil)
-      ;;(setq org-roam-ui-follow -1)
-#+END_SRC 
+#+begin_src emacs-lisp
+  ;; M-x package-refresh-contents - to refresh the contents
 
-*** Key-binding package
+  ;; The `vertico' package applies a vertical layout to the minibuffer.
+  ;; It also pops up the minibuffer eagerly so we can see the available
+  ;; options without further interactions.  This package is very fast
+  ;; and "just works", though it also is highly customisable in case we
+  ;; need to modify its behaviour.
+  ;;
+  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:cff33514-d3ac-4c16-a889-ea39d7346dc5
+  (use-package vertico
+    :ensure t
+    :config
+    (setq vertico-cycle t)
+    (setq vertico-resize nil)
+    (vertico-mode 1))
 
-#+BEGIN_SRC emacs-lisp
-;; 3 Types of key bindigs
-;; key binding types
-(global-set-key (kbd "C-c C-f") 'find-file) ;; global
-(define-key emacs-lisp-mode-map (kbd "C-c C-e") 'eval-buffer) ;; use keymap
-;;(global-set-key (kbd "C-c t") 'toggle-evil-mode)
-;;(define-key global-map (kbd "C-c c") 'org-capture)
-#+END_SRC 
+  ;; The `marginalia' package provides helpful annotations next to
+  ;; completion candidates in the minibuffer.  The information on
+  ;; display depends on the type of content.  If it is about files, it
+  ;; shows file permissions and the last modified date.  If it is a
+  ;; buffer, it shows the buffer's size, major mode, and the like.
+  ;;
+  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:bd3f7a1d-a53d-4d3e-860e-25c5b35d8e7e
+  (use-package marginalia
+    :ensure t
+    :config
+    (marginalia-mode 1))
 
-*** Evil package
-#+BEGIN_SRC emacs-lisp
-;; TODO : Explore evil collections and how to use it
-(defun vs/evil_override_read_key_map ()
-  ;; Override key bindings in `evil-read-key-map`.
-  ;; Add more key bindings as needed
-  ;;(define-key evil-read-key-map (kbd "jk") #'keyboard-quit)
-  (define-key evil-read-key-map (kbd "C-[") #'keyboard-quit)
-  (define-key evil-read-key-map (kbd "C-]") #'keyboard-quit)
-  (define-key evil-read-key-map (kbd "C-g") #'keyboard-quit)
-)
+  ;; The `orderless' package lets the minibuffer use an out-of-order
+  ;; pattern matching algorithm.  It matches space-separated words or
+  ;; regular expressions in any order.  In its simplest form, something
+  ;; like "ins pac" matches `package-menu-mark-install' as well as
+  ;; `package-install'.  This is a powerful tool because we no longer
+  ;; need to remember exactly how something is named.
+  ;;
+  ;; Note that Emacs has lots of "completion styles" (pattern matching
+  ;; algorithms), but let us keep things simple.
+  ;;
+  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2
+  (use-package orderless
+    :ensure t
+    :config
+    (setq completion-styles '(orderless basic)))
 
-(defun vs/evil_init_config()
-  ;; Add more key bindings as needed
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil) 
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-C-i-jump nil)
-  (setq evil-respect-visual-line-mode t)
-)
+  ;; The `embark' package lets you target the thing or context at point
+  ;; and select an action to perform on it.  Use the `embark-act'
+  ;; command while over something to find relevant commands.
+  ;;
+  ;; When inside the minibuffer, `embark' can collect/export the
+  ;; contents to a fully fledged Emacs buffer.  The `embark-collect'
+  ;; command retains the original behaviour of the minibuffer, meaning
+  ;; that if you navigate over the candidate at hit RET, it will do what
+  ;; the minibuffer would have done.  In contrast, the `embark-export'
+  ;; command reads the metadata to figure out what category this is and
+  ;; places them in a buffer whose major mode is specialised for that
+  ;; type of content.  For example, when we are completing against
+  ;; files, the export will take us to a `dired-mode' buffer; when we
+  ;; preview the results of a grep, the export will put us in a
+  ;; `grep-mode' buffer.
+  ;;
+  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:61863da4-8739-42ae-a30f-6e9d686e1995
+  (use-package embark
+    :ensure t
+    :bind (("C-." . embark-act)
+           :map minibuffer-local-map
+           ("C-c C-c" . embark-collect)
+           ("C-c C-e" . embark-export)))
+  
+  (use-package consult
+    :ensure t
+    :bind (;; A recursive grep
+           ("M-s M-g" . consult-grep)
+           ;; Search for files names recursively
+           ("M-s M-f" . consult-find)
+           ;; Search through the outline (headings) of the file
+           ("M-s M-o" . consult-outline)
+           ;; Search the current buffer
+           ("M-s M-l" . consult-line)
+           ;; Switch to another buffer, or bookmarked file, or recently
+           ;; opened file.
+           ("M-s M-b" . consult-buffer)))
+  ;; The `embark-consult' package is glue code to tie together `embark'
+  ;; and `consult'.
+  (use-package embark-consult
+    :ensure t)
 
-(use-package 
-  evil 
-  :ensure t 
-  :init
-  (progn (vs/evil_init_config))
-  :config 
-  (evil-mode 1) 
-  (add-hook 'evil-read-key-map-hook 'vs/evil_override_read_key_map)
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state) 
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join))
+  ;; The `wgrep' packages lets us edit the results of a grep search
+  ;; while inside a `grep-mode' buffer.  All we need is to toggle the
+  ;; editable mode, make the changes, and then type C-c C-c to confirm
+  ;; or C-c C-k to abort.
+  ;;
+  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:9a3581df-ab18-4266-815e-2edd7f7e4852
+  (use-package wgrep
+    :ensure t
+    :bind ( :map grep-mode-map
+            ("e" . wgrep-change-to-wgrep-mode)
+            ("C-x C-q" . wgrep-change-to-wgrep-mode)
+            ("C-c C-c" . wgrep-finish-edit)))
 
-#+END_SRC 
-** Planners Packages
+  ;; The built-in `savehist-mode' saves minibuffer histories.  Vertico
+  ;; can then use that information to put recently selected options at
+  ;; the top.
+  ;;
+  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:25765797-27a5-431e-8aa4-cc890a6a913a
+  (savehist-mode 1)
 
-** Docs Packages (To manage Smart Notes)
-** Ivy and Counsel
+  ;; The built-in `recentf-mode' keeps track of recently visited files.
+  ;; You can then access those through the `consult-buffer' interface or
+  ;; with `recentf-open'/`recentf-open-files'.
+  ;;
+  ;; I do not use this facility, because the files I care about are
+  ;; either in projects or are bookmarked.
+  (recentf-mode 1)
 
-* Keybindings
+#+end_src
 
-** Ivy-related Keybindings
+** Consult notes package - usage and tests
+#+begin_src emacs-lisp
+  (use-package consult-notes
+    :ensure t)
 
-#+BEGIN_SRC emacs-lisp
-;; Set keybindings for Ivy and Counsel
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-(global-set-key (kbd "C-c s") 'swiper)
-(global-set-key (kbd "C-c g") 'counsel-rg)
-#+END_SRC
+  (setq consult-notes-file-dir-sources
+        `(("Denote Notes"  ?d ,(denote-directory))
+          ("Books"  ?b "~/Dropbox/plain_docs/area/v1/denote/books")
+          ("Courses"  ?c "~/Dropbox/plain_docs/area/v1/denote/courses")
+          ("Podcast"  ?p "~/Dropbox/plain_docs/area/v1/denote/podcast")
+          ("Notes"  ?n "~/Dropbox/plain_docs/area/v1/denote/notes")))
+#+end_src
 
-** Other Keybindings
+* Startup
+#+STARTUP: hidestars overview
+#+ARCHIVE: ~/org_archive/%s_archive::
+#+AUTHOR: Vikram 
+#+EMAIL: rootid@vikram.com
+#+OPTIONS: TOC:NIL NUM:NI
+#+TITLE: Emacs Configuration
+#+OPTIONS: toc:nil
+#+TOC: headlines 1
 
-#+BEGIN_SRC emacs-lisp
-;; Set other keybindings
-(global-set-key (kbd "C-c f") 'find-file)
-(global-set-key (kbd "C-c b") 'switch-to-buffer)
-(global-set-key (kbd "C-c w") 'save-buffer)
-#+END_SRC
-
-
-* yasnippet package
-- How to use it?
-#+BEGIN_SRC emacs-lisp
-(use-package yasnippet
-  :ensure t
-  :hook ((text-mode
-	  prog-mode
-	  conf-mode
-	  snippet-mode) . yas-minor-mode-on)
-  :init
-  (setq yas-snippet-dirs '("~/emacs_snippets"))
-  :config 
-  (yas-global-mode 1))
-#+END_SRC
-
-* Conclusion
-
-This concludes my Emacs configuration. Feel free to explore and modify it to suit your preferences.

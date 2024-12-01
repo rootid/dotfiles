@@ -91,6 +91,11 @@ link_org_sys:
 	#@stow --target=$(HOME_DIR) --dir=$(HOME_DIR)/Dropbox/plain_docs --ignore='jour*' area --verbose=3  
 	ln -s $(HOME_DIR)/Dropbox/plain_docs/area ~/area
 
+link_pvt_org_mode_snippets:
+	@stow org-mode --dir=$(HOME_DIR)/templates/ --target=$(HOME_DIR)/emacs_snippets/org-mode --verbose=3 
+# TODO: 
+#stow --target=/Users/vmat/emacs_snippets/org-mode --dir=/Users/vmat/templates org-mode --verbose=3 
+
 #install_python_bins:
 #	@echo "Installing python bins"
 #	pip3 install -r tools/python/requirements.txt

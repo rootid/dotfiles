@@ -2,7 +2,7 @@
 # name: task_330
 # key: task_330
 # --
-*** TODO ${1:Task Name} :problem_solving:
+*** TODO ${1:Task Name} :tag:
 SCHEDULED: `(format-time-string "<%Y-%m-%d %a ")>`3:30>
 :PROPERTIES:
 :CREATED: `(format-time-string "<%Y-%m-%d %a %H:%M>")`

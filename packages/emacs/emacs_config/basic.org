@@ -694,6 +694,15 @@ Use the package to capture the notes
 #+end_src
 
 
+** Calender Workflow for GTD
+
+#+begin_src emacs-lisp
+  (setq org-icalendar-include-todo t
+      org-icalendar-use-scheduled '(todo-start event-if-todo)
+      org-icalendar-use-deadline '(todo-due event-if-todo)
+      org-icalendar-categories '(all-tags category)
+      org-icalendar-with-timestamps 'active)
+#+end_src
 
 * Header
 #+STARTUP: hidestars overview

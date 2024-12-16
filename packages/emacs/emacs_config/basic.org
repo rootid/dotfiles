@@ -276,11 +276,11 @@ Open all applications and web pages and different types web application
              (file "~/templates/tpl_todo.txt")
               :empty-lines-before 1)
             ("cb" "Add Book to Read/Listen" entry
-             (file+headline "~/backlog/books.org" "Books To Read/Listen")
+             (file+headline "~/area/v1/denote/notes/capture_books.org" "Books To Read/Listen")
              (file "~/templates/tpl_book.txt")
               :empty-lines-before 1)
             ("cm" "Media to Watch/Listen" entry
-             (file+headline "~/backlog/media.org" "Media to Watch/Listen")
+             (file+headline "~/area/v1/denote/notes/capture_media.org" "Media to Watch/Listen")
              (file "~/templates/tpl_media.txt")
                :empty-lines-before 1)
             ("cl" "Bookmark" entry
@@ -295,12 +295,12 @@ Open all applications and web pages and different types web application
              (file+headline "~/backlog/errands.org" "Errands")
              (file "~/templates/tpl_errands.txt")
                :empty-lines-before 1)
-            ("n" "TidBits/Ideas")
-            ("nq" "Quotes Tidbits One-liner" entry
-             (file"~/motivation/quotes.org")
-             (file "~/templates/tpl_quote.txt"))
+            ("n" "TidBits/Ideas/Anec")
+            ("na" "Anec/Quotes Tidbits One-liner" entry
+             (file+headline "~/area/v1/denote/notes/capture_quotes.org" "Quotes/Anecdotes")
+             (file "~/templates/tpl_quote.txt") :empty-lines-before 1)
             ("ni" "Add Idea to Marketplace" entry
-             (file+headline "~/idea_marketplace/ideas.org" "Idea MarketPlace")
+             (file+headline "~/area/v1/denote/notes/capture_ideas.org" "Idea MarketPlace")
              (file "~/templates/tpl_idea.txt")
                :empty-lines-before 1)
             ("j" "Create Daily Journal" entry 
@@ -703,6 +703,39 @@ Use the package to capture the notes
       org-icalendar-categories '(all-tags category)
       org-icalendar-with-timestamps 'active)
 #+end_src
+
+** org-download package for copy paste images
+#+begin_src emacs-lisp
+; Prereq - brew insall pngpaste 
+; org-downaload package
+(use-package org-download
+  :after org
+  :config
+  (org-download-enable)
+  :custom
+  (org-download-method 'directory)
+  (org-download-image-dir "~/area/images")
+  (org-download-heading-lvl nil)
+  (org-download-timestamp "%Y%m%d-%H%M%S_")
+  (org-download-backend 'url-retrieve)
+  (org-download-screenshot-method "/opt/homebrew/bin/pngpaste %s")
+  :bind
+  ("C-M-y" . org-download-screenshot)
+  :config
+  (require 'org-download))
+
+#+end_src
+
+** Mermaid diagra
+- Install first mermaid cli - brew install mermaid-cli
+;;#+begin_src emacs-lisp
+  (use-package ob-mermaid
+    :ensure t)
+  ;; Configure mermaid
+  (setq ob-mermaid-cli-path "/usr/local/bin/mmdc")
+  (org-babel-do-load-languages 'org-babel-load-languages '((mermaid . t)))
+
+;;#+end_src
 
 * Header
 #+STARTUP: hidestars overview

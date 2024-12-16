@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: dot
+# key: dot
+# --
+#+begin_src dot :file change_me.png
+#+end_src

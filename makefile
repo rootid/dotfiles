@@ -1,4 +1,4 @@
-.PHONY: install_homebrew install_omz update_brew_bundle dry_run_stow link_config_files unlink_config_files link_tools unlink_tools link_vim unlink_vim init_vim_packages link_org_sys
+.PHONY: install_homebrew install_omz update_brew_bundle dry_run_stow link_config_files unlink_config_files link_tools unlink_tools link_vim unlink_vim init_vim_packages link_org_sys link_pvt_org_mode_snippets
 
 HOME_DIR = /Users/vmat
 SHELL := /bin/zsh

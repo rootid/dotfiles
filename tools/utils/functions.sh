@@ -9,6 +9,9 @@ export PATH="$CURSOR_HOME:$PATH"
 IDEA_HOME_DUP=/Applications/IntelliJ_IDEA_CE.app/Contents/MacOS
 export PATH="$IDEA_HOME_DUP:$PATH"
 
+function go_aai() {
+  open ~/aai.jpg 
+}
 function go_get_week_number() {
   ${PYTHON} ${TOP_DIR}/go_get_week_number.py
 }

@@ -3,8 +3,7 @@
 # key: img
 # --
 #+CAPTION: caption
-#+NAME: fig:name
-#+ATTR_HTML: :width 63% :style float:left;margin:20px 20px 20px 0px
+#+NAME: fig:`(shell-command-to-string "uuidgen")`
+#+ATTR_HTML: :width 63% :style float:center;margin:20px 20px 20px 0px
 #+ATTR_LATEX: :width 0.5
 #+ATTR_ORG: :width 0.75 :align center :scale 0.5
-[[path]]

@@ -270,7 +270,11 @@ Open all applications and web pages and different types web application
 
     ;; Org capture template
     (setq org-capture-templates
-          '(("c" "Capture Task, Book, Media")
+          '(("c" "Capture Company, Task, Book, Media")
+            ("cj" "Company entry" entry
+             (file+headline "~/area/v1/denote/notes/capture_companies.org" "Company")
+             (file "~/templates/tpl_company.txt")
+              :empty-lines-before 1)
             ("ct" "TODO entry" entry
              (file+headline "~/backlog/backlog.org" "Backlog")
              (file "~/templates/tpl_todo.txt")

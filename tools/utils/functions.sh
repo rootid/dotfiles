@@ -71,3 +71,19 @@ function default_block() {
 function go_freedom_youtube() {
    go_block_dns $HOME/.dns-block-youtube
 }
+
+CHROME_APP="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+PROFILES="~/Library/Application Support/Google/Chrome/Local State"
+
+function go_chrome_open_vanilla() {
+  "$chrome_app"
+}
+
+function go_chrome_open() {
+  "$CHROME_APP"  --profile-directory="Profile 3"
+}
+
+function go_chrome_list_profiles() {
+  cat "$PROFILES" | jq -r '.profile.info_cache|to_entries|map(.key + ": " + .value.name)|.[]' 
+}
+

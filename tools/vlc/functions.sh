@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VLC='/Applications/VLC.app/Contents/MacOS/VLC'
+VLC='~/Applications/VLC.app/Contents/MacOS/VLC'
 
 # Install cli by building code
 # https://handbrake.fr/docs/en/latest/developer/build-mac.html

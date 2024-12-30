@@ -534,4 +534,35 @@ let g:bullets_enabled_file_types = [
     \ 'scratch'
     \]
 "}
+"
+
+" Section: Java Templates {
+
+autocmd FileType java iabbrev <buffer> psvm public static void main(String[] args) {<CR>}
+autocmd FileType java iabbrev <buffer> syo System.out.println();
+autocmd FileType java iabbrev <buffer> pcl public class {<CR>}
+
+" Package declaration
+autocmd FileType java iabbrev <buffer> pkg package 
+" Import statement
+autocmd FileType java iabbrev <buffer> imp import 
+" Class declaration
+autocmd FileType java iabbrev <buffer> puc public class
+" Interface declaration
+autocmd FileType java iabbrev <buffer> pui public interface
+
+" Methods and Variables
+autocmd FileType java iabbrev <buffer> pri private
+"" Protected variable
+autocmd FileType java iabbrev <buffer> pro protected
+" Public method
+autocmd FileType java iabbrev <buffer> pub public void
+
+" Java folding
+autocmd FileType java setlocal foldmethod=syntax
+set foldnestmax=2
+set foldlevelstart=1
+
+"}
+"
 " vim: set et tw=79 foldmarker={,} foldlevel=0 foldmethod=marker spell:

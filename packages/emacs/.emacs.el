@@ -46,3 +46,8 @@
 ;; org mode is installed already if you use Emacs version >= 24
 (require 'org)
 (org-babel-load-file (expand-file-name "~/emacs_config/basic.org"))
+
+(require 'emacsql)
+(require 'emacsql-sqlite)
+
+(setq emacsql-default-connection-type 'sqlite) ;; Set SQLite as the default

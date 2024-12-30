@@ -12,5 +12,5 @@ function go_file_name_remove_spaces() {
 
 alias lr='ls -ltr'
 alias vi='vim -u NONE'
-alias vlc=/Applications/VLC.app/Contents/MacOS/VLC
+alias vlc=~/Applications/VLC.app/Contents/MacOS/VLC
 alias python=`which python3` 

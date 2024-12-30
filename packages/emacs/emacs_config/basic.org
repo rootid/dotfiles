@@ -192,10 +192,12 @@ Open all applications and web pages and different types web application
 
     (setq org-attach-id-dir "~/org_attach/")
 
-    (setq org-modules '(org-habit))
-    (setq org-habit-graph-column 70)
-    (setq org-habit-show-habits-only-for-today nil) ;; To display if we're on track for habit
-    (setq org-agenda-skip-scheduled-if-done nil)
+    ;;(setq org-modules '(org-habit))
+    ;;(setq org-habit-graph-column 70)
+    ;;(setq org-habit-show-habits-only-for-today nil) ;; To display if we're on track for habit
+    ;;(setq org-habit-preceding-days 5)
+    ;;(setq org-habit-following-days 3)
+    ;;(setq org-agenda-skip-scheduled-if-done nil)
     ;; TODO use these
     ;;(ol-bbdb ol-bibtex ol-docview ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m)))
     (setq org-export-backends '(ascii beamer html icalendar latex odt))
@@ -349,6 +351,32 @@ Open all applications and web pages and different types web application
 
 #+END_SRC
 
+
+** Org Habit with Heatmap
+#+BEGIN_SRC emacs-lisp
+
+ (use-package org-habit
+  :custom
+  (org-habit-graph-column 1)
+  (org-habit-preceding-days 10)
+  (org-habit-following-days 1)
+  (org-habit-show-habits-only-for-today nil))
+
+ ;; Fix ME
+ ;;(use-package org-heatmap
+ ;; :init
+ ;; (add-to-list 'load-path "~/emacs_scripts/emacsql.el")
+ ;; (add-to-list 'load-path "~/emacs_scripts/org-heatmap.el")
+ ;; ;;(require 'org-heatmap)
+ ;; :after (org)
+ ;; :custom
+ ;; ;;(org-agenda-files '("/path-to/org-heatmap/examples/examples.org"))
+ ;; (org-heatmap-db-location "/tmp/org-heatmap.db")
+ ;; :config
+ ;; (org-heatmap-mode))
+
+
+#+END_SRC
 ** Org mode helper script
 
 #+BEGIN_SRC emacs-lisp

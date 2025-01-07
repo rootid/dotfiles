@@ -1,4 +1,5 @@
 #+STARTUP: hidestars overview
+#+STARTUP: inlineimages
 #+ARCHIVE: ~/org_archive/%s_archive::
 #+OPTIONS: num:5 whn:2 toc:4 H:6
 #+OPTIONS: d:t \n:t p:t todo:t

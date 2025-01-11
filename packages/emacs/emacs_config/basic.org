@@ -310,7 +310,11 @@ Open all applications and web pages and different types web application
              (file "~/templates/tpl_idea.txt")
                :empty-lines-before 1)
             ("j" "Create Daily Journal" entry 
-            (file+function "~/area/v1/denote/notes/20241201T173755--Journal__daily_journal.org" org-reverse-datetree-goto-date-in-file) "* %?\nEntered on %U\n  %i\n  %a")))
+            (file+function "~/area/v1/denote/notes/20241201T173755--Journal__daily_journal.org" org-reverse-datetree-goto-date-in-file) "* %?\nEntered on %U\n  %i\n  %a")
+            ("w" "Watch Later" entry
+             (file+headline "~/area/v1/denote/notes/capture_youtube.org" "Media to Watch/Listen")
+             (file "~/templates/tpl_yt.txt")
+               :empty-lines-before 1)))
 
     (setq org-refile-use-outline-path 'file)
     (setq org-outline-path-complete-in-steps nil)

@@ -12,8 +12,13 @@ export PATH="$IDEA_HOME_DUP:$PATH"
 function go_aai() {
   open ~/aai.jpg 
 }
+
 function go_get_week_number() {
   ${PYTHON} ${TOP_DIR}/go_get_week_number.py
+}
+
+function go_get_my_eta() {
+  ${PYTHON} ${TOP_DIR}/go_get_eta.py
 }
 
 function go_open_ide_intellij() {

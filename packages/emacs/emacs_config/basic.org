@@ -314,7 +314,11 @@ Open all applications and web pages and different types web application
             ("w" "Watch Later" entry
              (file+headline "~/area/v1/denote/notes/capture_youtube.org" "Media to Watch/Listen")
              (file "~/templates/tpl_yt.txt")
-               :empty-lines-before 1)))
+               :empty-lines-before 1)
+            ("b" "Backlog" entry
+             (file+headline "~/backlog/backlog.org" "Backlog")
+             (file "~/templates/tpl_todo.txt")
+              :empty-lines-before 1)))
 
     (setq org-refile-use-outline-path 'file)
     (setq org-outline-path-complete-in-steps nil)

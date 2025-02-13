@@ -9,6 +9,30 @@ export PATH="$CURSOR_HOME:$PATH"
 IDEA_HOME_DUP=/Applications/IntelliJ_IDEA_CE.app/Contents/MacOS
 export PATH="$IDEA_HOME_DUP:$PATH"
 
+function go_pdf_shrink() {
+
+which ps2pdf > /dev/null 2>&1
+
+if [ $? -ne 0 ] 
+then
+    echo "Error: ps2pdf is not installed"
+    echo "Please install ghostscript package to continue"
+    exit 1
+fi
+
+input_file=$1
+output_file="derive_${input_file}.pdf"
+
+if [ ! -f "$input_file" ] 
+then
+    echo "Input file '$input_file' not found"
+    exit 1
+fi
+
+ps2pdf -dPDFSETTINGS=/ebook "$input_file" "$output_file"
+
+}
+
 function go_aai() {
   open ~/aai.jpg 
 }

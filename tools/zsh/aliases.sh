@@ -7,7 +7,10 @@ function go_dir_name_remove_spaces() {
 }
 
 function go_file_name_remove_spaces() {
-  find . -depth -type f -name "* *" -execdir rename 's/ /_/g' {} +
+  find . -type f -name "* *" -print0 | while IFS= read -r -d '' file; do
+      new_name=$(echo "$file" | tr ' ' '_')
+      mv "$file" "$new_name"
+  done
 }
 
 alias lr='ls -ltr'

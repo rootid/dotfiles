@@ -10,26 +10,25 @@ IDEA_HOME_DUP=/Applications/IntelliJ_IDEA_CE.app/Contents/MacOS
 export PATH="$IDEA_HOME_DUP:$PATH"
 
 function go_pdf_shrink() {
+  which ps2pdf > /dev/null 2>&1
 
-which ps2pdf > /dev/null 2>&1
+  if [ $? -ne 0 ] 
+  then
+      echo "Error: ps2pdf is not installed"
+      echo "Please install ghostscript package to continue"
+      exit 1
+  fi
 
-if [ $? -ne 0 ] 
-then
-    echo "Error: ps2pdf is not installed"
-    echo "Please install ghostscript package to continue"
-    exit 1
-fi
+  input_file=$1
+  output_file="shrink_${input_file}"
 
-input_file=$1
-output_file="derive_${input_file}.pdf"
+  if [ ! -f "$input_file" ] 
+  then
+      echo "Input file '$input_file' not found"
+      exit 1
+  fi
 
-if [ ! -f "$input_file" ] 
-then
-    echo "Input file '$input_file' not found"
-    exit 1
-fi
-
-ps2pdf -dPDFSETTINGS=/ebook "$input_file" "$output_file"
+  ps2pdf -dPDFSETTINGS=/ebook "$input_file" "$output_file"
 
 }
 
@@ -102,7 +101,7 @@ function go_freedom_youtube() {
 }
 
 CHROME_APP="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-PROFILES="~/Library/Application Support/Google/Chrome/Local State"
+PROFILES="$HOME/Library/Application Support/Google/Chrome/Local State"
 
 function go_chrome_open_vanilla() {
   "$chrome_app"
@@ -110,6 +109,10 @@ function go_chrome_open_vanilla() {
 
 function go_chrome_open() {
   "$CHROME_APP"  --profile-directory="Profile 3"
+}
+
+function go_chrome_open_profile1() {
+  "$CHROME_APP" --profile-directory="Profile 1"
 }
 
 function go_chrome_list_profiles() {

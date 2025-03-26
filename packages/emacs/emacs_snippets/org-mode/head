@@ -1,5 +1,4 @@
-#+STARTUP: hidestars overview
-#+STARTUP: inlineimages
+#+STARTUP: hidestars overview inlineimages
 #+ARCHIVE: ~/org_archive/%s_archive::
 #+OPTIONS: num:5 whn:2 toc:4 H:6
 #+OPTIONS: d:t \n:t p:t todo:t
@@ -7,3 +6,4 @@
 #+EMAIL: hello@vikram.com
 #+OPTIONS: TOC:NIL NUM:NI
 #+TITLE: $1
+#+EXPORT_FILE_NAME: /tmp/$2.html

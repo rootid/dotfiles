@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 TOP_DIR=${HOME}/utils
-PYTHON=python3.11
+PYTHON=python3
 
 CURSOR_HOME=/Applications/Cursor.app/Contents/MacOS
 export PATH="$CURSOR_HOME:$PATH"
@@ -9,6 +9,9 @@ export PATH="$CURSOR_HOME:$PATH"
 IDEA_HOME_DUP=/Applications/IntelliJ_IDEA_CE.app/Contents/MacOS
 export PATH="$IDEA_HOME_DUP:$PATH"
 
+# find . -type f -iname "*.pdf" -not -name "shrink_*" | sed 's|^./||' | while read -r file; do
+#     go_pdf_shrink "$file"
+# done
 function go_pdf_shrink() {
   which ps2pdf > /dev/null 2>&1
 
@@ -42,6 +45,10 @@ function go_get_week_number() {
 
 function go_get_my_eta() {
   ${PYTHON} ${TOP_DIR}/go_get_eta.py
+}
+
+function go_timer_start() {
+  ${PYTHON} ${TOP_DIR}/go_timer_start.py
 }
 
 function go_open_ide_intellij() {

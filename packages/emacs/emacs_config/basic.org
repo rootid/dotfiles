@@ -184,6 +184,7 @@ Open all applications and web pages and different types web application
        (R . t)
        (dot . t)
        (plantuml . t)
+       (latex . t)
        (org . t)))
 
     ;; Set Org directory
@@ -766,7 +767,31 @@ Use the package to capture the notes
 
 #+end_src
 
-** Mermaid diagra
+** Tikz packages
+
+PreReq to run the workflow
+- brew install imagemagick
+- brew install ghostscript
+#+begin_src emacs-lisp
+  (use-package texfrag
+    :ensure t
+    :hook (org-mode . texfrag-mode) ;; Enable texfrag-mode in Org mode
+    :config
+    ;; Optional: Set additional LaTeX header for Org mode
+    (setq texfrag-org-add-to-header "\\usepackage{amsmath,amssymb}")
+    
+    ;; Optional: Adjust scaling factor for previews
+    (setq texfrag-scale 1.5))
+
+  (setq org-latex-create-formula-image-program 'imagemagick)
+  (add-to-list 'org-latex-packages-alist '("" "tikz" t))
+
+ (eval-after-load "preview"
+  '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
+
+#+end_src
+
+** Mermaid diagram
 - Install first mermaid cli - brew install mermaid-cli
 ;;#+begin_src emacs-lisp
   (use-package ob-mermaid

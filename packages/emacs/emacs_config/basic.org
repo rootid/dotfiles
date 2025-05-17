@@ -207,6 +207,54 @@ Open all applications and web pages and different types web application
       :after org
       :commands (org-export-dispatch))
 
+
+    ;; --- ox-md Configuration ---
+
+(with-eval-after-load 'ox-md
+  ;; Example: Set headline style to ATX (GitHub Flavored Markdown style)
+  ;; Uses '#' for level 1, '##' for level 2, etc.
+  (setq org-md-headline-preface ""
+        org-md-headline-style 'atx)
+
+  ;; Example: Ensure a blank line after headlines (often good for readability)
+  (setq org-md-blank-line-after-headline t)
+
+  ;; Example: Set the default file extension for Markdown exports
+  ;; The default is "md", but you could use "markdown" if you prefer.
+  (setq org-md-extension "md")
+
+  ;; Example: How to export tags
+  ;; By default, tags are exported as a comma-separated list in a paragraph
+  ;; below the headline.
+  ;; (setq org-md-tag-keyword "Tags:")
+
+  ;; Example: Control how code blocks are exported
+  ;; 'verbatim (default), 'fenced (most common for GFM), 'indented
+  (setq org-md-src-block-backend 'fenced)
+
+  ;; Example: Control how a table of contents is handled
+  ;; `t` for including it automatically, `nil` otherwise.
+  (setq org-md-export-to-markdown-with-toc nil) ; Don't add a TOC by default
+
+  ;; Example: If you want to add a TOC, define its level range
+  ;; (setq org-md-toc-maximum-level 3)
+
+  ;; Example: Add a custom preamble to the exported Markdown file.
+  ;; This is useful for adding metadata like Jekyll front matter or
+  ;; other specific headers.
+  ;; (setq org-md-preamble-format
+  ;;       '((standard . "# My Org-exported Markdown Document\n\n")))
+
+  ;; Example: Customize link export format
+  ;; By default, it's `[description](link)`.
+  ;; (setq org-md-link-format '([%s](%s)))
+
+  ;; More advanced: Adjusting headline levels if your Org file uses
+  ;; top-level headings (level 1) that you want to appear as
+  ;; secondary headings (level 2) in Markdown.
+  ;; (setq org-md-export-headline-offset 1) ; This would make Org level 1 -> Markdown level 2
+)
+
     (defun move-cancelled-tasks-to-archive ()
     "Move cancelled tasks to the archive."
     (interactive)

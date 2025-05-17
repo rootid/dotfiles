@@ -1,12 +1,16 @@
 """
-prerequisite - brew install python-tk
+Prerequisite
+brew install python-tk
+
 Run like this
 python3 go_timer_start
-"""
+-"""
 
 import tkinter as tk
 from tkinter import messagebox
 import time
+import os
+import platform
 
 class TimerApp:
     def __init__(self, root):
@@ -153,7 +157,24 @@ class TimerApp:
                     self.is_running = False
                     self.start_stop_button.config(text="Start")
                     self.elapsed_time = 0
+
+                    # Force window to front and grab attention
+                    self.root.attributes('-topmost', True)
+                    self.root.lift()
+                    self.root.focus_force()
+
+                    # Flash the window to get attention
+                    self.flash_window()
+
+                    # Play alert sound (works on macOS)
+                    self.play_alert_sound()
+
                     messagebox.showinfo("Timer", "Time's up!")
+
+                    # Reset window state
+                    self.root.attributes('-topmost', False)
+                    self.root.focus_force()
+
                     remaining = 0
 
                 # Format time as HH:MM:SS
@@ -175,6 +196,25 @@ class TimerApp:
 
         # Schedule next update (every 100ms for smooth display)
         self.root.after(100, self.update_timer)
+
+    def flash_window(self, count=0):
+        """Flash the window to get user attention"""
+        if count < 5:  # Flash 5 times
+            bg_color = "#ff0000" if count % 2 == 0 else "#ffffff"
+            self.time_label.config(bg=bg_color)
+            self.root.after(500, lambda: self.flash_window(count + 1))
+        else:
+            self.time_label.config(bg=self.root.cget('bg'))  # Reset to default
+
+    def play_alert_sound(self):
+        """Play an alert sound to notify the user"""
+        if platform.system() == 'Darwin':  # macOS
+            os.system('afplay /System/Library/Sounds/Sosumi.aiff')
+        elif platform.system() == 'Windows':
+            import winsound
+            winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+        else:  # Linux/Unix
+            os.system('aplay /usr/share/sounds/sound-icons/glass-water-1.wav &>/dev/null &')
 
 # Main application entry point
 if __name__ == "__main__":

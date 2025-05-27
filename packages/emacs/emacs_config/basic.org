@@ -5,8 +5,93 @@
 ;;
 ;;#+end_src
 
+
+* Package Management
+
+#+begin_src emacs-lisp
+
+  ;; Initialize package sources
+  (require 'package)
+
+  ;; package-archives keeps track of all existing sources of packages 
+  ;; (setq variable value) - set value to variable 
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/") 
+                           ("org" . "https://orgmode.org/elpa/") 
+                           ("elpa" . "https://elpa.gnu.org/packages/")))
+
+  ;; No automatic package loading of packages 
+  (setq package-enable-at-startup nil)
+
+  ;; Initialize the package system and load installed packages. 
+  (package-initialize) 
+
+  ;; make sure package archive contents are updated
+  (unless package-archive-contents (package-refresh-contents))
+
+  ;; install/update use-package if not available/latest version is updated
+  (unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+  ;; TODO - Additional config https://protesilaos.com/emacs/modus-themes#h:f0f3dbcb-602d-40cf-b918-8f929c441baf
+  (add-to-list 'load-path "~/dotfiles/packages/emacs/emacs_themes/modus-themes")
+  (load-theme 'modus-operandi)            ; Light theme
+
+  ;; TODO - Explore straight.el vs packge.el
+  ;; Use of straight.el 
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name
+          "straight/repos/straight.el/bootstrap.el"
+          (or (bound-and-true-p straight-base-dir)
+              user-emacs-directory)))
+        (bootstrap-version 7))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+
+#+end_src
+
+* Basic configuration
+
+Includes modeline configuration, file save configuration, 2 spaces
+
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+
+  (display-time-mode 1)
+  (setq display-time-24hr-format t)
+  (setq display-time-format "%H:%M")
+
+  ;; Disable emacs automatic backup~ file
+  (setq make-backup-files nil)
+
+  ;; Disable creating those #auto-save# files
+  (setq auto-save-default nil)
+
+  ;; Disable locking
+  (setq create-lockfiles nil)
+
+  (setq-default indent-tabs-mode nil)
+  (setq-local lisp-indent-function nil)
+  (setq-local lisp-indent-offset 2)
+
+  (setq-default indent-tabs-mode nil) ; Use spaces instead of tabs by default
+  (setq-default tab-width 2) ; your preferred number of spaces
+#+END_SRC
+
+
 * Basic Key Bindings
 Use key strokes economically. Refer - [[https://sites.google.com/site/steveyegge2/effective-emacs][Efffective Emacs From Yegge]] 
+Note - kbd is a macro that converts a human-readable string into the internal representation Emacs uses for keys.
 
 #+begin_src emacs-lisp
   ;; M-x alternative
@@ -20,28 +105,10 @@ Use key strokes economically. Refer - [[https://sites.google.com/site/steveyegge
   (global-set-key (kbd "C-c w") 'save-buffer)
 #+end_src
 
-* Emacs Code Formatter
-Format elisp code in Org mode file
 
-#+BEGIN_SRC emacs-lisp
-  ;; No tabs
-  (setq-default tab-always-indent t) 
-
-  (defun vs_utils/indent_org_block_automatically ()
-    (interactive)
-    (when (org-in-src-block-p)
-      (org-edit-special)
-      (indent-region (point-min) (point-max))
-      (org-edit-src-exit)))
-
-  (define-key org-mode-map
-              (kbd "C-c C-i") #'vs_utils/indent_org_block_automatically)
-
-#+END_SRC
-
+* Emacs Theme
 ** Use of Nano
 #+BEGIN_SRC emacs-lisp
-
   (straight-use-package
    '(nano :type git :host github :repo "rougier/nano-emacs"))
 
@@ -54,6 +121,21 @@ Format elisp code in Org mode file
 
 #+END_SRC
 
+
+* Emacs Vanilla Helper Functions
+
+Reload Emacs Config file
+
+#+begin_src emacs-lisp
+  (defun reload-init-file ()
+    (interactive)
+    (load-file user-init-file))
+
+  (global-set-key (kbd "<f5>") 'reload-init-file)
+
+#+end_src
+
+
 * Emacs Helper Packages 
 ** Why? - Use Vim Modal editing keystorkes.
 #+BEGIN_SRC emacs-lisp
@@ -61,11 +143,8 @@ Format elisp code in Org mode file
     evil 
     :ensure t 
     :config 
-    (evil-mode 1) 
-    )
+    (evil-mode 1))
 #+END_SRC
-** To learn Emacs key maps.
-** How? - Adds a completion panel for commands.
 
 #+begin_src emacs-lisp
 (use-package which-key
@@ -102,38 +181,6 @@ Format elisp code in Org mode file
 
 #+end_src
 
-* Emacs Helper Functions
-#+begin_src emacs-lisp
-  (defun reload-init-file ()
-    (interactive)
-    (load-file user-init-file))
-
-  (global-set-key (kbd "<f5>") 'reload-init-file)
-
-#+end_src
-
-* Basic configuration
-
-Includes modeline configuration, file save configuration, 2 spaces
-
-#+BEGIN_SRC emacs-lisp
-  (display-time-mode 1)
-  (setq display-time-24hr-format t)
-  (setq display-time-format "%H:%M")
-
-  ;; Disable emacs automatic backup~ file
-  (setq make-backup-files nil)
-
-  ;; Disable creating those #auto-save# files
-  (setq auto-save-default nil)
-
-  ;; Disable locking
-  (setq create-lockfiles nil)
-
-  (setq-default indent-tabs-mode nil)
-  (setq-local lisp-indent-function nil)
-  (setq-local lisp-indent-offset 2)
-#+END_SRC
 
 * Shortcuts to Open Browser
 TODO - Create different types of workflows with one click and Hydra
@@ -152,10 +199,11 @@ Open all applications and web pages and different types web application
   (global-set-key (kbd "C-c y") 'go_open_ymusic)
 #+END_SRC 
 
+
 * Org mode configuration
 ** Org mode packages
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
     (use-package org
       :ensure t)
   
@@ -193,12 +241,6 @@ Open all applications and web pages and different types web application
 
     (setq org-attach-id-dir "~/org_attach/")
 
-    ;;(setq org-modules '(org-habit))
-    ;;(setq org-habit-graph-column 70)
-    ;;(setq org-habit-show-habits-only-for-today nil) ;; To display if we're on track for habit
-    ;;(setq org-habit-preceding-days 5)
-    ;;(setq org-habit-following-days 3)
-    ;;(setq org-agenda-skip-scheduled-if-done nil)
     ;; TODO use these
     ;;(ol-bbdb ol-bibtex ol-docview ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m)))
     (setq org-export-backends '(ascii beamer html icalendar latex odt))
@@ -406,7 +448,24 @@ Open all applications and web pages and different types web application
                 (lambda (&rest _)
                   (gtd-save-org-buffers)))
 
-#+END_SRC
+#+end_src
+
+
+#+begin_src emacs-lisp
+    ;; No tabs
+    ;;(setq-default tab-always-indent t) 
+
+    (defun vs_utils/indent_org_block_automatically ()
+      (interactive)
+      (when (org-in-src-block-p)
+        (org-edit-special)
+        (indent-region (point-min) (point-max))
+        (org-edit-src-exit)))
+
+    (define-key org-mode-map
+                (kbd "C-c C-i") #'vs_utils/indent_org_block_automatically)
+
+#+end_src
 
 
 ** Org Habit with Heatmap
@@ -850,13 +909,21 @@ PreReq to run the workflow
 
 ;;#+end_src
 
-* Header
-#+STARTUP: hidestars overview
-#+ARCHIVE: ~/org_archive/%s_archive::
-#+AUTHOR: Vikram 
-#+EMAIL: rootid@vikram.com
-#+OPTIONS: TOC:NIL NUM:NI
-#+TITLE: Emacs Configuration
-#+OPTIONS: toc:nil
-#+TOC: headlines 1
 
+* Test Workflow
+1. Write the Config in Org Mode
+2. Add the following Property in header Section
+   #+PROPERTY: header-args :tangle init.el
+3. Run C-x C-m org-babel-tangle
+4. Use init.el to run as emacs_custom init.el 
+
+TODO: change #+PROPERTY: header-args :tangle init.el to #+PROPERTY: header-args :tangle  ~/.emacs.el 
+
+   
+* Header
+#+TITLE: My Emacs Configuration
+#+STARTUP: hidestars overview inlineimages
+#+AUTHOR: Vikram@Rootid
+#+EMAIL: hello@vikram.com
+#+ARCHIVE: ~/org_archive/%s_archive::
+#+PROPERTY: header-args :tangle ~/.emacs.el

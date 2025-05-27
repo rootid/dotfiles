@@ -1,4 +1,4 @@
-;; Initializ package sources
+;; Initialize package sources
 (require 'package)
 
 ;; package-archives keeps track of all existing sources of packages 

@@ -87,6 +87,7 @@ link_org_sys:
 	@stow projects --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
 	@stow archives --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
 	@stow publish --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
+	@stow denote  --dir=$(HOME_DIR)/Dropbox/plain_docs/area/v1 --target=$(HOME_DIR) --verbose=3 
 	# Keep only first level stow directories 
 	#@stow --target=$(HOME_DIR) --dir=$(HOME_DIR)/Dropbox/plain_docs --ignore='jour*' area --verbose=3  
 	ln -s $(HOME_DIR)/Dropbox/plain_docs/area ~/area

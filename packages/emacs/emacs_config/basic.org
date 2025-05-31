@@ -158,12 +158,12 @@ Reload Emacs Config file
   (setq which-key-idle-delay 1))
 #+end_src
 
+
 ** Hydra Package
 - To quickly open directories and files
 - Reduce context switching time
 
 #+begin_src emacs-lisp
-
   (use-package hydra
     :ensure t)
 
@@ -174,14 +174,18 @@ Reload Emacs Config file
 
   (defhydra hydra-dired (:exit t)
     "dired navigation"
-    ("g" (dired "~/gtd") "GTD")
-    ("c" (dired "~/backlog") "Capture")
-    ("r" (dired "~/review") "Review")
-    ("w" (dired "~/Downloads") "Downloads")
-    ("d" (dired "~/Documents") "Documents"))
+    ("w" (dired "~/web") "Web")
+    ("n" (dired "~/notes") "Notes"))
 
   (global-set-key (kbd "C-c d") 'hydra-dired/body)
 
+  (defhydra hydra-open-files ()
+    "Open files"
+    ("c" (lambda () (interactive) (find-file "~/emacs_config/basic.org")) "Open Config file")
+    ("i" (lambda () (interactive) (find-file "~/beorg/inbox.org")) "Open Inbox")
+    ("q" nil "quit"))
+
+  (global-set-key (kbd "C-c g") 'hydra-open-files/body)
 #+end_src
 
 
@@ -203,7 +207,7 @@ Open all applications and web pages and different types web application
 #+END_SRC 
 
 
-* Org mode configuration
+* Org Mode configuration
 ** Org Mode Packages
 
 #+begin_src emacs-lisp
@@ -497,6 +501,16 @@ Open all applications and web pages and different types web application
 #+END_SRC
 ** Org Mode Helper Script
 
+Set the tabs to 2 spaces
+
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)
+            (setq tab-width 2)
+            (local-set-key (kbd "TAB") 'tab-to-tab-stop)))
+#+end_src
+
 #+BEGIN_SRC emacs-lisp
 
   (defun vs_org/opened_buffer_files ()
@@ -627,17 +641,16 @@ Verify the sub directory path to copy the path
     :config 
     (yas-global-mode 1))
 #+END_SRC
-** Denote package
+
+
+* Note Taking Packages
+
+** Denote Package
 Use the package to capture the notes
 #+begin_src emacs-lisp
-
-  (defun vs_denote/dired_open ()
-    "Short cut to open the notes folder in dired."
-    (interactive)
-    (dired denote-directory))
-
   (use-package denote
     :ensure t)
+  
   (setq denote-directory (expand-file-name "~/Dropbox/plain_docs/area/v1/denote/notes"))
   (setq denote-save-buffer-after-creation nil)
   (setq denote-known-keywords '("emacs" "philosophy" "economics" "orgmode" "functionalProgramming" "project"))
@@ -649,53 +662,25 @@ Use the package to capture the notes
     (define-key map (kbd "C-c n l") #'vs_denote/dired_open)
     (define-key map (kbd "C-c n r") #'denote-dired-rename-file))
 
- (defvar my-denote-silo-directories
-  `("~/scratch/Readwise/Podcasts"
-    "~/Dropbox/plain_docs/area/v1/denote/books"
-    "~/Dropbox/plain_docs/area/v1/denote/notes"
-    "~/Dropbox/plain_docs/area/v1/denote/essays"
-    ;;"~/Dropbox/plain_docs/area/v1/denote/podcast"
-    ;; You don't actually need to include the `denote-directory' here
-    ;; if you use the regular commands in their global context.  I am
-    ;; including it for completeness.
-    ,denote-directory)
-  "List of file paths pointing to my Denote silos.
-  This is a list of strings.")
+  ;; Now we use our function to sluggify titles without affecting their
+  ;; letter casing.
+  (setq denote-file-name-slug-functions
+        '((title . my-denote-sluggify-title) ; our function here
+          (signature . denote-sluggify-signature)
+          (keyword . identity)))
 
-  (defvar my-denote-commands-for-silos
-    '(denote
-      denote-date
-      denote-subdirectory
-      denote-template
-      denote-type)
-    "List of Denote commands to call after selecting a silo.
-    This is a list of symbols that specify the note-creating
-    interactive functions that Denote provides.")
-  
-  (defun my-denote-pick-silo-then-command (silo command)
-    "Select SILO and run Denote COMMAND in it.
-    SILO is a file path from `my-denote-silo-directories', while
-    COMMAND is one among `my-denote-commands-for-silos'."
-    (interactive
-     (list (completing-read "Select a silo: " my-denote-silo-directories nil t)
-           (intern (completing-read
-                    "Run command in silo: "
-                    my-denote-commands-for-silos nil t))))
-    (let ((denote-directory silo))
-      (call-interactively command)))
 
-;; Our variant of the above, which does the same thing except from
-;; downcasing the string.
-(defun my-denote-sluggify-title (str)
-  "Make STR an appropriate slug for title."
-  (denote--slug-hyphenate (denote--slug-no-punct str)))
+  ;; Our variant of the above, which does the same thing except from
+  ;; downcasing the string.
+  (defun my-denote-sluggify-title (str)
+    "Make STR an appropriate slug for title."
+    (denote--slug-hyphenate (denote--slug-no-punct str)))
 
-;; Now we use our function to sluggify titles without affecting their
-;; letter casing.
-(setq denote-file-name-slug-functions
-      '((title . my-denote-sluggify-title) ; our function here
-        (signature . denote-sluggify-signature)
-        (keyword . identity)))
+
+  (defun vs_denote/dired_open ()
+    "Short cut to open the notes folder in dired."
+    (interactive)
+    (dired denote-directory))
 #+end_src
 
 ** Deft package
@@ -716,137 +701,141 @@ Use the package to capture the notes
  (global-set-key (kbd "C-x C-g") 'deft-find-file)
 #+end_src
 
-** Navigation Packages
+** Denote Helpers
+- **Navigation**
+  #+begin_src emacs-lisp
+    ;; M-x package-refresh-contents - to refresh the contents
 
-#+begin_src emacs-lisp
-  ;; M-x package-refresh-contents - to refresh the contents
+    ;; The `vertico' package applies a vertical layout to the minibuffer.
+    ;; It also pops up the minibuffer eagerly so we can see the available
+    ;; options without further interactions.  This package is very fast
+    ;; and "just works", though it also is highly customisable in case we
+    ;; need to modify its behaviour.
+    ;;
+    ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:cff33514-d3ac-4c16-a889-ea39d7346dc5
+    (use-package vertico
+        :ensure t
+        :config
+        (setq vertico-cycle t)
+        (setq vertico-resize nil)
+        (vertico-mode 1))
 
-  ;; The `vertico' package applies a vertical layout to the minibuffer.
-  ;; It also pops up the minibuffer eagerly so we can see the available
-  ;; options without further interactions.  This package is very fast
-  ;; and "just works", though it also is highly customisable in case we
-  ;; need to modify its behaviour.
-  ;;
-  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:cff33514-d3ac-4c16-a889-ea39d7346dc5
-  (use-package vertico
-    :ensure t
-    :config
-    (setq vertico-cycle t)
-    (setq vertico-resize nil)
-    (vertico-mode 1))
+    ;; The `marginalia' package provides helpful annotations next to
+    ;; completion candidates in the minibuffer.  The information on
+    ;; display depends on the type of content.  If it is about files, it
+    ;; shows file permissions and the last modified date.  If it is a
+    ;; buffer, it shows the buffer's size, major mode, and the like.
+    ;;
+    ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:bd3f7a1d-a53d-4d3e-860e-25c5b35d8e7e
+    (use-package marginalia
+        :ensure t
+        :config
+        (marginalia-mode 1))
 
-  ;; The `marginalia' package provides helpful annotations next to
-  ;; completion candidates in the minibuffer.  The information on
-  ;; display depends on the type of content.  If it is about files, it
-  ;; shows file permissions and the last modified date.  If it is a
-  ;; buffer, it shows the buffer's size, major mode, and the like.
-  ;;
-  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:bd3f7a1d-a53d-4d3e-860e-25c5b35d8e7e
-  (use-package marginalia
-    :ensure t
-    :config
-    (marginalia-mode 1))
+    ;; The `orderless' package lets the minibuffer use an out-of-order
+    ;; pattern matching algorithm.  It matches space-separated words or
+    ;; regular expressions in any order.  In its simplest form, something
+    ;; like "ins pac" matches `package-menu-mark-install' as well as
+    ;; `package-install'.  This is a powerful tool because we no longer
+    ;; need to remember exactly how something is named.
+    ;;
+    ;; Note that Emacs has lots of "completion styles" (pattern matching
+    ;; algorithms), but let us keep things simple.
+    ;;
+    ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2
+    (use-package orderless
+        :ensure t
+        :config
+        (setq completion-styles '(orderless basic)))
 
-  ;; The `orderless' package lets the minibuffer use an out-of-order
-  ;; pattern matching algorithm.  It matches space-separated words or
-  ;; regular expressions in any order.  In its simplest form, something
-  ;; like "ins pac" matches `package-menu-mark-install' as well as
-  ;; `package-install'.  This is a powerful tool because we no longer
-  ;; need to remember exactly how something is named.
-  ;;
-  ;; Note that Emacs has lots of "completion styles" (pattern matching
-  ;; algorithms), but let us keep things simple.
-  ;;
-  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:7cc77fd0-8f98-4fc0-80be-48a758fcb6e2
-  (use-package orderless
-    :ensure t
-    :config
-    (setq completion-styles '(orderless basic)))
+    ;; The `embark' package lets you target the thing or context at point
+    ;; and select an action to perform on it.  Use the `embark-act'
+    ;; command while over something to find relevant commands.
+    ;;
+    ;; When inside the minibuffer, `embark' can collect/export the
+    ;; contents to a fully fledged Emacs buffer.  The `embark-collect'
+    ;; command retains the original behaviour of the minibuffer, meaning
+    ;; that if you navigate over the candidate at hit RET, it will do what
+    ;; the minibuffer would have done.  In contrast, the `embark-export'
+    ;; command reads the metadata to figure out what category this is and
+    ;; places them in a buffer whose major mode is specialised for that
+    ;; type of content.  For example, when we are completing against
+    ;; files, the export will take us to a `dired-mode' buffer; when we
+    ;; preview the results of a grep, the export will put us in a
+    ;; `grep-mode' buffer.
+    ;;
+    ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:61863da4-8739-42ae-a30f-6e9d686e1995
+    (use-package embark
+        :ensure t
+        :bind (("C-." . embark-act)
+            :map minibuffer-local-map
+            ("C-c C-c" . embark-collect)
+            ("C-c C-e" . embark-export)))
 
-  ;; The `embark' package lets you target the thing or context at point
-  ;; and select an action to perform on it.  Use the `embark-act'
-  ;; command while over something to find relevant commands.
-  ;;
-  ;; When inside the minibuffer, `embark' can collect/export the
-  ;; contents to a fully fledged Emacs buffer.  The `embark-collect'
-  ;; command retains the original behaviour of the minibuffer, meaning
-  ;; that if you navigate over the candidate at hit RET, it will do what
-  ;; the minibuffer would have done.  In contrast, the `embark-export'
-  ;; command reads the metadata to figure out what category this is and
-  ;; places them in a buffer whose major mode is specialised for that
-  ;; type of content.  For example, when we are completing against
-  ;; files, the export will take us to a `dired-mode' buffer; when we
-  ;; preview the results of a grep, the export will put us in a
-  ;; `grep-mode' buffer.
-  ;;
-  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:61863da4-8739-42ae-a30f-6e9d686e1995
-  (use-package embark
-    :ensure t
-    :bind (("C-." . embark-act)
-           :map minibuffer-local-map
-           ("C-c C-c" . embark-collect)
-           ("C-c C-e" . embark-export)))
-  
-  (use-package consult
-    :ensure t
-    :bind (;; A recursive grep
-           ("M-s M-g" . consult-grep)
-           ;; Search for files names recursively
-           ("M-s M-f" . consult-find)
-           ;; Search through the outline (headings) of the file
-           ("M-s M-o" . consult-outline)
-           ;; Search the current buffer
-           ("M-s M-l" . consult-line)
-           ;; Switch to another buffer, or bookmarked file, or recently
-           ;; opened file.
-           ("M-s M-b" . consult-buffer)))
-  ;; The `embark-consult' package is glue code to tie together `embark'
-  ;; and `consult'.
-  (use-package embark-consult
-    :ensure t)
+    (use-package consult
+        :ensure t
+        :bind (;; A recursive grep
+            ("M-s M-g" . consult-grep)
+            ;; Search for files names recursively
+            ("M-s M-f" . consult-find)
+            ;; Search through the outline (headings) of the file
+            ("M-s M-o" . consult-outline)
+            ;; Search the current buffer
+            ("M-s M-l" . consult-line)
+            ;; Switch to another buffer, or bookmarked file, or recently
+            ;; opened file.
+            ("M-s M-b" . consult-buffer)))
+    ;; The `embark-consult' package is glue code to tie together `embark'
+    ;; and `consult'.
+    (use-package embark-consult
+        :ensure t)
 
-  ;; The `wgrep' packages lets us edit the results of a grep search
-  ;; while inside a `grep-mode' buffer.  All we need is to toggle the
-  ;; editable mode, make the changes, and then type C-c C-c to confirm
-  ;; or C-c C-k to abort.
-  ;;
-  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:9a3581df-ab18-4266-815e-2edd7f7e4852
-  (use-package wgrep
-    :ensure t
-    :bind ( :map grep-mode-map
-            ("e" . wgrep-change-to-wgrep-mode)
-            ("C-x C-q" . wgrep-change-to-wgrep-mode)
-            ("C-c C-c" . wgrep-finish-edit)))
+    ;; The `wgrep' packages lets us edit the results of a grep search
+    ;; while inside a `grep-mode' buffer.  All we need is to toggle the
+    ;; editable mode, make the changes, and then type C-c C-c to confirm
+    ;; or C-c C-k to abort.
+    ;;
+    ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:9a3581df-ab18-4266-815e-2edd7f7e4852
+    (use-package wgrep
+        :ensure t
+        :bind ( :map grep-mode-map
+                ("e" . wgrep-change-to-wgrep-mode)
+                ("C-x C-q" . wgrep-change-to-wgrep-mode)
+                ("C-c C-c" . wgrep-finish-edit)))
 
-  ;; The built-in `savehist-mode' saves minibuffer histories.  Vertico
-  ;; can then use that information to put recently selected options at
-  ;; the top.
-  ;;
-  ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:25765797-27a5-431e-8aa4-cc890a6a913a
-  (savehist-mode 1)
+    ;; The built-in `savehist-mode' saves minibuffer histories.  Vertico
+    ;; can then use that information to put recently selected options at
+    ;; the top.
+    ;;
+    ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:25765797-27a5-431e-8aa4-cc890a6a913a
+    (savehist-mode 1)
 
-  ;; The built-in `recentf-mode' keeps track of recently visited files.
-  ;; You can then access those through the `consult-buffer' interface or
-  ;; with `recentf-open'/`recentf-open-files'.
-  ;;
-  ;; I do not use this facility, because the files I care about are
-  ;; either in projects or are bookmarked.
-  (recentf-mode 1)
+    ;; The built-in `recentf-mode' keeps track of recently visited files.
+    ;; You can then access those through the `consult-buffer' interface or
+    ;; with `recentf-open'/`recentf-open-files'.
+    ;;
+    ;; I do not use this facility, because the files I care about are
+    ;; either in projects or are bookmarked.
+    (recentf-mode 1)
 
-#+end_src
+    #+end_src
+- **Silo Navigation**
+ #+begin_src emacs-lisp
 
-** Consult Notes Package - usage and tests
-#+begin_src emacs-lisp
-  (use-package consult-notes
-    :ensure t)
+   ;;(setq consult-notes-file-dir-sources
+   ;;   `(("Denote Notes"  ?d ,(denote-directory))
+   ;;     ("Books"  ?b "~/Documents/books/")))
+   ;;
+   ;; (straight-use-package
+   ;;'(consult-denote :repo "protesilaos/consult-denote"))
+   ;;(use-package consult-denote
+   ;;    :ensure t)
 
-  (setq consult-notes-file-dir-sources
-        `(("Denote Notes"  ?d ,(denote-directory))
-          ("Books"  ?b "~/Dropbox/plain_docs/area/v1/denote/books")
-          ("Courses"  ?c "~/Dropbox/plain_docs/area/v1/denote/courses")
-          ("Podcast"  ?p "~/Dropbox/plain_docs/area/v1/denote/podcast")
-          ("Notes"  ?n "~/Dropbox/plain_docs/area/v1/denote/notes")))
-#+end_src
+   (setq consult-notes-file-dir-sources
+         `(("Denote Notes"  ?d ,(denote-directory))
+           ("Web"  ?w "~/Dropbox/plain_docs/publish/web/")))
+    #+end_src
+
 
 ** Org-Config for Calender Workflow
 

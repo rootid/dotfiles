@@ -1,4 +1,8 @@
 * Expt
+
+;; Test palimpsest to move contetn at the end
+(add-hook 'text-mode-hook 'palimpsest-mode)
+
 ;;#+begin_src emacs-lisp
 ;;(use-package org-ql
 ;;  :ensure t)
@@ -135,7 +139,6 @@ Reload Emacs Config file
 
 #+end_src
 
-
 * Emacs Helper Packages 
 ** Why? - Use Vim Modal editing keystorkes.
 #+BEGIN_SRC emacs-lisp
@@ -155,7 +158,7 @@ Reload Emacs Config file
   (setq which-key-idle-delay 1))
 #+end_src
 
-** Hydra package
+** Hydra Package
 - To quickly open directories and files
 - Reduce context switching time
 
@@ -201,7 +204,7 @@ Open all applications and web pages and different types web application
 
 
 * Org mode configuration
-** Org mode packages
+** Org Mode Packages
 
 #+begin_src emacs-lisp
     (use-package org
@@ -467,8 +470,7 @@ Open all applications and web pages and different types web application
 
 #+end_src
 
-
-** Org Habit with Heatmap
+** Org Habit With Heatmap
 #+BEGIN_SRC emacs-lisp
 
  (use-package org-habit
@@ -493,7 +495,7 @@ Open all applications and web pages and different types web application
 
 
 #+END_SRC
-** Org mode helper script
+** Org Mode Helper Script
 
 #+BEGIN_SRC emacs-lisp
 
@@ -563,6 +565,7 @@ Open all applications and web pages and different types web application
                         (format "%s %s-%s" date start-time end-time))))
 #+END_SRC 
 
+
 * Org Mode Helper Packages
 ** Graphwiz/Dot install
 #+begin_src emacs-lisp
@@ -571,7 +574,11 @@ Open all applications and web pages and different types web application
     :config
     (setq graphviz-dot-indent-width 4))
 #+end_src
-** Reverse Date Tree
+** org-reverse-datetree
+- Why?
+  For daily logs I need dates in desceding order wuth latest date on top
+- How?
+  
 Use this package to log the journal and review entries in descending date order
 #+BEGIN_SRC emacs-lisp
 ;;  (use-package org-reverse-datetree
@@ -602,7 +609,7 @@ Use this package to log the journal and review entries in descending date order
 ;;(global-set-key (kbd "C-c r") 'my/org-refile-within-file)
 #+END_SRC 
 
-** Yasnippet package
+** Yasnippet 
 - Why? 
 Org mode template to add structured content
 - How to use it?
@@ -709,7 +716,7 @@ Use the package to capture the notes
  (global-set-key (kbd "C-x C-g") 'deft-find-file)
 #+end_src
 
-** Navigation packages
+** Navigation Packages
 
 #+begin_src emacs-lisp
   ;; M-x package-refresh-contents - to refresh the contents
@@ -828,7 +835,7 @@ Use the package to capture the notes
 
 #+end_src
 
-** Consult notes package - usage and tests
+** Consult Notes Package - usage and tests
 #+begin_src emacs-lisp
   (use-package consult-notes
     :ensure t)
@@ -841,8 +848,11 @@ Use the package to capture the notes
           ("Notes"  ?n "~/Dropbox/plain_docs/area/v1/denote/notes")))
 #+end_src
 
+** Org-Config for Calender Workflow
 
-** Calender Workflow for GTD
+- Plan Day
+- Export the Planner in Calender
+- Calender Prmpting to  
 
 #+begin_src emacs-lisp
   (setq org-icalendar-include-todo t
@@ -852,7 +862,10 @@ Use the package to capture the notes
       org-icalendar-with-timestamps 'active)
 #+end_src
 
-** org-download package for copy paste images
+
+** org-download
+- Package to copy paste images from clipboard
+- How to use ti
 #+begin_src emacs-lisp
 ; Prereq - brew insall pngpaste 
 ; org-downaload package
@@ -910,7 +923,7 @@ PreReq to run the workflow
 ;;#+end_src
 
 
-* Test Workflow
+* Test Workflows
 1. Write the Config in Org Mode
 2. Add the following Property in header Section
    #+PROPERTY: header-args :tangle init.el

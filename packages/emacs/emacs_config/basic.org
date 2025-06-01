@@ -211,100 +211,100 @@ Open all applications and web pages and different types web application
 ** Org Mode Packages
 
 #+begin_src emacs-lisp
-    (use-package org
-      :ensure t)
-  
-    (use-package ox-twbs
-      :ensure t
-      :after org)
+  (use-package org
+    :ensure t)
 
-    (use-package org-bullets
-      :ensure t
-      :config
-      (setq org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●"))
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  (use-package ox-twbs
+    :ensure t
+    :after org)
 
-    (setq org-babel-python-command "python3")
-    (setq org-plantuml-jar-path (expand-file-name "~/projects/org_mode/org-mode-test/plantuml-1.2024.5.jar"))
-    (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+  (use-package org-bullets
+    :ensure t
+    :config
+    (setq org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●"))
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((emacs-lisp . t)
-       (python . t)
-       (shell . t)
-       (java . t)
-       (C . t)
-       (ruby . t)
-       (R . t)
-       (dot . t)
-       (plantuml . t)
-       (latex . t)
-       (org . t)))
+  (setq org-babel-python-command "python3")
+  (setq org-plantuml-jar-path (expand-file-name "~/projects/org_mode/org-mode-test/plantuml-1.2024.5.jar"))
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
 
-    ;; Set Org directory
-    (setq org-directory "~/gtd")
-    ;;(setq org-agenda-files '("backlog.org" "projects.org" "tickler.org"))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (shell . t)
+     (java . t)
+     (C . t)
+     (ruby . t)
+     (R . t)
+     (dot . t)
+     (plantuml . t)
+     (latex . t)
+     (org . t)))
 
-    (setq org-attach-id-dir "~/org_attach/")
+  ;; Set Org directory
+  (setq org-directory "~/gtd")
+  ;;(setq org-agenda-files '("backlog.org" "projects.org" "tickler.org"))
 
-    ;; TODO use these
-    ;;(ol-bbdb ol-bibtex ol-docview ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m)))
-    (setq org-export-backends '(ascii beamer html icalendar latex odt))
+  (setq org-attach-id-dir "~/org_attach/")
 
-    (use-package ox-epub
-      :after org
-      :commands (org-export-dispatch))
+  ;; TODO use these
+  ;;(ol-bbdb ol-bibtex ol-docview ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m)))
+  (setq org-export-backends '(ascii beamer html icalendar latex odt))
+
+  (use-package ox-epub
+    :after org
+    :commands (org-export-dispatch))
 
 
-    ;; --- ox-md Configuration ---
+  ;; --- ox-md Configuration ---
 
-(with-eval-after-load 'ox-md
-  ;; Example: Set headline style to ATX (GitHub Flavored Markdown style)
-  ;; Uses '#' for level 1, '##' for level 2, etc.
-  (setq org-md-headline-preface ""
-        org-md-headline-style 'atx)
+  (with-eval-after-load 'ox-md
+    ;; Example: Set headline style to ATX (GitHub Flavored Markdown style)
+    ;; Uses '#' for level 1, '##' for level 2, etc.
+    (setq org-md-headline-preface ""
+          org-md-headline-style 'atx)
 
-  ;; Example: Ensure a blank line after headlines (often good for readability)
-  (setq org-md-blank-line-after-headline t)
+    ;; Example: Ensure a blank line after headlines (often good for readability)
+    (setq org-md-blank-line-after-headline t)
 
-  ;; Example: Set the default file extension for Markdown exports
-  ;; The default is "md", but you could use "markdown" if you prefer.
-  (setq org-md-extension "md")
+    ;; Example: Set the default file extension for Markdown exports
+    ;; The default is "md", but you could use "markdown" if you prefer.
+    (setq org-md-extension "md")
 
-  ;; Example: How to export tags
-  ;; By default, tags are exported as a comma-separated list in a paragraph
-  ;; below the headline.
-  ;; (setq org-md-tag-keyword "Tags:")
+    ;; Example: How to export tags
+    ;; By default, tags are exported as a comma-separated list in a paragraph
+    ;; below the headline.
+    ;; (setq org-md-tag-keyword "Tags:")
 
-  ;; Example: Control how code blocks are exported
-  ;; 'verbatim (default), 'fenced (most common for GFM), 'indented
-  (setq org-md-src-block-backend 'fenced)
+    ;; Example: Control how code blocks are exported
+    ;; 'verbatim (default), 'fenced (most common for GFM), 'indented
+    (setq org-md-src-block-backend 'fenced)
 
-  ;; Example: Control how a table of contents is handled
-  ;; `t` for including it automatically, `nil` otherwise.
-  (setq org-md-export-to-markdown-with-toc nil) ; Don't add a TOC by default
+    ;; Example: Control how a table of contents is handled
+    ;; `t` for including it automatically, `nil` otherwise.
+    (setq org-md-export-to-markdown-with-toc nil) ; Don't add a TOC by default
 
-  ;; Example: If you want to add a TOC, define its level range
-  ;; (setq org-md-toc-maximum-level 3)
+    ;; Example: If you want to add a TOC, define its level range
+    ;; (setq org-md-toc-maximum-level 3)
 
-  ;; Example: Add a custom preamble to the exported Markdown file.
-  ;; This is useful for adding metadata like Jekyll front matter or
-  ;; other specific headers.
-  ;; (setq org-md-preamble-format
-  ;;       '((standard . "# My Org-exported Markdown Document\n\n")))
+    ;; Example: Add a custom preamble to the exported Markdown file.
+    ;; This is useful for adding metadata like Jekyll front matter or
+    ;; other specific headers.
+    ;; (setq org-md-preamble-format
+    ;;       '((standard . "# My Org-exported Markdown Document\n\n")))
 
-  ;; Example: Customize link export format
-  ;; By default, it's `[description](link)`.
-  ;; (setq org-md-link-format '([%s](%s)))
+    ;; Example: Customize link export format
+    ;; By default, it's `[description](link)`.
+    ;; (setq org-md-link-format '([%s](%s)))
 
-  ;; More advanced: Adjusting headline levels if your Org file uses
-  ;; top-level headings (level 1) that you want to appear as
-  ;; secondary headings (level 2) in Markdown.
-  ;; (setq org-md-export-headline-offset 1) ; This would make Org level 1 -> Markdown level 2
-)
+    ;; More advanced: Adjusting headline levels if your Org file uses
+    ;; top-level headings (level 1) that you want to appear as
+    ;; secondary headings (level 2) in Markdown.
+    ;; (setq org-md-export-headline-offset 1) ; This would make Org level 1 -> Markdown level 2
+    )
 
-    (defun move-cancelled-tasks-to-archive ()
+  (defun move-cancelled-tasks-to-archive ()
     "Move cancelled tasks to the archive."
     (interactive)
     (save-mark-and-excursion
@@ -312,148 +312,136 @@ Open all applications and web pages and different types web application
        (lambda ()
          (when (string= (org-get-todo-state) "CANCELLED")
            (org-archive-subtree))))
-       "/+CANCELLED" 'file))
+      "/+CANCELLED" 'file))
 
-    ;; Bind the function to a key
-    (global-set-key (kbd "C-c C-x a") 'move-cancelled-tasks-to-archive)
+  ;; Bind the function to a key
+  (global-set-key (kbd "C-c C-x a") 'move-cancelled-tasks-to-archive)
 
-    ;; FixME
-    ;; Define a function to export Org files to HTML
-    ;;(defun my-export-to-html ()
-    ;;  "Export the current Org file to HTML."
-    ;;  (interactive)
-    ;;  (org-export-to-file 'html (concat (buffer-file-name) ".html") nil))
-    ;;
-           ;;;; Customize key binding for HTML export
-    ;;(global-set-key (kbd "C-c e h") 'my-export-to-html)
+  ;; FixME
+  ;; Define a function to export Org files to HTML
+  ;;(defun my-export-to-html ()
+  ;;  "Export the current Org file to HTML."
+  ;;  (interactive)
+  ;;  (org-export-to-file 'html (concat (buffer-file-name) ".html") nil))
+  ;;
+             ;;;; Customize key binding for HTML export
+  ;;(global-set-key (kbd "C-c e h") 'my-export-to-html)
 
-    (defun vs/gtd_copy_id_to_clipboard() "Copy an ID link with the
+  (defun vs/gtd_copy_id_to_clipboard() "Copy an ID link with the
              headline to killring, if no ID is there then create a new unique
-           ID.  This function works only in org-mode or org-agenda buffers. 
-           The purpose of this function is to easily construct id:-links to 
-           org-mode items. If its assigned to a key it saves you marking the
-           text and copying to the killring."
-           (interactive)
-           (when (eq major-mode 'org-agenda-mode) ;if we are in agenda mode we switch to orgmode
-             (org-agenda-show)
-             (org-agenda-goto))       
-           (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
-             (setq mytmphead (nth 4 (org-heading-components)))
-             (setq mytmpid (funcall 'org-id-get-create))
-             (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
-             (kill-new mytmplink)
-             (message "Copied %s to killring (clipboard)" mytmplink)))
-    (global-set-key (kbd "C-c i") 'vs/gtd_copy_id_to_clipboard)
-    (global-set-key (kbd "C-c c") 'org-capture)
-    (global-set-key (kbd "C-c a") 'org-agenda)
-    (define-key org-mode-map (kbd "C-c o") 'org-open-at-point)
+             ID.  This function works only in org-mode or org-agenda buffers. 
+             The purpose of this function is to easily construct id:-links to 
+             org-mode items. If its assigned to a key it saves you marking the
+             text and copying to the killring."
+         (interactive)
+         (when (eq major-mode 'org-agenda-mode) ;if we are in agenda mode we switch to orgmode
+           (org-agenda-show)
+           (org-agenda-goto))       
+         (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+           (setq mytmphead (nth 4 (org-heading-components)))
+           (setq mytmpid (funcall 'org-id-get-create))
+           (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
+           (kill-new mytmplink)
+           (message "Copied %s to killring (clipboard)" mytmplink)))
+  (global-set-key (kbd "C-c i") 'vs/gtd_copy_id_to_clipboard)
+  (global-set-key (kbd "C-c c") 'org-capture)
+  (global-set-key (kbd "C-c a") 'org-agenda)
+  (define-key org-mode-map (kbd "C-c o") 'org-open-at-point)
 
-    (evil-define-key 'normal org-mode-map (kbd "TAB") 'org-cycle) ;; C-h k <TAB> to confirm override
+  (evil-define-key 'normal org-mode-map (kbd "TAB") 'org-cycle) ;; C-h k <TAB> to confirm override
 
-    (setq org-log-into-drawer t) ;; C-c C-z - start notes
-    (setq org-clock-into-drawer "CLOCKING")
-    (setq org-log-reschedule 'time) ;; To disable - (setq org-log-reschedule nil)
-    (setq org-log-done 'note) ;; To disable - (setq org-log-done nil)
-    (setq org-clock-sound t)
+  (setq org-log-into-drawer t) ;; C-c C-z - start notes
+  (setq org-clock-into-drawer "CLOCKING")
+  (setq org-log-reschedule 'time) ;; To disable - (setq org-log-reschedule nil)
+  (setq org-log-done 'note) ;; To disable - (setq org-log-done nil)
+  (setq org-clock-sound t)
 
-    (defun vs_org/gtd_show_mobile() "Show tasks from Mobile." 
-           (interactive)
-           (setq org-agenda-files '("~/beorg/inbox.org")))
+  ;; Org capture template
+  (setq org-capture-templates
+        '(("c" "Capture Company, Task, Book, Media")
+          ("cj" "Company entry" entry
+           (file+headline "~/area/v1/denote/notes/capture_companies.org" "Company")
+           (file "~/templates/tpl_company.txt")
+           :empty-lines-before 1)
+          ("ct" "TODO entry" entry
+           (file+headline "~/backlog/backlog.org" "Backlog")
+           (file "~/templates/tpl_todo.txt")
+           :empty-lines-before 1)
+          ("cb" "Add Book to Read/Listen" entry
+           (file+headline "~/area/v1/denote/notes/capture_books.org" "Books To Read/Listen")
+           (file "~/templates/tpl_book.txt")
+           :empty-lines-before 1)
+          ("cm" "Media to Watch/Listen" entry
+           (file+headline "~/area/v1/denote/notes/capture_media.org" "Media to Watch/Listen")
+           (file "~/templates/tpl_media.txt")
+           :empty-lines-before 1)
+          ("cl" "Bookmark" entry
+           (file+headline "~/backlog/bookmark.org" "Bookmarks")
+           (file "~/templates/tpl_bookmark.txt")
+           :empty-lines-before 1)
+          ("cy" "Things to Buy" entry
+           (file+headline "~/backlog/things_to_buy.org" "Things To Buy")
+           (file "~/templates/tpl_buy.txt")
+           :empty-lines-before 1)
+          ("ce" "Errands" entry
+           (file+headline "~/backlog/errands.org" "Errands")
+           (file "~/templates/tpl_errands.txt")
+           :empty-lines-before 1)
+          ("n" "TidBits/Ideas/Anec")
+          ("na" "Anec/Quotes Tidbits One-liner" entry
+           (file+headline "~/area/v1/denote/notes/capture_quotes.org" "Quotes/Anecdotes")
+           (file "~/templates/tpl_quote.txt") :empty-lines-before 1)
+          ("ni" "Add Idea to Marketplace" entry
+           (file+headline "~/area/v1/denote/notes/capture_ideas.org" "Idea MarketPlace")
+           (file "~/templates/tpl_idea.txt")
+           :empty-lines-before 1)
+          ("j" "Create Daily Journal" entry 
+           (file+function "~/area/v1/denote/notes/20241201T173755--Journal__daily_journal.org" org-reverse-datetree-goto-date-in-file) "* %?\nEntered on %U\n  %i\n  %a")
+          ("w" "Watch Later" entry
+           (file+headline "~/area/v1/denote/notes/capture_youtube.org" "Media to Watch/Listen")
+           (file "~/templates/tpl_yt.txt")
+           :empty-lines-before 1)
+          ("b" "Backlog" entry
+           (file+headline "~/backlog/backlog.org" "Backlog")
+           (file "~/templates/tpl_todo.txt")
+           :empty-lines-before 1)))
 
-    (defun vs_org/open_inbox()
-          (interactive)
-          (find-file "~/beorg/inbox.org")) 
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
 
-    (defun vs_org/org_show_scratch() "Show Scratch Org." 
-           (interactive)
-           (setq org-agenda-files '("task.org")))
+  ;; Add a hook that will log when we activate a task by creating an "ACTIVATED" property the first time the task enters the NEXT state
+  (defun log-todo-next-creation-date (&rest ignore)
+    "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
+    (when (and (string= (org-get-todo-state) "NEXT")
+               (not (org-entry-get nil "ACTIVATED")))
+      (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
+  (add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
 
-    ;; Org capture template
-    (setq org-capture-templates
-          '(("c" "Capture Company, Task, Book, Media")
-            ("cj" "Company entry" entry
-             (file+headline "~/area/v1/denote/notes/capture_companies.org" "Company")
-             (file "~/templates/tpl_company.txt")
-              :empty-lines-before 1)
-            ("ct" "TODO entry" entry
-             (file+headline "~/backlog/backlog.org" "Backlog")
-             (file "~/templates/tpl_todo.txt")
-              :empty-lines-before 1)
-            ("cb" "Add Book to Read/Listen" entry
-             (file+headline "~/area/v1/denote/notes/capture_books.org" "Books To Read/Listen")
-             (file "~/templates/tpl_book.txt")
-              :empty-lines-before 1)
-            ("cm" "Media to Watch/Listen" entry
-             (file+headline "~/area/v1/denote/notes/capture_media.org" "Media to Watch/Listen")
-             (file "~/templates/tpl_media.txt")
-               :empty-lines-before 1)
-            ("cl" "Bookmark" entry
-             (file+headline "~/backlog/bookmark.org" "Bookmarks")
-             (file "~/templates/tpl_bookmark.txt")
-               :empty-lines-before 1)
-            ("cy" "Things to Buy" entry
-             (file+headline "~/backlog/things_to_buy.org" "Things To Buy")
-             (file "~/templates/tpl_buy.txt")
-               :empty-lines-before 1)
-            ("ce" "Errands" entry
-             (file+headline "~/backlog/errands.org" "Errands")
-             (file "~/templates/tpl_errands.txt")
-               :empty-lines-before 1)
-            ("n" "TidBits/Ideas/Anec")
-            ("na" "Anec/Quotes Tidbits One-liner" entry
-             (file+headline "~/area/v1/denote/notes/capture_quotes.org" "Quotes/Anecdotes")
-             (file "~/templates/tpl_quote.txt") :empty-lines-before 1)
-            ("ni" "Add Idea to Marketplace" entry
-             (file+headline "~/area/v1/denote/notes/capture_ideas.org" "Idea MarketPlace")
-             (file "~/templates/tpl_idea.txt")
-               :empty-lines-before 1)
-            ("j" "Create Daily Journal" entry 
-            (file+function "~/area/v1/denote/notes/20241201T173755--Journal__daily_journal.org" org-reverse-datetree-goto-date-in-file) "* %?\nEntered on %U\n  %i\n  %a")
-            ("w" "Watch Later" entry
-             (file+headline "~/area/v1/denote/notes/capture_youtube.org" "Media to Watch/Listen")
-             (file "~/templates/tpl_yt.txt")
-               :empty-lines-before 1)
-            ("b" "Backlog" entry
-             (file+headline "~/backlog/backlog.org" "Backlog")
-             (file "~/templates/tpl_todo.txt")
-              :empty-lines-before 1)))
+  (setq org-agenda-prefix-format
+        '((agenda . " %i %-12:c%?-12t% s")
+          (todo   . " ")
+          (tags   . " %i %-12:c")
+          (search . " %i %-12:c")))
 
-    (setq org-refile-use-outline-path 'file)
-    (setq org-outline-path-complete-in-steps nil)
+  ;; Automatic saving after refilling
+  (setq org-agenda-files 
+        (mapcar 'file-truename 
+                (file-expand-wildcards "~/gtd/*.org")))
 
-    ;; Add a hook that will log when we activate a task by creating an "ACTIVATED" property the first time the task enters the NEXT state
-    (defun log-todo-next-creation-date (&rest ignore)
-      "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
-      (when (and (string= (org-get-todo-state) "NEXT")
-                 (not (org-entry-get nil "ACTIVATED")))
-        (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
-    (add-hook 'org-after-todo-state-change-hook #'log-todo-next-creation-date)
+  ;; Save the corresponding buffers
+  (defun gtd-save-org-buffers ()
+    "Save `org-agenda-files' buffers without user confirmation.  See also `org-save-all-org-buffers'"
+    (interactive)
+    (message "Saving org-agenda-files buffers...")
+    (save-some-buffers t (lambda () 
+                           (when (member (buffer-file-name) org-agenda-files) 
+                             t)))
+    (message "Saving org-agenda-files buffers... done"))
 
-    (setq org-agenda-prefix-format
-          '((agenda . " %i %-12:c%?-12t% s")
-            (todo   . " ")
-            (tags   . " %i %-12:c")
-            (search . " %i %-12:c")))
-
-    ;; Automatic saving after refilling
-    (setq org-agenda-files 
-          (mapcar 'file-truename 
-                  (file-expand-wildcards "~/gtd/*.org")))
-
-    ;; Save the corresponding buffers
-    (defun gtd-save-org-buffers ()
-      "Save `org-agenda-files' buffers without user confirmation.  See also `org-save-all-org-buffers'"
-      (interactive)
-      (message "Saving org-agenda-files buffers...")
-      (save-some-buffers t (lambda () 
-                             (when (member (buffer-file-name) org-agenda-files) 
-                               t)))
-      (message "Saving org-agenda-files buffers... done"))
-
-    ;; Add it after refile
-    (advice-add 'org-refile :after
-                (lambda (&rest _)
-                  (gtd-save-org-buffers)))
+  ;; Add it after refile
+  (advice-add 'org-refile :after
+              (lambda (&rest _)
+                (gtd-save-org-buffers)))
 
 #+end_src
 

@@ -19,6 +19,7 @@ update_brew_bundle:
 
 dry_run_stow:
 	@stow --simulate zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=5
+	@stow --simulate ssh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=5
 
 link_config_files:
 	@stow config --dir=$(HOME_DIR)/dotfiles/ --target=$(HOME_DIR) --verbose=3 # the base config file only for non packaged apps
@@ -27,6 +28,7 @@ link_config_files:
 	@stow zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 	@stow tmux --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 	@stow emacs --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
+	@stow ssh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
 
 unlink_config_files:
 	@echo "unlinking selected config files"

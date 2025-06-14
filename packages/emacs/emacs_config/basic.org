@@ -68,7 +68,7 @@ Includes modeline configuration, file save configuration, 2 spaces
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-message t)
   (tool-bar-mode -1)
-  (menu-bar-mode -1)
+  ;;(menu-bar-mode -1)
   (scroll-bar-mode -1)
 
   (display-time-mode 1)
@@ -179,13 +179,13 @@ Reload Emacs Config file
 
   (global-set-key (kbd "C-c d") 'hydra-dired/body)
 
-  (defhydra hydra-open-files ()
+  (defhydra go-open-files ()
     "Open files"
     ("c" (lambda () (interactive) (find-file "~/emacs_config/basic.org")) "Open Config file")
     ("i" (lambda () (interactive) (find-file "~/beorg/inbox.org")) "Open Inbox")
     ("q" nil "quit"))
 
-  (global-set-key (kbd "C-c g") 'hydra-open-files/body)
+  (global-set-key (kbd "C-c g") 'go-open-files/body)
 #+end_src
 
 

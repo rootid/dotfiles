@@ -2,13 +2,16 @@
 :PROPERTIES:
 :ID:       `(shell-command-to-string "uuidgen")`:CREATED: `(with-temp-buffer (org-insert-time-stamp (current-time) t t))`
 :Links:    $0
-:Author:   Liu Cixin
+:Author:   Vikram Sawant
 :Genre:    non-fiction
 :Idea:     $1 
 :Pages:    302
 :END:
 ** Introduction
 ** Summary
+** Summary - LLM 
 ** Key Takeaways (3)
 ** Action Items
 ** Questions
+** Archives
+Notes

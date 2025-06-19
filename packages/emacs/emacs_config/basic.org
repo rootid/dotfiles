@@ -652,17 +652,17 @@ Use the package to capture the notes
 
   ;; Now we use our function to sluggify titles without affecting their
   ;; letter casing.
-  (setq denote-file-name-slug-functions
-        '((title . my-denote-sluggify-title) ; our function here
-          (signature . denote-sluggify-signature)
-          (keyword . identity)))
+  ;;(setq denote-file-name-slug-functions
+  ;;      '((title . my-denote-sluggify-title) ; our function here
+  ;;        (signature . denote-sluggify-signature)
+  ;;        (keyword . identity)))
 
 
-  ;; Our variant of the above, which does the same thing except from
-  ;; downcasing the string.
-  (defun my-denote-sluggify-title (str)
-    "Make STR an appropriate slug for title."
-    (denote--slug-hyphenate (denote--slug-no-punct str)))
+  ;;;; Our variant of the above, which does the same thing except from
+  ;;;; downcasing the string.
+  ;;(defun my-denote-sluggify-title (str)
+  ;;  "Make STR an appropriate slug for title."
+  ;;  (denote--slug-hyphenate (denote--slug-no-punct str)))
 
 
   (defun vs_denote/dired_open ()
@@ -844,23 +844,24 @@ Use the package to capture the notes
 - Package to copy paste images from clipboard
 - How to use ti
 #+begin_src emacs-lisp
-; Prereq - brew insall pngpaste 
-; org-downaload package
-(use-package org-download
-  :after org
-  :config
-  (org-download-enable)
-  :custom
-  (org-download-method 'directory)
-  (org-download-image-dir "~/area/images")
-  (org-download-heading-lvl nil)
-  (org-download-timestamp "%Y%m%d-%H%M%S_")
-  (org-download-backend 'url-retrieve)
-  (org-download-screenshot-method "/opt/homebrew/bin/pngpaste %s")
-  :bind
-  ("C-M-y" . org-download-screenshot)
-  :config
-  (require 'org-download))
+  ; Prereq - brew insall pngpaste 
+  ; org-downaload package
+  (use-package org-download
+    :after org
+    :config
+    (org-download-enable)
+    :custom
+    (org-download-method 'directory)
+    (org-download-image-dir "~/area/images")
+    (org-download-heading-lvl nil)
+    (org-download-timestamp "%Y%m%d-%H%M%S_")
+    (org-download-backend 'url-retrieve)
+    (org-download-screenshot-method "/opt/homebrew/bin/pngpaste %s")
+    :bind
+;Ctrl-Option-y
+    ("C-M-y" . org-download-screenshot) 
+    :config
+    (require 'org-download))
 
 #+end_src
 

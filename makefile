@@ -1,130 +1,122 @@
-.PHONY: install_homebrew install_omz update_brew_bundle dry_run_stow link_config_files unlink_config_files link_tools unlink_tools link_vim unlink_vim init_vim_packages link_org_sys link_pvt_org_mode_snippets
+# --- Configuration ---
+# Use the HOME environment variable for portability instead of a hardcoded path.
+HOME ?= $(HOME)
+# Define the location of your dotfiles directory.
+DOTFILES_DIR = $(HOME)/dotfiles
 
-HOME_DIR = /Users/vmat
+# Define the shell to be used for recipes.
 SHELL := /bin/zsh
 
+# --- Phony Targets ---
+# .PHONY declares that these targets are not files.
+# Using a multi-line declaration is cleaner and easier to maintain.
+.PHONY: all clean \
+	install_homebrew install_omz update_brew_bundle \
+	dry_run_stow \
+	link_config_files unlink_config_files \
+	link_tools unlink_tools \
+	init_vim_packages link_vim unlink_vim \
+	link_org_sys unlink_org_sys \
+	link_pvt_org_mode_snippets
+
+# --- Base Commands ---
+# Define a reusable base command for stow to keep the code DRY (Don't Repeat Yourself).
+STOW = @stow --dir=$(DOTFILES_DIR)/packages/ --target=$(HOME)
+STOW_DRY_RUN = $(STOW) --simulate --verbose=5
+STOW_LINK = $(STOW) --verbose=3
+STOW_UNLINK = $(STOW) --delete --verbose=5
+
+# --- Main Targets ---
+
+all: link_config_files link_tools
+
 install_homebrew:
-	@echo "Installing Homebrew on Mac"
-	source bin/install.sh && install_homebrew
-	@echo "Installation completed"
+	@echo "Installing Homebrew on Mac..."
+	@$(SHELL) -c 'source bin/install.sh && install_homebrew'
+	@echo "Homebrew installation completed."
 
 install_omz:
-	@echo "Installing ZSH on mac"
-	source bin/install.sh && install_omz
-	@echo "Installation completed"
+	@echo "Installing Oh My Zsh..."
+	@$(SHELL) -c 'source bin/install.sh && install_omz'
+	@echo "Oh My Zsh installation completed."
 
 update_brew_bundle:
-	@echo "Adding Apps/Install using brewfile"
-	@brew bundle --file=packages/brew/brewfile
+	@echo "Updating applications using Brewfile..."
+	@brew bundle --file=$(DOTFILES_DIR)/packages/brew/brewfile
+
+# --- Stow Operations ---
 
 dry_run_stow:
-	@stow --simulate zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=5
-	@stow --simulate ssh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=5
+	@echo "Performing a dry run of stow operations..."
+	$(STOW_DRY_RUN) zsh
+	$(STOW_DRY_RUN) ssh
 
 link_config_files:
-	@stow config --dir=$(HOME_DIR)/dotfiles/ --target=$(HOME_DIR) --verbose=3 # the base config file only for non packaged apps
-	@stow stow --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
-	@stow git --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
-	@stow zsh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
-	@stow tmux --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
-	@stow emacs --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
-	@stow ssh --dir=$(HOME_DIR)/dotfiles/packages/ --target=$(HOME_DIR) --verbose=3
+	@echo "Linking configuration files..."
+	@stow config --dir=$(DOTFILES_DIR) --target=$(HOME) --verbose=3
+	$(STOW_LINK) stow
+	$(STOW_LINK) git
+	$(STOW_LINK) zsh
+	$(STOW_LINK) tmux
+	$(STOW_LINK) emacs
+	$(STOW_LINK) ssh
 
 unlink_config_files:
-	@echo "unlinking selected config files"
-	@stow --delete emacs --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5 
-	@stow --delete emacs-templates --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5 
-	#@stow --delete emacs --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5 --simulate 
+	@echo "Unlinking selected config files..."
+	$(STOW_UNLINK) emacs
+	$(STOW_UNLINK) emacs-templates
 
 link_tools:
-	@echo "Updating tools shortcuts"
-	@stow tools --dir=$(HOME_DIR)/dotfiles --target=$(HOME_DIR) --no-folding --verbose=3 
+	@echo "Linking tools..."
+	@stow tools --dir=$(DOTFILES_DIR) --target=$(HOME) --no-folding --verbose=3
 
 unlink_tools:
-	@echo "unlinking tools shortcuts"
-	@stow -D tools --verbose=5 --simulate
+	@echo "Unlinking tools (dry run)..."
+	@stow --delete tools --dir=$(DOTFILES_DIR) --target=$(HOME) --verbose=5 --simulate
 
-link_vim :
-	#stow --simulate vim -t ~ --dir=$(HOME_DIR)/dotfiles/packages/ --no-folding --verbose=3
-	#stow --simulate vim -t ~ --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=3
-	@stow vim --target=$(HOME_DIR) --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=3
-
-unlink_vim :
-	#@stow --simulate --delete vim --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5
-	@stow --delete vim --dir=$(HOME_DIR)/dotfiles/packages/ --verbose=5
+# --- Vim Package Management ---
 
 init_vim_packages:
-	# To add any vim package add to either start(regular) or opt(experimental) dir 
-	@echo "Move the latest repo @ top"
-	# TODO - Fix the error handling by checking not continue if dir exists
-	#
-	mkdir -p $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/{colors,syntax,others}/{start,opt} 
-	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-obsession.git  
-	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-repeat.git  
-	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-abolish.git  
-	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-fugitive.git  
-	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-commentary.git  
-	@git -C $(HOME_DIR)/dotfiles/packages/vim/.vim/pack/others/start clone git@github.com:tpope/vim-surround.git 
+	@echo "Initializing Vim package directories..."
+	@mkdir -p $(DOTFILES_DIR)/packages/vim/.vim/pack/{colors,syntax,others}/{start,opt}
+	@mkdir -p $(DOTFILES_DIR)/packages/vim/.vim/autoload
+	@echo "Downloading vim-plug..."
+	@curl -fLo $(DOTFILES_DIR)/packages/vim/.vim/autoload/plug.vim --create-dirs \
+		https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-	#@stow --delete publish --dir=$(HOME_DIR)/plain_docs --verbose=3
-	#@stow --delete projects --dir=$(HOME_DIR)/plain_docs --verbose=3
-	#@stow --delete archives --dir=$(HOME_DIR)/plain_docs --verbose=3
-	#@stow --delete publish --dir=$(HOME_DIR)/plain_docs --verbose=3 --simulate
+link_vim:
+	@echo "Linking Vim configuration..."
+	$(STOW_LINK) vim
 
-unlink_org_sys:
-	#@stow --delete area --dir=$(HOME_DIR)/Dropbox/plain_docs --verbose=3
-	#@stow --delete others  --dir=$(HOME_DIR)/Dropbox/plain_docs/area --verbose=3
-	#@stow --delete books   --dir=$(HOME_DIR)/Dropbox/plain_docs/area --verbose=3
-	#@stow --delete courses  --dir=$(HOME_DIR)/Dropbox/plain_docs/area --verbose=3
-	@stow --simulate area --target=$(HOME_DIR) --dir=$(HOME_DIR)/Dropbox/plain_docs --ignore='v1|journal|books|course' --verbose=3  
-	#--no-folding
+unlink_vim:
+	@echo "Unlinking Vim configuration..."
+	$(STOW_UNLINK) vim
 
-#courses -> Dropbox/plain_docs/area/courses
+# --- Org Mode Symlinking ---
 
 link_org_sys:
-	# PreReq - first clone the plain_docs directory
-	# To add any project 
-	# mkdir ~/Dropbox/projects/<project_name>
-	# make link_org_sys
-	@stow projects --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
-	@stow archives --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
-	@stow publish --dir=$(HOME_DIR)/Dropbox/plain_docs --target=$(HOME_DIR) --verbose=3 
-	@stow denote  --dir=$(HOME_DIR)/Dropbox/plain_docs/area/v1 --target=$(HOME_DIR) --verbose=3 
-	# Keep only first level stow directories 
-	#@stow --target=$(HOME_DIR) --dir=$(HOME_DIR)/Dropbox/plain_docs --ignore='jour*' area --verbose=3  
-	ln -s $(HOME_DIR)/Dropbox/plain_docs/area ~/area
+	@echo "Linking Org mode directories..."
+	@stow projects --dir=$(HOME)/Dropbox/plain_docs --target=$(HOME) --verbose=3
+	@stow archives --dir=$(HOME)/Dropbox/plain_docs --target=$(HOME) --verbose=3
+	@stow publish --dir=$(HOME)/Dropbox/plain_docs --target=$(HOME) --verbose=3
+	@stow denote --dir=$(HOME)/Dropbox/plain_docs/area/v1 --target=$(HOME) --verbose=3
+	@ln -sfn $(HOME)/Dropbox/plain_docs/area $(HOME)/area
+
+unlink_org_sys:
+	@echo "Unlinking Org mode directories (dry run)..."
+	@stow --simulate area --target=$(HOME) --dir=$(HOME)/Dropbox/plain_docs --ignore='v1|journal|books|course' --verbose=3
 
 link_pvt_org_mode_snippets:
-	@stow org-mode --dir=$(HOME_DIR)/templates/ --target=$(HOME_DIR)/emacs_snippets/org-mode --verbose=3 
-# TODO: 
-#stow --target=/Users/vmat/emacs_snippets/org-mode --dir=/Users/vmat/templates org-mode --verbose=3 
+	@echo "Linking private Org mode snippets..."
+	@stow org-mode --dir=$(HOME)/templates/ --target=$(HOME)/emacs_snippets/org-mode --verbose=3
 
-#install_python_bins:
-#	@echo "Installing python bins"
-#	pip3 install -r tools/python/requirements.txt
-#
-#add_fonts:
-#	@echo "Adding font"
-#	fonts/install.sh
-#
-#link_config:
-#	@echo "Adding/updating config"
-#	@stow -t ~ config -vvv
-#
-#update_ssh_config:
-#	@echo "Adding/updating ssh config"
-#	@stow -t ~ ssh -vvv
-#
-#unlink_config:
-#	@echo "unlinking config shortcuts"
-#	@stow -D config -vvv
-#
-#update_vim:
-#	# To update color clone repo and add color to vim/.vim/color dir and run this command
-#	@echo "Updating vim config"
-#	@stow -t ~ vim --no-folding -vvv
-#	mkdir -p $(HOME)/.vim-plug/plugged
-#
+clean:
+	@echo "This is a placeholder for a clean command."
 
-# stow test the changes first eg. stow -n -t ~ ssh -vvv
-# vim: noexpandtab
+# --- Makefile self-documentation ---
+help:
+	@echo "Available commands:"
+	@grep -E '^[a-zA-Z_-]+:.*?$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?$$"}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/@[^ ]* //g'
+
+
+# vim: set noexpandtab:

@@ -137,17 +137,32 @@ endif
 " set undofile   " Maintain undo history between sessions
 
 " }
+" Section: Plugins {
+"
+
+
+"curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+"    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+call plug#begin()
+  Plug 'tpope/vim-obsession' " Session
+  Plug 'tpope/vim-repeat' "Repeat
+  Plug 'tpope/vim-abolish'
+  Plug 'tpope/vim-commentary' " gcc
+  Plug 'tpope/vim-surround'
+  " If installed using Homebrew
+  "Plug '/usr/local/opt/fzf'
+  "Plug 'junegunn/fzf.vim'
+
+call plug#end()
+
+
+" }
 
 " Section: Plugins {
 "Plug 'KevinBockelandt/notoire'
 "Plug 'junegunn/vim-easy-align'
-"Plug 'tpope/vim-surround'
 "Plug 'editorconfig/editorconfig-vim' "editorconfig
 "Plug 'tpope/vim-fugitive' "Git
-"Plug 'tpope/vim-abolish'
-"Plug 'tpope/vim-repeat' "Repeat
-"Plug 'tpope/vim-obsession' " Session
-"Plug 'tpope/vim-commentary' " gcc
 "Plug 'nathanaelkane/vim-indent-guides' "indent
 "Plug 'Yggdroot/indentLine' "indent
 "Plug 'mattn/emmet-vim' "HTML
@@ -161,14 +176,8 @@ endif
 " Plug 'inkarkat/vim-SpellCheck'
 " Plug 'b4b4r07/vim-sqlfmt'
 " Plug 'mattn/vim-sqlfmt'
-
 " Plug 'honza/vim-snippets'
 " Plug 'SirVer/ultisnips'  "vim-snippets must install to ultisnips work
-
-" If installed using Homebrew
-"Plug '/usr/local/opt/fzf'
-"Plug 'junegunn/fzf.vim'
-
 "Plug 'vimwiki/vimwiki'
 "Plug 'mattn/calendar-vim'
 " }

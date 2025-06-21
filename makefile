@@ -76,6 +76,8 @@ unlink_tools:
 
 # --- NeoVim Package Management ---
 init_nvim:
+	# brew install nvim
+	# git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
 	@echo "init dir structure for nvim"
 	mkdir -p $(HOME)/.config
 	stow --verbose=5 --dir=$(DOTFILES_DIR)/packages/ --target=$(HOME)/.config nvim 

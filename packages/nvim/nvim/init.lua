@@ -1,0 +1,5 @@
+require("goodson")
+--require("goodson.remap")
+--require("goodson.packer")
+--require("plugins")
+print("Hello world")

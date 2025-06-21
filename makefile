@@ -74,6 +74,12 @@ unlink_tools:
 	@echo "Unlinking tools (dry run)..."
 	@stow --delete tools --dir=$(DOTFILES_DIR) --target=$(HOME) --verbose=5 --simulate
 
+# --- NeoVim Package Management ---
+init_nvim:
+	@echo "init dir structure for nvim"
+	mkdir -p $(HOME)/.config
+	stow --verbose=5 --dir=$(DOTFILES_DIR)/packages/ --target=$(HOME)/.config nvim 
+
 # --- Vim Package Management ---
 
 init_vim_packages:

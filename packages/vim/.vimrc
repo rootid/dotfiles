@@ -371,10 +371,16 @@ command -range=% KSB :<line1>,<line2>s/\n\{3,}/\r\r/e
 " Fast formatting pretty print line > 100
 nmap ,f1 :g/.\{100,\}/ .!par w100<CR>
 
-set expandtab 
-set shiftwidth=2 
+" Use spaces instead of tabs
+set expandtab
+" Number of spaces to use for each step of (auto)indent
+set shiftwidth=2
+" Number of spaces a <Tab> counts for while editing
 set softtabstop=2
+" Number of spaces that a <Tab> in the file counts for
 set tabstop=2
+
+autocmd FileType python setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
 
 " Invoke StripTrailingWhitespace for all below files types
 autocmd FileType c,cpp,java,go,javascript,python,rst,ruby,rust,yml,perl autocmd BufWritePre <buffer> call StripTrailingWhitespace()
@@ -571,6 +577,46 @@ autocmd FileType java iabbrev <buffer> pub public void
 autocmd FileType java setlocal foldmethod=syntax
 set foldnestmax=2
 set foldlevelstart=1
+
+
+"augroup jsx_performance
+"    autocmd!
+"    "autocmd FileType typescriptreact syntax off
+"    autocmd BufNewFile,BufRead *.tsx set filetype=typescript
+"augroup END
+
+" Define an autocmd group to manage our specific syntax settings
+augroup disable_tsx_syntax
+    "autocmd! " Clear any existing autocmds in this group to prevent duplicates
+
+    " Autocommand to disable syntax highlighting specifically for typescriptreact files
+    " Triggered when a buffer is read/opened or a new buffer is created
+    autocmd BufReadPost,BufNewFile *.tsx,*.jsx,*.ts,*.js " Adjust patterns as needed
+                \ if &filetype ==# 'typescriptreact' || &filetype ==# 'javascriptreact' || &filetype ==# 'typescript' || &filetype ==# 'javascript'
+                \ | syntax off
+                \ | echo "Syntax highlighting disabled for " . &filetype . " (high CPU fix)"
+                \ | endif
+
+    " Autocommand to ensure syntax is re-enabled for all other file types
+    " This is crucial. When you switch *from* a .tsx file to a different file type,
+    " syntax needs to be turned back on.
+    autocmd BufEnter *
+                \ if &filetype !=# 'typescriptreact' && &filetype !=# 'javascriptreact' && &filetype !=# 'typescript' && &filetype !=# 'javascript' && &syntax ==# "OFF"
+                \ | syntax on
+                \ | echo "Syntax highlighting enabled for " . &filetype
+                \ | endif
+
+augroup END
+
+" Optional: You might still want to set filetype explicitly for .tsx if not already
+" This ensures the autocmd above correctly identifies it.
+augroup tsx_filetype_detection
+    autocmd!
+    autocmd BufNewFile,BufRead *.tsx set filetype=typescriptreact
+    autocmd BufNewFile,BufRead *.jsx set filetype=javascriptreact
+    autocmd BufNewFile,BufRead *.ts set filetype=typescript
+    autocmd BufNewFile,BufRead *.js set filetype=javascript
+augroup END
 
 "}
 "

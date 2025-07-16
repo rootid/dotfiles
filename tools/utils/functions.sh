@@ -9,6 +9,12 @@ export PATH="$CURSOR_HOME:$PATH"
 IDEA_HOME_DUP=/Applications/IntelliJ_IDEA_CE.app/Contents/MacOS
 export PATH="$IDEA_HOME_DUP:$PATH"
 
+PASSWORD_MGR="${HOME}/Applications/Chrome Apps.localized/Google Password Manager.app"
+
+function go_open_password_mgr() {
+  open ${PASSWORD_MGR}
+}
+
 # find . -type f -iname "*.pdf" -not -name "shrink_*" | sed 's|^./||' | while read -r file; do
 #     go_pdf_shrink "$file"
 # done

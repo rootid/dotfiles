@@ -101,9 +101,6 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 source $HOME/.my_sh_workflow
-export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home
-export PATH="$JAVA_HOME/bin:$PATH"
 eval "$(direnv hook zsh)"
 
 
@@ -125,10 +122,17 @@ export NVM_DIR="$HOME/.nvm"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
-
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/vmat/.lmstudio/bin"
 # End of LM Studio CLI section
 
 
 . "$HOME/.local/bin/env"
+
+export PATH="$PATH:/Users/vmat/software/gradle/gradle-9.0.0/bin"
+
+#export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+#export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home
+export JAVA_HOME="/Users/vmat/.sdkman/candidates/java/17.0.8-tem"
+export PATH="$JAVA_HOME/bin:$PATH"
+

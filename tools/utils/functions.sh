@@ -11,6 +11,10 @@ export PATH="$IDEA_HOME_DUP:$PATH"
 
 PASSWORD_MGR="${HOME}/Applications/Chrome Apps.localized/Google Password Manager.app"
 
+function go_ai_run_gemini_cli() {
+  npx https://github.com/google-gemini/gemini-cl
+}
+
 function go_open_password_mgr() {
   open ${PASSWORD_MGR}
 }

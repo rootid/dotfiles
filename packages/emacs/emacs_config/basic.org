@@ -183,6 +183,8 @@ Reload Emacs Config file
     "Open files"
     ("c" (lambda () (interactive) (find-file "~/emacs_config/basic.org")) "Open Config file")
     ("i" (lambda () (interactive) (find-file "~/beorg/inbox.org")) "Open Inbox")
+    ("r" (lambda () (interactive) (find-file "~/beorg/inbox.org")) "Open Refile")
+    ("4" (lambda () (interactive) (find-file "~/beorg/inbox.org")) "Open 4DX")
     ("q" nil "quit"))
 
   (global-set-key (kbd "C-c g") 'go-open-files/body)

@@ -1,3 +1,14 @@
+
+* How To use babel?
+1. Write the Config in Org Mode
+2. Add the following Property in header Section
+   #+PROPERTY: header-args :tangle init.el
+3. Run C-x C-m org-babel-tangle
+4. Run C-x C-m reload-init-file
+4. Use init.el to run as emacs_custom init.el 
+
+TODO: change #+PROPERTY: header-args :tangle init.el to #+PROPERTY: header-args :tangle  ~/.emacs.el 
+
 * Expt
 
 ;; Test palimpsest to move contetn at the end
@@ -13,7 +24,6 @@
 * Package Management
 
 #+begin_src emacs-lisp
-
   ;; Initialize package sources
   (require 'package)
 
@@ -36,10 +46,6 @@
   (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-
-  ;; TODO - Additional config https://protesilaos.com/emacs/modus-themes#h:f0f3dbcb-602d-40cf-b918-8f929c441baf
-  (add-to-list 'load-path "~/dotfiles/packages/emacs/emacs_themes/modus-themes")
-  (load-theme 'modus-operandi)            ; Light theme
 
   ;; TODO - Explore straight.el vs packge.el
   ;; Use of straight.el 
@@ -92,7 +98,6 @@ Includes modeline configuration, file save configuration, 2 spaces
   (setq-default tab-width 2) ; your preferred number of spaces
 #+END_SRC
 
-
 * Basic Key Bindings
 Use key strokes economically. Refer - [[https://sites.google.com/site/steveyegge2/effective-emacs][Efffective Emacs From Yegge]] 
 Note - kbd is a macro that converts a human-readable string into the internal representation Emacs uses for keys.
@@ -109,8 +114,11 @@ Note - kbd is a macro that converts a human-readable string into the internal re
   (global-set-key (kbd "C-c w") 'save-buffer)
 #+end_src
 
-
 * Emacs Theme
+** Use of Operandi
+  ;; TODO - Additional config https://protesilaos.com/emacs/modus-themes#h:f0f3dbcb-602d-40cf-b918-8f929c441baf
+  (add-to-list 'load-path "~/dotfiles/packages/emacs/emacs_themes/modus-themes")
+  (load-theme 'modus-operandi)            ; Light theme
 ** Use of Nano
 #+BEGIN_SRC emacs-lisp
   (straight-use-package
@@ -124,7 +132,6 @@ Note - kbd is a macro that converts a human-readable string into the internal re
   (set-face-attribute 'default nil :height 148)
 
 #+END_SRC
-
 
 * Emacs Vanilla Helper Functions
 
@@ -158,7 +165,6 @@ Reload Emacs Config file
   (setq which-key-idle-delay 1))
 #+end_src
 
-
 ** Hydra Package
 - To quickly open directories and files
 - Reduce context switching time
@@ -183,18 +189,13 @@ Reload Emacs Config file
     "Open files"
     ("c" (lambda () (interactive) (find-file "~/emacs_config/basic.org")) "Open Config file")
     ("i" (lambda () (interactive) (find-file "~/beorg/inbox.org")) "Open Inbox")
-    ("r" (lambda () (interactive) (find-file "~/beorg/inbox.org")) "Open Refile")
-    ("4" (lambda () (interactive) (find-file "~/beorg/inbox.org")) "Open 4DX")
+    ("a" (lambda () (interactive) (find-file "~/4dx/4dx.org")) "Open 4DX")
     ("q" nil "quit"))
 
   (global-set-key (kbd "C-c g") 'go-open-files/body)
 #+end_src
 
-
 * Shortcuts to Open Browser
-TODO - Create different types of workflows with one click and Hydra
-TODO Use the Hydra to automate the workflows 
-Open all applications and web pages and different types web application
 #+BEGIN_SRC emacs-lisp
   (defun open-web-page (url)
     "Open a web page in the default browser."
@@ -207,7 +208,6 @@ Open all applications and web pages and different types web application
 
   (global-set-key (kbd "C-c y") 'go_open_ymusic)
 #+END_SRC 
-
 
 * Org Mode configuration
 ** Org Mode Packages
@@ -245,7 +245,7 @@ Open all applications and web pages and different types web application
      (org . t)))
 
   ;; Set Org directory
-  (setq org-directory "~/gtd")
+  ;;(setq org-directory "~/gtd")
   ;;(setq org-agenda-files '("backlog.org" "projects.org" "tickler.org"))
 
   (setq org-attach-id-dir "~/org_attach/")
@@ -260,7 +260,6 @@ Open all applications and web pages and different types web application
 
 
   ;; --- ox-md Configuration ---
-
   (with-eval-after-load 'ox-md
     ;; Example: Set headline style to ATX (GitHub Flavored Markdown style)
     ;; Uses '#' for level 1, '##' for level 2, etc.
@@ -358,55 +357,6 @@ Open all applications and web pages and different types web application
   (setq org-log-done 'note) ;; To disable - (setq org-log-done nil)
   (setq org-clock-sound t)
 
-  ;; Org capture template
-  (setq org-capture-templates
-        '(("c" "Capture Company, Task, Book, Media")
-          ("cj" "Company entry" entry
-           (file+headline "~/area/v1/denote/notes/capture_companies.org" "Company")
-           (file "~/templates/tpl_company.txt")
-           :empty-lines-before 1)
-          ("ct" "TODO entry" entry
-           (file+headline "~/backlog/backlog.org" "Backlog")
-           (file "~/templates/tpl_todo.txt")
-           :empty-lines-before 1)
-          ("cb" "Add Book to Read/Listen" entry
-           (file+headline "~/area/v1/denote/notes/capture_books.org" "Books To Read/Listen")
-           (file "~/templates/tpl_book.txt")
-           :empty-lines-before 1)
-          ("cm" "Media to Watch/Listen" entry
-           (file+headline "~/area/v1/denote/notes/capture_media.org" "Media to Watch/Listen")
-           (file "~/templates/tpl_media.txt")
-           :empty-lines-before 1)
-          ("cl" "Bookmark" entry
-           (file+headline "~/backlog/bookmark.org" "Bookmarks")
-           (file "~/templates/tpl_bookmark.txt")
-           :empty-lines-before 1)
-          ("cy" "Things to Buy" entry
-           (file+headline "~/backlog/things_to_buy.org" "Things To Buy")
-           (file "~/templates/tpl_buy.txt")
-           :empty-lines-before 1)
-          ("ce" "Errands" entry
-           (file+headline "~/backlog/errands.org" "Errands")
-           (file "~/templates/tpl_errands.txt")
-           :empty-lines-before 1)
-          ("n" "TidBits/Ideas/Anec")
-          ("na" "Anec/Quotes Tidbits One-liner" entry
-           (file+headline "~/area/v1/denote/notes/capture_quotes.org" "Quotes/Anecdotes")
-           (file "~/templates/tpl_quote.txt") :empty-lines-before 1)
-          ("ni" "Add Idea to Marketplace" entry
-           (file+headline "~/area/v1/denote/notes/capture_ideas.org" "Idea MarketPlace")
-           (file "~/templates/tpl_idea.txt")
-           :empty-lines-before 1)
-          ("j" "Create Daily Journal" entry 
-           (file+function "~/area/v1/denote/notes/20241201T173755--Journal__daily_journal.org" org-reverse-datetree-goto-date-in-file) "* %?\nEntered on %U\n  %i\n  %a")
-          ("w" "Watch Later" entry
-           (file+headline "~/area/v1/denote/notes/capture_youtube.org" "Media to Watch/Listen")
-           (file "~/templates/tpl_yt.txt")
-           :empty-lines-before 1)
-          ("b" "Backlog" entry
-           (file+headline "~/backlog/backlog.org" "Backlog")
-           (file "~/templates/tpl_todo.txt")
-           :empty-lines-before 1)))
 
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
@@ -464,31 +414,6 @@ Open all applications and web pages and different types web application
 
 #+end_src
 
-** Org Habit With Heatmap
-#+BEGIN_SRC emacs-lisp
-
- (use-package org-habit
-  :custom
-  (org-habit-graph-column 1)
-  (org-habit-preceding-days 10)
-  (org-habit-following-days 1)
-  (org-habit-show-habits-only-for-today nil))
-
- ;; Fix ME
- ;;(use-package org-heatmap
- ;; :init
- ;; (add-to-list 'load-path "~/emacs_scripts/emacsql.el")
- ;; (add-to-list 'load-path "~/emacs_scripts/org-heatmap.el")
- ;; ;;(require 'org-heatmap)
- ;; :after (org)
- ;; :custom
- ;; ;;(org-agenda-files '("/path-to/org-heatmap/examples/examples.org"))
- ;; (org-heatmap-db-location "/tmp/org-heatmap.db")
- ;; :config
- ;; (org-heatmap-mode))
-
-
-#+END_SRC
 ** Org Mode Helper Script
 
 Set the tabs to 2 spaces
@@ -569,7 +494,6 @@ Set the tabs to 2 spaces
                         (format "%s %s-%s" date start-time end-time))))
 #+END_SRC 
 
-
 * Org Mode Helper Packages
 ** Graphwiz/Dot install
 #+begin_src emacs-lisp
@@ -631,7 +555,6 @@ Verify the sub directory path to copy the path
     :config 
     (yas-global-mode 1))
 #+END_SRC
-
 
 * Note Taking Packages
 
@@ -903,15 +826,92 @@ PreReq to run the workflow
 ;;#+end_src
 
 
-* Test Workflows
-1. Write the Config in Org Mode
-2. Add the following Property in header Section
-   #+PROPERTY: header-args :tangle init.el
-3. Run C-x C-m org-babel-tangle
-4. Use init.el to run as emacs_custom init.el 
+* Tasklist
+** TODO Remove unused package and cleanup the clutter
+- [ ] Org Habit With Heatmap
+;;#+BEGIN_SRC emacs-lisp
 
-TODO: change #+PROPERTY: header-args :tangle init.el to #+PROPERTY: header-args :tangle  ~/.emacs.el 
+ (use-package org-habit
+  :custom
+  (org-habit-graph-column 1)
+  (org-habit-preceding-days 10)
+  (org-habit-following-days 1)
+  (org-habit-show-habits-only-for-today nil))
 
+ ;; Fix ME
+ ;;(use-package org-heatmap
+ ;; :init
+ ;; (add-to-list 'load-path "~/emacs_scripts/emacsql.el")
+ ;; (add-to-list 'load-path "~/emacs_scripts/org-heatmap.el")
+ ;; ;;(require 'org-heatmap)
+ ;; :after (org)
+ ;; :custom
+ ;; ;;(org-agenda-files '("/path-to/org-heatmap/examples/examples.org"))
+ ;; (org-heatmap-db-location "/tmp/org-heatmap.db")
+ ;; :config
+ ;; (org-heatmap-mode))
+
+
+;;#+END_SRC
+** TODO Clean up org capture templates
+- [ ] Use of Hydra package to fix the templates unified template with sections 
+  ;; Org capture template
+  (setq org-capture-templates
+        '(("c" "Capture Company, Task, Book, Media")
+          ("cj" "Company entry" entry
+           (file+headline "~/area/v1/denote/notes/capture_companies.org" "Company")
+           (file "~/templates/tpl_company.txt")
+           :empty-lines-before 1)
+          ("ct" "TODO entry" entry
+           (file+headline "~/backlog/backlog.org" "Backlog")
+           (file "~/templates/tpl_todo.txt")
+           :empty-lines-before 1)
+          ("cb" "Add Book to Read/Listen" entry
+           (file+headline "~/area/v1/denote/notes/capture_books.org" "Books To Read/Listen")
+           (file "~/templates/tpl_book.txt")
+           :empty-lines-before 1)
+          ("cm" "Media to Watch/Listen" entry
+           (file+headline "~/area/v1/denote/notes/capture_media.org" "Media to Watch/Listen")
+           (file "~/templates/tpl_media.txt")
+           :empty-lines-before 1)
+          ("cl" "Bookmark" entry
+           (file+headline "~/backlog/bookmark.org" "Bookmarks")
+           (file "~/templates/tpl_bookmark.txt")
+           :empty-lines-before 1)
+          ("cy" "Things to Buy" entry
+           (file+headline "~/backlog/things_to_buy.org" "Things To Buy")
+           (file "~/templates/tpl_buy.txt")
+           :empty-lines-before 1)
+          ("ce" "Errands" entry
+           (file+headline "~/backlog/errands.org" "Errands")
+           (file "~/templates/tpl_errands.txt")
+           :empty-lines-before 1)
+          ("n" "TidBits/Ideas/Anec")
+          ("na" "Anec/Quotes Tidbits One-liner" entry
+           (file+headline "~/area/v1/denote/notes/capture_quotes.org" "Quotes/Anecdotes")
+           (file "~/templates/tpl_quote.txt") :empty-lines-before 1)
+          ("ni" "Add Idea to Marketplace" entry
+           (file+headline "~/area/v1/denote/notes/capture_ideas.org" "Idea MarketPlace")
+           (file "~/templates/tpl_idea.txt")
+           :empty-lines-before 1)
+          ("j" "Create Daily Journal" entry 
+           (file+function "~/area/v1/denote/notes/20241201T173755--Journal__daily_journal.org" org-reverse-datetree-goto-date-in-file) "* %?\nEntered on %U\n  %i\n  %a")
+          ("w" "Watch Later" entry
+           (file+headline "~/area/v1/denote/notes/capture_youtube.org" "Media to Watch/Listen")
+           (file "~/templates/tpl_yt.txt")
+           :empty-lines-before 1)
+          ("b" "Backlog" entry
+           (file+headline "~/backlog/backlog.org" "Backlog")
+           (file "~/templates/tpl_todo.txt")
+           :empty-lines-before 1)))
+
+** TODO Fix and finalize the theme vs fonts [0/2][0%]
+- [ ] Understand the difference between nano font and operani theme
+- [ ] How to configure it  
+** TODO - Create different types of workflows with one click and Hydra [0/3][0%]
+- [ ] Understand the package and read the code and understand how to use it
+- [ ] Use the Hydra to automate the workflows to open browser
+- [ ] Open all applications and web pages and different types web application
    
 * Header
 #+TITLE: My Emacs Configuration

@@ -1,15 +1,15 @@
-
 * How To use babel?
 1. Write the Config in Org Mode
 2. Add the following Property in header Section
-   #+PROPERTY: header-args :tangle init.el
+-#+PROPERTY: header-args :tangle init.el
 3. Run C-x C-m org-babel-tangle
 4. Run C-x C-m reload-init-file
 4. Use init.el to run as emacs_custom init.el 
 
-TODO: change #+PROPERTY: header-args :tangle init.el to #+PROPERTY: header-args :tangle  ~/.emacs.el 
+TODO: change #+PROPERTY: header-args :tangle init.el to
+-#+PROPERTY: header-args :tangle  ~/.emacs.el 
 
-* Expt
+* Exp
 
 ;; Test palimpsest to move contetn at the end
 (add-hook 'text-mode-hook 'palimpsest-mode)
@@ -49,21 +49,21 @@ TODO: change #+PROPERTY: header-args :tangle init.el to #+PROPERTY: header-args 
 
   ;; TODO - Explore straight.el vs packge.el
   ;; Use of straight.el 
-  (defvar bootstrap-version)
-  (let ((bootstrap-file
-         (expand-file-name
-          "straight/repos/straight.el/bootstrap.el"
-          (or (bound-and-true-p straight-base-dir)
-              user-emacs-directory)))
-        (bootstrap-version 7))
-    (unless (file-exists-p bootstrap-file)
-      (with-current-buffer
-          (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-           'silent 'inhibit-cookies)
-        (goto-char (point-max))
-        (eval-print-last-sexp)))
-    (load bootstrap-file nil 'nomessage))
+  ;;(defvar bootstrap-version)
+  ;;(let ((bootstrap-file
+  ;;       (expand-file-name
+  ;;        "straight/repos/straight.el/bootstrap.el"
+  ;;        (or (bound-and-true-p straight-base-dir)
+  ;;            user-emacs-directory)))
+  ;;      (bootstrap-version 7))
+  ;;  (unless (file-exists-p bootstrap-file)
+  ;;    (with-current-buffer
+  ;;        (url-retrieve-synchronously
+  ;;         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+  ;;         'silent 'inhibit-cookies)
+  ;;      (goto-char (point-max))
+  ;;      (eval-print-last-sexp)))
+  ;;  (load bootstrap-file nil 'nomessage))
 
 #+end_src
 
@@ -120,7 +120,7 @@ Note - kbd is a macro that converts a human-readable string into the internal re
   (add-to-list 'load-path "~/dotfiles/packages/emacs/emacs_themes/modus-themes")
   (load-theme 'modus-operandi)            ; Light theme
 ** Use of Nano
-#+BEGIN_SRC emacs-lisp
+;;#+BEGIN_SRC emacs-lisp
   (straight-use-package
    '(nano :type git :host github :repo "rougier/nano-emacs"))
 
@@ -131,7 +131,7 @@ Note - kbd is a macro that converts a human-readable string into the internal re
   (setq nano-font-family-monospaced "Roboto Mono")
   (set-face-attribute 'default nil :height 148)
 
-#+END_SRC
+;;#+END_SRC
 
 * Emacs Vanilla Helper Functions
 
@@ -145,6 +145,98 @@ Reload Emacs Config file
   (global-set-key (kbd "<f5>") 'reload-init-file)
 
 #+end_src
+
+Shortcuts to Open Browser
+#+BEGIN_SRC emacs-lisp
+  (defun open-web-page (url)
+    "Open a web page in the default browser."
+    (interactive "sEnter URL: ")
+    (browse-url url))
+
+  (defun go_open_ymusic ()
+    (interactive)
+  (open-web-page "https://music.youtube.com"))
+
+  (global-set-key (kbd "C-c y") 'go_open_ymusic)
+#+END_SRC 
+
+Org Mode Helper Script
+Set the tabs to 2 spaces
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)
+            (setq tab-width 2)
+            (local-set-key (kbd "TAB") 'tab-to-tab-stop)))
+#+end_src
+
+#+BEGIN_SRC emacs-lisp
+  (defun vs_org/opened_buffer_files ()
+    "Return the list of files currently opened in emacs"
+    (delq nil
+          (mapcar (lambda (x)
+                    (if (and (buffer-file-name x)
+                             (string-match "\\.org$"
+                                           (buffer-file-name x)))
+                        (buffer-file-name x)))
+                  (buffer-list))))
+
+  (defun vs_org/switch_refile_to_buffers() "Show Projects in Pipeline." 
+         (interactive)
+         (setq org-refile-targets '((vs_org/opened_buffer_files :maxlevel . 9)))
+         (setq org-refile-use-outline-path 'file))
+
+
+  (defun vs_org/archive_cancelled_tasks ()
+    "Archive all cancelled tasks in the current buffer or region. A cancelled task is one with a CANCELLED keyword state."
+    (interactive)
+    (let ((count 0))
+      (if (region-active-p)
+          (org-map-entries
+           (lambda ()
+             (when (string= (org-get-todo-state) "CANCELLED")
+               (setq count (1+ count))
+               (org-archive-subtree)))
+           nil 'region)
+        (org-map-entries
+         (lambda ()
+           (when (string= (org-get-todo-state) "CANCELLED")
+             (setq count (1+ count))
+             (org-archive-subtree)))))
+      (message "Archived %d cancelled task%s"
+               count (if (= count 1) "" "s"))))
+
+  ;; Optional: Add a key binding
+  (global-set-key (kbd "C-c C-x C-a") 'vs_org/archive_cancelled_tasks)
+
+  (defun vs_org/schedule_task (days-ahead start-time duration)
+    "Schedule an interval in Org mode DAYS-AHEAD from today, at START-TIME, for DURATION minutes.
+  DAYS-AHEAD is number of days from today (0 = today)
+  START-TIME should be in 'HH:MM' format
+  DURATION should be in minutes"
+    (interactive 
+     (list 
+      (read-number "Days ahead (0 for today): ")
+      (read-string "Start time (HH:MM): ")
+      (read-number "Duration (minutes): ")))
+
+    (let* ((date (format-time-string "%Y-%m-%d" 
+                                     (time-add (current-time) 
+                                               (days-to-time days-ahead))))
+           (time-parts (split-string start-time ":"))
+           (hours (string-to-number (car time-parts)))
+           (minutes (string-to-number (cadr time-parts)))
+           (end-minutes (+ minutes duration))
+           (end-hours (+ hours (/ end-minutes 60)))
+           (end-minutes-final (mod end-minutes 60))
+           (end-time (format "%02d:%02d" end-hours end-minutes-final)))
+
+      (org-schedule nil (format "%s %s-%s" date start-time end-time))
+
+      (org-set-property "SCHEDULED_INTERVAL" 
+                        (format "%s %s-%s" date start-time end-time))))
+#+END_SRC 
+
 
 * Emacs Helper Packages 
 ** Why? - Use Vim Modal editing keystorkes.
@@ -195,19 +287,6 @@ Reload Emacs Config file
   (global-set-key (kbd "C-c g") 'go-open-files/body)
 #+end_src
 
-* Shortcuts to Open Browser
-#+BEGIN_SRC emacs-lisp
-  (defun open-web-page (url)
-    "Open a web page in the default browser."
-    (interactive "sEnter URL: ")
-    (browse-url url))
-
-  (defun go_open_ymusic ()
-    (interactive)
-  (open-web-page "https://music.youtube.com"))
-
-  (global-set-key (kbd "C-c y") 'go_open_ymusic)
-#+END_SRC 
 
 * Org Mode configuration
 ** Org Mode Packages
@@ -414,86 +493,6 @@ Reload Emacs Config file
 
 #+end_src
 
-** Org Mode Helper Script
-
-Set the tabs to 2 spaces
-
-#+begin_src emacs-lisp
-  (add-hook 'org-mode-hook
-          (lambda ()
-            (setq indent-tabs-mode nil)
-            (setq tab-width 2)
-            (local-set-key (kbd "TAB") 'tab-to-tab-stop)))
-#+end_src
-
-#+BEGIN_SRC emacs-lisp
-
-  (defun vs_org/opened_buffer_files ()
-    "Return the list of files currently opened in emacs"
-    (delq nil
-          (mapcar (lambda (x)
-                    (if (and (buffer-file-name x)
-                             (string-match "\\.org$"
-                                           (buffer-file-name x)))
-                        (buffer-file-name x)))
-                  (buffer-list))))
-
-  (defun vs_org/switch_refile_to_buffers() "Show Projects in Pipeline." 
-         (interactive)
-         (setq org-refile-targets '((vs_org/opened_buffer_files :maxlevel . 9)))
-         (setq org-refile-use-outline-path 'file))
-
-
-  (defun vs_org/archive_cancelled_tasks ()
-    "Archive all cancelled tasks in the current buffer or region. A cancelled task is one with a CANCELLED keyword state."
-    (interactive)
-    (let ((count 0))
-      (if (region-active-p)
-          (org-map-entries
-           (lambda ()
-             (when (string= (org-get-todo-state) "CANCELLED")
-               (setq count (1+ count))
-               (org-archive-subtree)))
-           nil 'region)
-        (org-map-entries
-         (lambda ()
-           (when (string= (org-get-todo-state) "CANCELLED")
-             (setq count (1+ count))
-             (org-archive-subtree)))))
-      (message "Archived %d cancelled task%s"
-               count (if (= count 1) "" "s"))))
-
-  ;; Optional: Add a key binding
-  (global-set-key (kbd "C-c C-x C-a") 'vs_org/archive_cancelled_tasks)
-
-  (defun vs_org/schedule_task (days-ahead start-time duration)
-    "Schedule an interval in Org mode DAYS-AHEAD from today, at START-TIME, for DURATION minutes.
-  DAYS-AHEAD is number of days from today (0 = today)
-  START-TIME should be in 'HH:MM' format
-  DURATION should be in minutes"
-    (interactive 
-     (list 
-      (read-number "Days ahead (0 for today): ")
-      (read-string "Start time (HH:MM): ")
-      (read-number "Duration (minutes): ")))
-
-    (let* ((date (format-time-string "%Y-%m-%d" 
-                                     (time-add (current-time) 
-                                               (days-to-time days-ahead))))
-           (time-parts (split-string start-time ":"))
-           (hours (string-to-number (car time-parts)))
-           (minutes (string-to-number (cadr time-parts)))
-           (end-minutes (+ minutes duration))
-           (end-hours (+ hours (/ end-minutes 60)))
-           (end-minutes-final (mod end-minutes 60))
-           (end-time (format "%02d:%02d" end-hours end-minutes-final)))
-
-      (org-schedule nil (format "%s %s-%s" date start-time end-time))
-
-      (org-set-property "SCHEDULED_INTERVAL" 
-                        (format "%s %s-%s" date start-time end-time))))
-#+END_SRC 
-
 * Org Mode Helper Packages
 ** Graphwiz/Dot install
 #+begin_src emacs-lisp
@@ -556,8 +555,123 @@ Verify the sub directory path to copy the path
     (yas-global-mode 1))
 #+END_SRC
 
-* Note Taking Packages
+* Dired Configuration
+#+begin_src emacs-lisp
+  ;; This buffer is for text that is not saved, and for Lisp evaluation.
+;; To create a file, visit it with C-c f and enter text in its buffer.
 
+;; Get vertical mode in Buffer
+(setq vertico-resize nil)
+(vertico-mode 1)
+
+;; To view the detailed info in buffer
+(marginalia-mode 1)
+;;(marginalia-mode -1)
+
+;; Avoid deleting whole file path, start from ~
+(file-name-shadow-mode 1)
+;; This works with `file-name-shadow-mode' enabled.  When you are in
+;; a sub-directory and use, say, `find-file' to go to your home '~/'
+;; or root '/' directory, Vertico will clear the old path to keep
+;; only your current input.
+(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+
+;; Hook to hide the dir details when in dired mode
+(add-hook 'dired-mode-hook #'dired-hide-details-mode)
+
+;; Avoid permentantly delete files
+(setq delete-by-moving-to-trash t)
+#+end_src
+
+* PDF Packages
+#+begin_src emacs-lisp
+  ;; Install poppler for pdf tools
+  ;;brew install poppler automake autoconf pkg-config
+
+  (use-package hydra :ensure t)
+
+  (defhydra hydra-pdf-annot (:color blue :hint nil)
+    "
+    PDF Annotations:
+    _h_: highlight  _u_: underline  _t_: text  _l_: list  _d_: delete  _q_: quit
+    "
+    ("h" pdf-annot-add-highlight-markup-annotation)
+    ("u" pdf-annot-add-underline-markup-annotation)
+    ("t" pdf-annot-add-text-annotation)
+    ("l" pdf-annot-list-annotations)
+    ("d" pdf-annot-delete)
+    ("q" nil :color blue))
+
+  (use-package pdf-tools
+    :ensure t
+
+    :mode ("\\.pdf\\'" . pdf-view-mode)
+    :magic ("%PDF" . pdf-view-mode)
+    :bind (:map pdf-view-mode-map
+                ("j" . pdf-view-next-line-or-next-page)
+                ("k" . pdf-view-previous-line-or-previous-page)
+                ("C-=" . pdf-view-enlarge)
+                ("C--" . pdf-view-shrink)
+                ("o" . pdf-outline)
+                ("C-c a" . hydra-pdf-annot/body))
+
+
+    :config
+    ;; This line forces Emacs to compile the engine and use it as the default
+    (pdf-tools-install :no-query)
+
+    ;; Automatically fit the PDF to your window size
+    (setq-default pdf-view-display-size 'fit-page)
+
+    ;; What it does? if change to nill will the relative rectanlge will go away?
+    (setq pdf-annot-activate-created-annotations t)
+    ;; Automatically update the buffer if the PDF changes on disk
+    (add-to-list 'revert-without-query ".pdf")
+
+    ;; Another way to configure the hook w/o omitting the -hook suffix
+    (add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1))))
+
+  (use-package org-pdftools
+    :ensure t
+    ;; Force Emacs to wait until both dependencies are fully loaded
+    :after (org pdf-tools)
+    ;;:hook (org-mode . org-pdftools-setup-link)
+    :config
+    (add-hook 'org-mode-hook #'org-pdftools-setup-link)
+    ;; Use isearch string in link if no annotation found under point
+    (setq org-pdftools-use-isearch-link t)
+    ;; Use free-pointer annotation when inserting precise notes
+    (setq org-pdftools-use-freepointer-annot t)
+    ;; Customize link description format (optional)
+    ;; default: "PDF: filename, page X, <quoted text>"
+    (setq org-pdftools-get-desc-function #'org-pdftools-get-desc-default))
+
+  (use-package org-noter
+    ;; FIX 1: You were missing `:ensure t`. Without this, Emacs won't 
+    ;; actually download the core package if it's missing!
+    :ensure t
+    :after (org pdf-tools)
+    :custom
+    ;; FIX 2: Modern use-package syntax prefers `:custom` over `:config (setq ...)`
+    ;; for setting variables. It's cleaner and handles load ordering better.
+    (org-noter-auto-save-last-location t)
+    (org-noter-highlight-selected-text t)
+    (org-noter-always-create-frame nil))
+
+  (defun my/pdf-copy-org-link ()
+    "Copy an org-link for the current PDF page and location to the kill ring."
+    (interactive)
+    (let* ((filename (buffer-file-name))
+           (page (pdf-view-current-page))
+           (format-link (format "[[pdf:%s::%d++0.00][Page %d]]" filename page page)))
+      (kill-new format-link)
+      (message "Copied: %s" format-link)))
+
+  ;; Bind it to 'c' in pdf-view-mode
+  ;;(define-key pdf-view-mode-map (kbd "c") #'my/pdf-copy-org-link)
+#+end_src
+
+* Note Taking Packages
 ** Denote Package
 Use the package to capture the notes
 #+begin_src emacs-lisp
@@ -749,7 +863,6 @@ Use the package to capture the notes
            ("Web"  ?w "~/Dropbox/plain_docs/publish/web/")))
     #+end_src
 
-
 ** Org-Config for Calender Workflow
 
 - Plan Day
@@ -763,7 +876,6 @@ Use the package to capture the notes
       org-icalendar-categories '(all-tags category)
       org-icalendar-with-timestamps 'active)
 #+end_src
-
 
 ** org-download
 - Package to copy paste images from clipboard
@@ -824,7 +936,6 @@ PreReq to run the workflow
   (org-babel-do-load-languages 'org-babel-load-languages '((mermaid . t)))
 
 ;;#+end_src
-
 
 * Tasklist
 ** TODO Remove unused package and cleanup the clutter

@@ -19,8 +19,6 @@ TODO: change #+PROPERTY: header-args :tangle init.el to
 ;;  :ensure t)
 ;;
 ;;#+end_src
-
-
 * Package Management
 
 #+begin_src emacs-lisp
@@ -96,6 +94,12 @@ Includes modeline configuration, file save configuration, 2 spaces
 
   (setq-default indent-tabs-mode nil) ; Use spaces instead of tabs by default
   (setq-default tab-width 2) ; your preferred number of spaces
+
+  (setq history-length 25)
+  (savehist-mode 1) ; persist the history
+  (save-place-mode 1) ; Do not loose the cursor after restart
+  (recentf-mode 1) ; to reopen the last files using M-x recentf-open-files
+
 #+END_SRC
 
 * Basic Key Bindings
@@ -115,6 +119,71 @@ Note - kbd is a macro that converts a human-readable string into the internal re
 #+end_src
 
 * Emacs Theme
+** Use of Operandi
+#+begin_src emacs-lisp
+  ;; This buffer is for text that is not saved, and for Lisp evaluation.
+  ;; To create a file, visit it with C-c f and enter text in its buffer.
+
+  ;; List all the fonts to get the font name
+  ;;(font-family-list) 
+  ;; Make sure install Anka/Coder to Mac/Unix
+  ;;(set-face-attribute 'default nil :family "Anka/Coder" :height 140) ; 14pt base size
+  ;;(set-face-attribute 'fixed-pitch nil :family "Anka/Coder" :height 1.0)
+  ;;(set-face-attribute 'variable-pitch nil :family "Libre Baskerville" :height 1.0)
+
+  ;; Set the default font to Menlo 15pt
+  (set-face-attribute 'default nil :font "Menlo" :height 150)
+
+  ;; Keep code and standard text tied to Menlo
+  (set-face-attribute 'fixed-pitch nil :inherit 'default)
+  (set-face-attribute 'variable-pitch nil :inherit 'default)
+
+  ;; For more Config refer - https://protesilaos.com/emacs/modus-themes#h:b66b128d-54a4-4265-b59f-4d1ea2feb073
+  (use-package modus-themes
+    :ensure t
+    :config
+    ;; Your customizations here.  All customizations must be evaluated
+    ;; BEFORE loading the theme.  Reload the theme for new customizations
+    ;; to take effect.
+    (setq modus-themes-italic-constructs t
+          modus-themes-bold-constructs nil
+          modus-themes-mixed-fonts t
+          modus-themes-variable-pitch-ui nil
+          modus-themes-disable-other-themes t
+
+          ;; Options for `modus-themes-prompts' are either nil (the
+          ;; default), or a list of properties that may include any of those
+          ;; symbols: `italic', `WEIGHT'
+          modus-themes-prompts '(italic bold)
+        
+          ;; The `modus-themes-completions' is an alist that reads two
+          ;; keys: `matches', `selection'.  Each accepts a nil value (or
+          ;; empty list) or a list of properties that can include any of
+          ;; the following (for WEIGHT read further below):
+          ;;
+          ;; `matches'   :: `underline', `italic', `WEIGHT'
+          ;; `selection' :: `underline', `italic', `WEIGHT'
+          modus-themes-completions
+          '((matches . (extrabold))
+            (selection . (semibold italic text-also)))
+
+          ;; The `modus-themes-headings' is an alist: read the manual's
+          ;; node about it or its docstring.  Basically, it supports
+          ;; per-level configurations for the optional use of
+          ;; `variable-pitch' typography, a height value as a multiple of
+          ;; the base font size (e.g. 1.5), and a `WEIGHT'.
+          modus-themes-headings
+          '((1 . (variable-pitch rainbow overline backgroud 1.1))
+            (2 . (1.0))
+            (agenda-date . (1.1))
+            (agenda-structure . (variable-pitch light 1.8))
+            (t . (1.1))))
+
+    (modus-themes-load-theme 'modus-operandi)
+
+    (define-key global-map (kbd "<f5>") #'modus-themes-toggle))
+#+end_src
+
 ** Use of Operandi
   ;; TODO - Additional config https://protesilaos.com/emacs/modus-themes#h:f0f3dbcb-602d-40cf-b918-8f929c441baf
   (add-to-list 'load-path "~/dotfiles/packages/emacs/emacs_themes/modus-themes")
@@ -237,7 +306,6 @@ Set the tabs to 2 spaces
                         (format "%s %s-%s" date start-time end-time))))
 #+END_SRC 
 
-
 * Emacs Helper Packages 
 ** Why? - Use Vim Modal editing keystorkes.
 #+BEGIN_SRC emacs-lisp
@@ -287,6 +355,34 @@ Set the tabs to 2 spaces
   (global-set-key (kbd "C-c g") 'go-open-files/body)
 #+end_src
 
+* Emacs code completion
+
+Use of Corfu package for autocompletion
+
+#+begin_src emacs-lisp
+  ;; 1. Explicitly ensure 'compat' is installed and loaded FIRST.
+  ;; This prevents the missing 'static-if' macro error during Corfu's compilation and hooks.
+  (use-package compat
+    :ensure t)
+
+  ;; 2. Now safely load and configure Corfu.
+  (use-package corfu
+    :ensure t
+    :custom
+    (corfu-auto t)                 ;; Automatically pop up the completion UI
+    (corfu-auto-prefix 2)          ;; Trigger autocomplete after typing 2 characters
+    (corfu-auto-delay 0.1)         ;; Wait a split second before popping up
+    (corfu-cycle t)                ;; When you hit the bottom of the list, loop to the top
+    (corfu-quit-no-match t)        ;; Hide the pop-up if what you typed doesn't match anything
+    (corfu-quit-at-boundary t)     ;; Hide the pop-up if you type a space
+  
+    :init
+    ;; Allow TAB to always complete
+    (setq tab-always-indent 'complete)
+  
+    ;; Enable Corfu globally in all buffers
+    (global-corfu-mode 1))
+#+end_src
 
 * Org Mode configuration
 ** Org Mode Packages
@@ -476,20 +572,48 @@ Set the tabs to 2 spaces
 
 #+end_src
 
+* Org Mode Helper Functions
 
 #+begin_src emacs-lisp
-    ;; No tabs
-    ;;(setq-default tab-always-indent t) 
 
-    (defun vs_utils/indent_org_block_automatically ()
-      (interactive)
-      (when (org-in-src-block-p)
-        (org-edit-special)
-        (indent-region (point-min) (point-max))
-        (org-edit-src-exit)))
+  ;; Make current org mode only file 
+  (defun vs_org/org-agenda-current-buffer ()
+    (interactive)
+    (let ((org-agenda-files (list (buffer-file-name (current-buffer)))))
+      (org-agenda)))
 
-    (define-key org-mode-map
-                (kbd "C-c C-i") #'vs_utils/indent_org_block_automatically)
+  ;; Fix me - how to use Hydra for helper function
+  ;;(define-key global-map (kbd "C-c a") #'org-agenda-current-buffer)
+
+  ;; Explort org file to ics
+  (defun vs_org/org-export-ics ()
+    "Export the current org buffer to an ICS file and report path."
+    (interactive)
+    (when (derived-mode-p 'org-mode)
+      (let ((ics-file (org-icalendar-export-to-ics)))
+        (message "Exported ICS: %s" ics-file))))
+
+  ;; Fix me - how to use Hydra for helper function
+  ;; Bind directly in org-mode
+  ;;(define-key org-mode-map (kbd "C-c e i") #'vs_org/org-export-ics)
+
+#+end_src
+
+
+#+begin_src emacs-lisp
+  ;; indent functions
+  ;; No tabs
+  ;;(setq-default tab-always-indent t) 
+
+  (defun vs_utils/indent_org_block_automatically ()
+    (interactive)
+    (when (org-in-src-block-p)
+      (org-edit-special)
+      (indent-region (point-min) (point-max))
+      (org-edit-src-exit)))
+
+  (define-key org-mode-map
+              (kbd "C-c C-i") #'vs_utils/indent_org_block_automatically)
 
 #+end_src
 
@@ -558,29 +682,35 @@ Verify the sub directory path to copy the path
 * Dired Configuration
 #+begin_src emacs-lisp
   ;; This buffer is for text that is not saved, and for Lisp evaluation.
-;; To create a file, visit it with C-c f and enter text in its buffer.
+  ;; To create a file, visit it with C-c f and enter text in its buffer.
 
-;; Get vertical mode in Buffer
-(setq vertico-resize nil)
-(vertico-mode 1)
+  ;; Get vertical mode in Buffer
+  (setq vertico-resize nil)
+  (vertico-mode 1)
 
-;; To view the detailed info in buffer
-(marginalia-mode 1)
-;;(marginalia-mode -1)
+  ;; To view the detailed info in buffer
+  (marginalia-mode 1)
+  ;;(marginalia-mode -1)
 
-;; Avoid deleting whole file path, start from ~
-(file-name-shadow-mode 1)
-;; This works with `file-name-shadow-mode' enabled.  When you are in
-;; a sub-directory and use, say, `find-file' to go to your home '~/'
-;; or root '/' directory, Vertico will clear the old path to keep
-;; only your current input.
-(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+  ;; Avoid deleting whole file path, start from ~
+  (file-name-shadow-mode 1)
+  ;; This works with `file-name-shadow-mode' enabled.  When you are in
+  ;; a sub-directory and use, say, `find-file' to go to your home '~/'
+  ;; or root '/' directory, Vertico will clear the old path to keep
+  ;; only your current input.
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
-;; Hook to hide the dir details when in dired mode
-(add-hook 'dired-mode-hook #'dired-hide-details-mode)
+  ;; Hook to hide the dir details when in dired mode
+  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
 
-;; Avoid permentantly delete files
-(setq delete-by-moving-to-trash t)
+  ;; Avoid permentantly delete files
+  (setq delete-by-moving-to-trash t)
+
+  ;; Auto-suggest other dired window as target
+  (setq dired-dwim-target t)
+
+  ;; Create destination dirs automatically if they don't exist
+  (setq dired-create-destination-dirs 'ask)
 #+end_src
 
 * PDF Packages
@@ -592,9 +722,9 @@ Verify the sub directory path to copy the path
 
   (defhydra hydra-pdf-annot (:color blue :hint nil)
     "
-    PDF Annotations:
-    _h_: highlight  _u_: underline  _t_: text  _l_: list  _d_: delete  _q_: quit
-    "
+      PDF Annotations:
+      _h_: highlight  _u_: underline  _t_: text  _l_: list  _d_: delete  _q_: quit
+      "
     ("h" pdf-annot-add-highlight-markup-annotation)
     ("u" pdf-annot-add-underline-markup-annotation)
     ("t" pdf-annot-add-text-annotation)
@@ -669,6 +799,60 @@ Verify the sub directory path to copy the path
 
   ;; Bind it to 'c' in pdf-view-mode
   ;;(define-key pdf-view-mode-map (kbd "c") #'my/pdf-copy-org-link)
+
+  (defun vs/extract-pdf-annots-to-links ()
+    "Extract user annotations directly from the PDF buffer, filtering out document links."
+    (interactive)
+
+    ;; 1. Identify the PDF buffer
+    (let ((pdf-buf (if (derived-mode-p 'pdf-annot-list-mode)
+                       pdf-annot-list-document-buffer
+                     (current-buffer))))
+
+      ;; 2. Verify it is a valid, active PDF buffer
+      (unless (and (buffer-live-p pdf-buf)
+                   (with-current-buffer pdf-buf (derived-mode-p 'pdf-view-mode)))
+        (error "Cannot find a valid PDF document buffer"))
+
+      ;; 3. Fetch all annotations
+      (let ((annots (with-current-buffer pdf-buf (pdf-annot-getannots))))
+
+        ;; 4. Build the new link buffer
+        (with-current-buffer (get-buffer-create "*My PDF Links*")
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (insert "Click on a page to jump to the PDF:\n\n")
+
+            (dolist (annot annots)
+              (let ((page (pdf-annot-get annot 'page))
+                    (type (pdf-annot-get annot 'type)))
+
+                ;; FIX: Ignore built-in document links, keep only user annotations
+                (unless (eq type 'link)
+                  (insert-text-button (format "Page %d (%s)" page type)
+                                      'action `(lambda (_)
+                                                 (pop-to-buffer ,pdf-buf)
+                                                 (pdf-view-goto-page ,page))
+                                      'follow-link t
+                                      'help-echo "Mouse-1 or RET to jump to PDF page")
+                  (insert "\n")))))
+
+          (goto-char (point-min))) ; Move cursor to the top
+
+        (pop-to-buffer (current-buffer)))))
+
+  (with-eval-after-load 'pdf-tools
+    (with-eval-after-load 'evil
+
+      ;; 1. Bind 'g l' in Evil Normal mode when looking at the PDF
+      ;; FIXME - check what's the issue
+      (evil-define-key 'normal pdf-view-mode-map 
+        (kbd "g l") #'vs/extract-pdf-annots-to-links)
+
+      ;; 2. Bind 'g l' in Evil Normal mode when looking at the Annotations list
+      (evil-define-key 'normal pdf-annot-list-mode-map 
+        (kbd "g l") #'vs/extract-pdf-annots-to-links)))
+
 #+end_src
 
 * Note Taking Packages
@@ -708,24 +892,6 @@ Use the package to capture the notes
     "Short cut to open the notes folder in dired."
     (interactive)
     (dired denote-directory))
-#+end_src
-
-** Deft package
-#+begin_src emacs_lisp
- (use-package deft
-  :ensure t)
- (setq deft-default-extension "md")
- (setq deft-extensions '("md"))
- (setq deft-directory "~/tutorial/org-mode-source/Podcasts")
- (setq deft-recursive t)
- (setq deft-use-filename-as-title nil)
- (setq deft-use-filter-string-for-filename t)
- (setq deft-file-naming-rules '((noslash . "-")
-                                (nospace . "-")
-                                (case-fn . downcase)))
- (setq deft-text-mode 'org-mode)
- (global-set-key (kbd "C-M-S-s-d") 'deft)
- (global-set-key (kbd "C-x C-g") 'deft-find-file)
 #+end_src
 
 ** Denote Helpers

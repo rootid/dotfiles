@@ -573,7 +573,21 @@ Use of Corfu package for autocompletion
 #+end_src
 
 * Org Mode Helper Functions
+** Update refile target
+#+begin_src emacs-lisp
+;; Create the refile target with all open org files
+(defun vs_org/refile-opened-org-files ()
+  "Return list of currently open .org files."
+  (delq nil
+        (mapcar (lambda (buf)
+                  (when (string-match "\\.org$" (or (buffer-file-name buf) ""))
+                    (buffer-file-name buf)))
+                (buffer-list))))
 
+(setq org-refile-targets '((vs_org/refile-opened-org-files :maxlevel . 9)))
+#+end_src
+
+** Export org mode current file to ics
 #+begin_src emacs-lisp
 
   ;; Make current org mode only file 
@@ -599,7 +613,7 @@ Use of Corfu package for autocompletion
 
 #+end_src
 
-
+** Code formatting in Org mode block
 #+begin_src emacs-lisp
   ;; indent functions
   ;; No tabs

@@ -136,3 +136,11 @@ export PATH="$PATH:/Users/vmat/software/gradle/gradle-9.0.0/bin"
 export JAVA_HOME="/Users/vmat/.sdkman/candidates/java/17.0.8-tem"
 export PATH="$JAVA_HOME/bin:$PATH"
 
+## Bun installation
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/vmat/.local/bin:$PATH"

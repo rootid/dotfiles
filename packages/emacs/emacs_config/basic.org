@@ -573,7 +573,7 @@ Use of Corfu package for autocompletion
 #+end_src
 
 * Org Mode Helper Functions
-** Update refile target
+** Update refile target to include all open org files
 #+begin_src emacs-lisp
 ;; Create the refile target with all open org files
 (defun vs_org/refile-opened-org-files ()
@@ -586,6 +586,52 @@ Use of Corfu package for autocompletion
 
 (setq org-refile-targets '((vs_org/refile-opened-org-files :maxlevel . 9)))
 #+end_src
+
+** Create a Schedule 
+#+begin_src emacs-lisp
+  ;; 1. Define your customizable list of templates
+  (defvar my-org-schedule-templates
+    '(("WFH"     . "~/templates/tpl_sch_wfh.txt")
+      ("Office"  . "~/templates/tpl_sch_ofc.txt")
+      ("Weekend"  . "~/templates/tpl_sch_weekend.txt"))
+    "An alist mapping schedule names to their template file paths.")
+
+  ;; 2. The single interactive function
+  (defun vs_org/my-org-create-schedule ()
+    "Prompt for a schedule template and a date, then insert it with replaced tags."
+    (interactive)
+    ;; Prompt for the template choice using the keys from our alist
+    (let* ((template-choice (completing-read "Select schedule template: " my-org-schedule-templates nil t))
+           ;; Extract the filepath mapped to the user's choice
+           (filepath (cdr (assoc template-choice my-org-schedule-templates)))
+           (full-path (expand-file-name filepath)))
+    
+      ;; Verify the file actually exists
+      (if (not (file-exists-p full-path))
+          (message "Error: Template file %s not found!" full-path)
+      
+        ;; Prompt for the date using Org's built-in calendar
+        (let* ((time (org-read-date nil t))
+               (date-full (format-time-string "%Y-%m-%d %a" time))
+               (date-short (format-time-string "%Y-%m-%d" time))
+               template-content)
+        
+          ;; Read the file silently
+          (setq template-content
+                (with-temp-buffer
+                  (insert-file-contents full-path)
+                  (buffer-string)))
+        
+          ;; Replace the {{DATE_FULL}} and {{DATE_SHORT}} placeholders
+          (setq template-content 
+                (replace-regexp-in-string "{{DATE_FULL}}" date-full template-content t t))
+          (setq template-content 
+                (replace-regexp-in-string "{{DATE_SHORT}}" date-short template-content t t))
+        
+          ;; Insert the final parsed string
+          (insert template-content)))))
+#+end_src
+
 
 ** Export org mode current file to ics
 #+begin_src emacs-lisp

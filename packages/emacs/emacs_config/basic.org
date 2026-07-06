@@ -355,6 +355,46 @@ Set the tabs to 2 spaces
   (global-set-key (kbd "C-c g") 'go-open-files/body)
 #+end_src
 
+* Navigation with emacs (Marks and Bookmarks)
+Hydra is a prereq
+#+begin_src emacs-lisp
+
+  (defhydra hydra-registers (:color blue :hint nil)
+    "
+    ^Registers^
+    ^---------^
+    _m_: Mark/Save position...
+    _j_: Jump to register...
+    _q_: Quit
+    "
+    ("m" point-to-register "mark")
+    ("j" jump-to-register "jump")
+    ("q" nil "quit"))
+
+  ;; Bind it to C-c m
+  (global-set-key (kbd "C-c m") 'hydra-registers/body)
+
+
+  (defhydra hydra-bookmarks (:color blue :hint nil)
+    "
+    ^Bookmarks^
+    ^---------^
+    _m_: Mark/Set bookmark...
+    _j_: Jump to bookmark...
+    _l_: List all bookmarks
+    _d_: Delete bookmark...
+    _q_: Quit
+    "
+    ("m" bookmark-set "set")
+    ("j" bookmark-jump "jump")
+    ("l" bookmark-bmenu-list "list")
+    ("d" bookmark-delete "delete")
+    ("q" nil "quit"))
+
+  ;; Bind it to C-c b (b for bookmarks)
+  (global-set-key (kbd "C-c b") 'hydra-bookmarks/body)
+#+end_src
+
 * Emacs code completion
 
 Use of Corfu package for autocompletion
@@ -631,7 +671,6 @@ Use of Corfu package for autocompletion
           ;; Insert the final parsed string
           (insert template-content)))))
 #+end_src
-
 
 ** Export org mode current file to ics
 #+begin_src emacs-lisp

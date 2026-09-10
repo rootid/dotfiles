@@ -11,6 +11,32 @@ export PATH="$IDEA_HOME_DUP:$PATH"
 
 PASSWORD_MGR="${HOME}/Applications/Chrome Apps.localized/Google Password Manager.app"
 
+# Prereq
+# brew install --cask calibre
+# sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/local/bin/ebook-convert
+function go_epub2pdf() {
+  local input="$1"
+  local output="${2:-${input%.*}.pdf}"
+  local font_size="${FONT_SIZE:-12}"
+  local paper_size="${PAPER_SIZE:-letter}"
+  local margin="${MARGIN:-36}"
+
+  if [[ -z "$input" || ! -f "$input" ]]; then
+    echo "Usage: epub2pdf <input.epub> [output.pdf]" >&2
+    return 1
+  fi
+
+  ebook-convert "$input" "$output" \
+    --paper-size "$paper_size" \
+    --pdf-page-numbers \
+    --pdf-default-font-size "$font_size" \
+    --margin-left "$margin" \
+    --margin-right "$margin" \
+    --margin-top "$margin" \
+    --margin-bottom "$margin"
+}
+
+
 function go_ai_run_gemini_cli() {
   npx https://github.com/google-gemini/gemini-cl
 }

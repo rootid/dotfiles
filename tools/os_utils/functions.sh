@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env zsh
 
 # Check if it's x86_64 or arm64
 function go_os_get_hardware_name() {

@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 alias tx='tmux'
 alias takeover="tmux detach -a"
 alias ta='tmux attach -t'

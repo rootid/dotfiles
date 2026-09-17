@@ -51,20 +51,20 @@ function go_open_password_mgr() {
 function go_pdf_shrink() {
   which ps2pdf > /dev/null 2>&1
 
-  if [ $? -ne 0 ] 
+  if [ $? -ne 0 ]
   then
       echo "Error: ps2pdf is not installed"
       echo "Please install ghostscript package to continue"
-      exit 1
+      return 1
   fi
 
   input_file=$1
   output_file="shrink_${input_file}"
 
-  if [ ! -f "$input_file" ] 
+  if [ ! -f "$input_file" ]
   then
       echo "Input file '$input_file' not found"
-      exit 1
+      return 1
   fi
 
   ps2pdf -dPDFSETTINGS=/ebook "$input_file" "$output_file"
@@ -126,16 +126,16 @@ function go_block_dns() {
 
 function go_block_twitter() {
    go_block_dns $HOME/.dns-block-media
-   default_block
+   go_block_default
 }
 
 function go_free_my_time() {
    go_block_dns $HOME/.dns-block-media
    go_block_dns $HOME/.dns-block-leisure
-   default_block
+   go_block_default
 }
 
-function default_block() {
+function go_block_default() {
    go_block_dns $HOME/.dns-block-adult
 }
 
@@ -147,7 +147,7 @@ CHROME_APP="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 PROFILES="$HOME/Library/Application Support/Google/Chrome/Local State"
 
 function go_chrome_open_vanilla() {
-  "$chrome_app"
+  "$CHROME_APP"
 }
 
 function go_chrome_open() {

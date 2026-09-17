@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 alias evi='emacs --no-splash'
 
 alias emacs_vanilla='emacs --no-init-file --no-loadup'

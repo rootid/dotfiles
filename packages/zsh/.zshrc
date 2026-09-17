@@ -1,3 +1,7 @@
+# De-duplicate PATH (and the underlying $path array) as entries are added
+# throughout this file, instead of letting repeated sourcing/installers grow it.
+typeset -U path PATH
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -135,12 +139,3 @@ export PATH="$PATH:/Users/vmat/software/gradle/gradle-9.0.0/bin"
 #export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home
 export JAVA_HOME="/Users/vmat/.sdkman/candidates/java/17.0.8-tem"
 export PATH="$JAVA_HOME/bin:$PATH"
-
-## Bun installation
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-
-
-# Added by Antigravity CLI installer
-export PATH="/Users/vmat/.local/bin:$PATH"

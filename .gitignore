@@ -6,3 +6,11 @@ bkup
 result
 tmp/
 tmp.*
+
+# Kept in sync with packages/git/.gitignore (the global core.excludesfile) so
+# this repo stays clean even before `make link_config_files` has run.
+.DS_Store
+*.swp
+*.swo
+*.out
+*.log

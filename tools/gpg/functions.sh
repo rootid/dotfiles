@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 ## New syntax go_<tool>_<action>
 # Create the key
 function go_gpg_gen_key() {

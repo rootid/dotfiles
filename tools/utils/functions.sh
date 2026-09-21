@@ -3,9 +3,6 @@
 TOP_DIR=${HOME}/utils
 PYTHON=python3
 
-CURSOR_HOME=/Applications/Cursor.app/Contents/MacOS
-export PATH="$CURSOR_HOME:$PATH"
-
 IDEA_HOME_DUP=/Applications/IntelliJ_IDEA_CE.app/Contents/MacOS
 export PATH="$IDEA_HOME_DUP:$PATH"
 
@@ -36,10 +33,6 @@ function go_epub2pdf() {
     --margin-bottom "$margin"
 }
 
-
-function go_ai_run_gemini_cli() {
-  npx https://github.com/google-gemini/gemini-cl
-}
 
 function go_open_password_mgr() {
   open ${PASSWORD_MGR}
@@ -89,10 +82,6 @@ function go_timer_start() {
 
 function go_open_ide_intellij() {
   idea
-}
-
-function go_open_ide_cursor() {
-  Cursor
 }
 
 function go_setup_java_project() {

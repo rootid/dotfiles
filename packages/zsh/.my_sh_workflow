@@ -1,6 +1,6 @@
-# zshrc workflow - 
+# zshrc workflow -
 # Never pollute the ~/.zshrc
-# 1. Create the directory for the function and aliases to /tools dir 
+# 1. Create the directory for the function and aliases to /tools dir
 # 2. Source the functions and aliases here
 # 3. Run make link_tools
 # Always put the config files in the package directory
@@ -8,53 +8,72 @@
 # Sourcing aliases
 ROOT_DIR=~
 
+# Source a tool file only when it is readable, so one missing link (or a
+# git-crypt locked file) cannot break shell startup. Missing files are
+# reported once, at the end, instead of dumping an error per line.
+typeset -ga MISSING_SH_WORKFLOW_FILES=()
+go_sh_workflow_source() {
+  if [[ -r "$1" ]]; then
+    source "$1"
+  else
+    MISSING_SH_WORKFLOW_FILES+=("$1")
+  fi
+}
+
 # zshrc
-source $ROOT_DIR/zsh/aliases.sh
+go_sh_workflow_source $ROOT_DIR/zsh/aliases.sh
 
 # Brew
-source $ROOT_DIR/brew/functions.sh
+go_sh_workflow_source $ROOT_DIR/brew/functions.sh
 
 # Git
-source $ROOT_DIR/git/functions.sh
-source $ROOT_DIR/git/aliases.sh
+go_sh_workflow_source $ROOT_DIR/git/functions.sh
+go_sh_workflow_source $ROOT_DIR/git/aliases.sh
 
 # Git Crypt
-source $ROOT_DIR/git-crypt/functions.sh
+go_sh_workflow_source $ROOT_DIR/git-crypt/functions.sh
 
 # rg
-source $ROOT_DIR/rg/aliases.sh
+go_sh_workflow_source $ROOT_DIR/rg/aliases.sh
 
 # ACK
-source $ROOT_DIR/ack/aliases.sh
+go_sh_workflow_source $ROOT_DIR/ack/aliases.sh
 
 # Java
-source $ROOT_DIR/java/aliases.sh
-source $ROOT_DIR/java/functions.sh
+go_sh_workflow_source $ROOT_DIR/java/aliases.sh
+go_sh_workflow_source $ROOT_DIR/java/functions.sh
 
 # VLC
-source $ROOT_DIR/vlc/functions.sh
+go_sh_workflow_source $ROOT_DIR/vlc/functions.sh
 
 # GPG
-source $ROOT_DIR/gpg/functions.sh
+go_sh_workflow_source $ROOT_DIR/gpg/functions.sh
 
 # OS utils
-source $ROOT_DIR/os_utils/functions.sh
+go_sh_workflow_source $ROOT_DIR/os_utils/functions.sh
 
-# Toggle
-#source $ROOT_DIR/toggl/functions.sh
+# SSH
+go_sh_workflow_source $ROOT_DIR/ssh/functions.sh
+
+# Toggle (git-crypt encrypted - only loads in an unlocked checkout)
+#go_sh_workflow_source $ROOT_DIR/toggl/functions.sh
 
 # Tmux
-source $ROOT_DIR/tmux/aliases.sh
+go_sh_workflow_source $ROOT_DIR/tmux/aliases.sh
 
 # Emacs
-source $ROOT_DIR/emacs/aliases.sh
-source $ROOT_DIR/emacs/functions.sh
+go_sh_workflow_source $ROOT_DIR/emacs/aliases.sh
+go_sh_workflow_source $ROOT_DIR/emacs/functions.sh
 
 # Utils
-source $ROOT_DIR/utils/functions.sh
+go_sh_workflow_source $ROOT_DIR/utils/functions.sh
 
 # Nix
-source $ROOT_DIR/nix/functions.sh
+go_sh_workflow_source $ROOT_DIR/nix/functions.sh
+
+if (( ${#MISSING_SH_WORKFLOW_FILES} )); then
+  print -u2 "my_sh_workflow: not sourced (run 'make link_tools'?): ${MISSING_SH_WORKFLOW_FILES[*]}"
+fi
 
 CUSTOM_BIN=$HOME/dotfiles/bin
 export PATH=$CUSTOM_BIN:$PATH

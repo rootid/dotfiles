@@ -2,7 +2,7 @@
 
 function install_homebrew() {
 # Check for Homebrew
-  if test ! $(which brew)
+  if ! command -v brew >/dev/null 2>&1
   then
     echo "Installing Homebrew"
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -10,6 +10,7 @@ function install_homebrew() {
 }
 
 function install_omz() {
-  sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# curl, not wget: macOS ships curl but not wget.
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 }
 

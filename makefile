@@ -1,8 +1,7 @@
 # --- Configuration ---
-# Use the HOME environment variable for portability instead of a hardcoded path.
-HOME ?= $(HOME)
-# Define the location of your dotfiles directory.
-DOTFILES_DIR = $(HOME)/dotfiles
+# HOME comes from the environment. DOTFILES_DIR is derived from this Makefile's
+# own location, so the repo works from any path (not just ~/dotfiles).
+DOTFILES_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 # Define the shell to be used for recipes.
 SHELL := /bin/zsh
@@ -10,11 +9,12 @@ SHELL := /bin/zsh
 # --- Phony Targets ---
 # .PHONY declares that these targets are not files.
 # Using a multi-line declaration is cleaner and easier to maintain.
-.PHONY: all clean \
+.PHONY: all clean help \
 	install_homebrew install_omz update_brew_bundle \
 	dry_run_stow \
 	link_config_files unlink_config_files \
 	link_tools unlink_tools \
+	init_nvim \
 	init_vim_packages link_vim unlink_vim \
 	link_org_sys unlink_org_sys \
 	link_pvt_org_mode_snippets
@@ -62,9 +62,14 @@ link_config_files:
 	$(STOW_LINK) ssh
 
 unlink_config_files:
-	@echo "Unlinking selected config files..."
+	@echo "Unlinking configuration files..."
+	$(STOW_UNLINK) ssh
 	$(STOW_UNLINK) emacs
-	$(STOW_UNLINK) emacs-templates
+	$(STOW_UNLINK) tmux
+	$(STOW_UNLINK) zsh
+	$(STOW_UNLINK) git
+	$(STOW_UNLINK) stow
+	@stow --delete config --dir=$(DOTFILES_DIR) --target=$(HOME) --verbose=5
 
 link_tools:
 	@echo "Linking tools..."

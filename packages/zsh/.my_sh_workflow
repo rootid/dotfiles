@@ -71,6 +71,19 @@ go_sh_workflow_source $ROOT_DIR/utils/functions.sh
 # Nix
 go_sh_workflow_source $ROOT_DIR/nix/functions.sh
 
+# Cursor
+go_sh_workflow_source $ROOT_DIR/cursor/env.sh
+go_sh_workflow_source $ROOT_DIR/cursor/functions.sh
+
+# AI agents (shared helpers use $GO_AI_AGENT, default claude)
+go_sh_workflow_source $ROOT_DIR/claude/functions.sh
+go_sh_workflow_source $ROOT_DIR/claude/aliases.sh
+go_sh_workflow_source $ROOT_DIR/agy/functions.sh
+go_sh_workflow_source $ROOT_DIR/agy/aliases.sh
+go_sh_workflow_source $ROOT_DIR/gemini/functions.sh
+go_sh_workflow_source $ROOT_DIR/ai/functions.sh
+go_sh_workflow_source $ROOT_DIR/ai/aliases.sh
+
 if (( ${#MISSING_SH_WORKFLOW_FILES} )); then
   print -u2 "my_sh_workflow: not sourced (run 'make link_tools'?): ${MISSING_SH_WORKFLOW_FILES[*]}"
 fi

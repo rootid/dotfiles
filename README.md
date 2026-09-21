@@ -20,7 +20,8 @@ editing `~/.zshrc` edits `packages/zsh/.zshrc` here.
 ## Quick start (new machine)
 
 ```sh
-# 1. Clone to ~/dotfiles (the Makefile assumes this path)
+# 1. Clone to ~/dotfiles (the Makefile works from any path, but
+#    .my_sh_workflow puts ~/dotfiles/bin on $PATH)
 git clone git@github.com:rootid/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
@@ -141,7 +142,7 @@ Run `make help` to list targets. Running plain `make` runs `all`.
 | Command | What it does |
 |---|---|
 | `make unlink_tools` | **Dry run only** — shows what `stow --delete tools` would remove |
-| `make unlink_config_files` | Unstow `emacs` only (not the full set that `link_config_files` links) |
+| `make unlink_config_files` | Unstow `ssh emacs tmux zsh git stow` and `config/` — the mirror of `link_config_files` |
 | `make unlink_vim` | Unstow `packages/vim` |
 
 ### Org-mode (external, requires `~/Dropbox/plain_docs`)
@@ -322,7 +323,7 @@ locked.
 | Symptom | Fix |
 |---|---|
 | `WARNING! stowing X would cause conflicts: existing target is neither a link nor a directory` | A real file is in the way. Back it up and remove it, then restow. |
-| `no such file or directory: ~/<tool>/functions.sh` on shell start | You registered a tool in `.my_sh_workflow` but didn't run `make link_tools`. |
+| `my_sh_workflow: not sourced (run 'make link_tools'?): ...` on shell start | You registered a tool in `.my_sh_workflow` but didn't run `make link_tools` — or the file is git-crypt encrypted and the repo is locked. The shell still starts; only those helpers are missing. |
 | New alias/function not available | Open a new shell (`exec zsh`); sourcing only happens at startup. |
 | A link points to the wrong place / stale links after a rename | `stow -R ...` for that package (see [Tips](#tips)). |
 | Encrypted-looking garbage in a file | Repo is locked — `git-crypt unlock`. |

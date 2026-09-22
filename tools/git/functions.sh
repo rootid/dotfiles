@@ -24,3 +24,16 @@ function go_git_save_work() {
  echo "Switching to branch ${old_branch} from ${new_branch}"
  git checkout "${old_branch}"
 }
+
+function go_git_new_feature() {
+  local branch_name=${1:?Error: branch name required}
+  echo "Fetching latest changes..."
+  git fetch origin || return 1
+  echo "Switching to main..."
+  git switch main || return 1
+  echo "Pulling latest from origin/main..."
+  git pull origin main || return 1
+  echo "Creating new branch: ${branch_name}"
+  git switch -c "${branch_name}" || return 1
+  echo "✓ Ready to work on ${branch_name}"
+}

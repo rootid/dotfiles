@@ -12,6 +12,7 @@ editing `~/.zshrc` edits `packages/zsh/.zshrc` here.
   - [A new config file (dotfile)](#a-new-config-file-dotfile)
   - [A new standalone script](#a-new-standalone-script)
   - [A Homebrew package](#a-homebrew-package)
+- [AI agents (Claude Code, agy)](#ai-agents-claude-code-agy)
 - [Secrets (git-crypt)](#secrets-git-crypt)
 - [Troubleshooting](#troubleshooting)
 
@@ -36,7 +37,7 @@ git-crypt unlock
 
 # 4. Preview, then link
 make dry_run_stow                # simulate - shows what would be linked
-make                             # = make all = link_config_files + link_tools
+make                             # = make all = link_config_files + link_tools + link_ai
 
 # 5. Optional editors
 make init_vim_packages link_vim
@@ -116,9 +117,10 @@ Run `make help` to list targets. Running plain `make` runs `all`.
 
 | Command | What it does |
 |---|---|
-| `make` / `make all` | `link_config_files` + `link_tools` — link everything normally in use |
+| `make` / `make all` | `link_config_files` + `link_tools` + `link_ai` — link everything normally in use |
 | `make link_config_files` | Stow `config/`, then `packages/` `stow git zsh tmux emacs ssh` |
 | `make link_tools` | Stow `tools/` into `$HOME` with `--no-folding` |
+| `make link_ai` / `make unlink_ai` | Stow / unstow the AI agent config packages `claude gemini agents` (`--no-folding`) — see [AI agents](#ai-agents-claude-code-agy) |
 | `make dry_run_stow` | Simulate stowing `zsh` and `ssh` (verbose, changes nothing) |
 | `make update_brew_bundle` | `brew bundle` against `packages/brew/brewfile` |
 
@@ -282,6 +284,70 @@ cask "iterm2"
 then run `make update_brew_bundle`. To capture everything currently installed:
 `brew bundle dump --force --file=packages/brew/brewfile` (review the diff before
 committing).
+
+---
+
+## AI agents (Claude Code, agy)
+
+### Aliases
+
+| Claude Code | agy | What it does |
+|---|---|---|
+| `cl` | `gy` | Start a session |
+| `clc` | `gyc` | Continue the most recent conversation |
+| `clr` | — | Pick a past conversation to resume |
+| `clp "..."` | `gyp "..."` | One-shot: print the answer and exit |
+| `clq` | `gyq` | Quick: Claude on Haiku / agy at low effort |
+| `cld` | `gyd` | Deep: Claude on Opus at max effort / agy at high effort |
+| `clplan` | `gyplan` | Plan mode: proposes changes, edits nothing |
+
+Model and effort presets are variables at the top of
+`tools/claude/functions.sh` and `tools/agy/functions.sh` — edit one line when
+a new model ships. The everyday default model comes from
+`~/.claude/settings.json`.
+
+### Shared helpers (`tools/ai/`)
+
+These go to whichever agent `GO_AI_AGENT` names (`claude` by default, or
+`agy` / `gemini`). Switch per call with `GO_AI_AGENT=agy ai "..."`, or per
+shell with `export GO_AI_AGENT=agy`. (It isn't `AI_AGENT`, because Claude Code
+exports that variable to identify itself.)
+
+| Command | What it does |
+|---|---|
+| `ai "question"` | Ask a one-shot question. Pipe in context: `git log -5 \| ai "summarise"` |
+| `aiexplain` | Explain piped text or an argument: `pbpaste \| aiexplain`, `aiexplain 'tar -xzvf x.tgz'` |
+| `aifix` | Re-run the previous command (asks first), send the error, get the cause and a corrected command |
+| `aireview [base]` | Review `base...HEAD` (default `main`), printed in the terminal |
+| `aicommit` | Draft a message for the **staged** diff and open `git commit -e` — save to commit, empty it to abort |
+| `aipr [base]` | Draft a PR title and description, open it in `$EDITOR`, then confirm before `gh pr create` |
+| **Ctrl-X Ctrl-A** | Type what you want in plain English on the prompt, press the keys, and the line becomes a suggested command. Review it, then press Enter |
+| `go_ai_doctor` | Check that the CLIs are installed and the config symlinks are intact |
+| `go_ai_skills_restore` | Reinstall every skill pinned in `~/.agents/.skill-lock.json` (new machine) |
+
+Nothing an agent outputs is ever run automatically: commands land on your
+prompt, and commit messages and PR bodies open in your editor first.
+
+### Config packages
+
+| Package | Links | Not tracked (stays local) |
+|---|---|---|
+| `packages/claude` | `~/.claude/settings.json`, `~/.claude/CLAUDE.md` (global preferences) | sessions, projects, history, caches, `settings.local.json` |
+| `packages/gemini` | `~/.gemini/settings.json` (shared by agy and gemini) | `oauth_creds.json`, `google_accounts.json` — blocked by `.stow-local-ignore` and `.gitignore` |
+| `packages/agents` | `~/.agents/.skill-lock.json` — the skills "Brewfile" | the 76 installed skills themselves; `go_ai_skills_restore` reinstalls them |
+
+`make link_ai` stows these with `--no-folding`, so only individual files are
+links and runtime state never lands in the repo. It also recreates
+`~/.gemini/skills → ~/.agents/skills`.
+
+**Settings drift:** Claude Code and agy rewrite their own settings (e.g. `/model`
+saves a new default). Those edits go through the symlink into the repo, so
+`git diff` shows them; commit the ones you want to keep. If a tool replaces the
+file instead of editing it, the link turns into a regular file and
+`go_ai_doctor` reports it as `BROKEN`.
+
+**Adding skills:** install with `npx skills add <owner/repo> -g`, then commit the
+updated `packages/agents/.agents/.skill-lock.json`.
 
 ---
 

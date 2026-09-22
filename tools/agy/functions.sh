@@ -18,3 +18,7 @@ function go_agy_deep() {
 function go_agy_plan() {
   agy --mode plan "$@"
 }
+
+function go_agy_usage() {
+  agy -p "/usage"
+}

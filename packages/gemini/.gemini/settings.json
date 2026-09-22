@@ -1,0 +1,14 @@
+{
+  "general": {
+    "preferredEditor": "cursor",
+    "defaultApprovalMode": "auto_edit"
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "ui": {
+    "theme": "ANSI Light"
+  }
+}

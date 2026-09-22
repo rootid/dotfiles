@@ -20,3 +20,7 @@ function go_claude_deep() {
 function go_claude_plan() {
   claude --permission-mode plan "$@"
 }
+
+function go_claude_usage() {
+  claude -p "/usage"
+}

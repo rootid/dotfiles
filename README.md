@@ -138,6 +138,7 @@ Run `make help` to list targets. Running plain `make` runs `all`.
 |---|---|
 | `make install_homebrew` | Install Homebrew if `brew` isn't found (`bin/install.sh`) |
 | `make install_omz` | Install Oh My Zsh (`bin/install.sh`) |
+| `make install_statusline_deps` | `npm install -g ccusage` if missing - powers the statusline's session-reset countdown (`bin/install.sh`) |
 
 ### Unlinking
 

@@ -10,7 +10,7 @@ SHELL := /bin/zsh
 # .PHONY declares that these targets are not files.
 # Using a multi-line declaration is cleaner and easier to maintain.
 .PHONY: all clean help \
-	install_homebrew install_omz update_brew_bundle \
+	install_homebrew install_omz install_statusline_deps update_brew_bundle \
 	dry_run_stow \
 	link_config_files unlink_config_files \
 	link_tools unlink_tools \
@@ -40,6 +40,11 @@ install_omz:
 	@echo "Installing Oh My Zsh..."
 	@$(SHELL) -c 'source bin/install.sh && install_omz'
 	@echo "Oh My Zsh installation completed."
+
+install_statusline_deps:
+	@echo "Installing statusline dependencies (ccusage)..."
+	@$(SHELL) -c 'source bin/install.sh && install_statusline_deps'
+	@echo "Statusline dependencies installed."
 
 update_brew_bundle:
 	@echo "Updating applications using Brewfile..."

@@ -24,3 +24,13 @@ function go_claude_plan() {
 function go_claude_usage() {
   claude -p "/usage"
 }
+
+# Pin the version here; bump when you want a newer cc-statusline release.
+CC_STATUSLINE_VERSION=1.4.0
+
+# Re-run the cc-statusline wizard (interactive) to regenerate
+# packages/claude/.claude/statusline.sh. https://www.npmjs.com/package/@chongdashu/cc-statusline
+function go_claude_statusline_regen() {
+  local target="$HOME/dotfiles/packages/claude/.claude/statusline.sh"
+  npx "@chongdashu/cc-statusline@${CC_STATUSLINE_VERSION}" init --output "$target" "$@"
+}

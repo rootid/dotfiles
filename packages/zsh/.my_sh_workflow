@@ -84,6 +84,10 @@ go_sh_workflow_source $ROOT_DIR/gemini/functions.sh
 go_sh_workflow_source $ROOT_DIR/ai/functions.sh
 go_sh_workflow_source $ROOT_DIR/ai/aliases.sh
 
+# AgentsView (token/usage analytics across coding-agent sessions)
+go_sh_workflow_source $ROOT_DIR/agentsview/functions.sh
+go_sh_workflow_source $ROOT_DIR/agentsview/aliases.sh
+
 if (( ${#MISSING_SH_WORKFLOW_FILES} )); then
   print -u2 "my_sh_workflow: not sourced (run 'make link_tools'?): ${MISSING_SH_WORKFLOW_FILES[*]}"
 fi

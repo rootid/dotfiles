@@ -1,0 +1,9 @@
+# Replaces ~/.stow-global-ignore for this package only.
+# ~/.gemini also holds agy/gemini credentials - never link them from here.
+oauth_creds\.json
+google_accounts\.json
+installation_id
+\.stow-local-ignore
+
+.+~
+\#.*\#

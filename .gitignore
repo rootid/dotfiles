@@ -14,3 +14,13 @@ tmp.*
 *.swo
 *.out
 *.log
+
+# AI agent credentials and runtime state that live next to the config we do
+# track in packages/{claude,gemini,agents}. Never commit these.
+packages/gemini/.gemini/oauth_creds.json
+packages/gemini/.gemini/google_accounts.json
+packages/gemini/.gemini/installation_id
+packages/claude/.claude/settings.local.json
+packages/claude/.claude/.credentials.json
+
+fixme.md

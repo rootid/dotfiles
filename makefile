@@ -14,6 +14,7 @@ SHELL := /bin/zsh
 	dry_run_stow \
 	link_config_files unlink_config_files \
 	link_tools unlink_tools \
+	link_ai unlink_ai \
 	init_nvim \
 	init_vim_packages link_vim unlink_vim \
 	link_org_sys unlink_org_sys \
@@ -28,7 +29,7 @@ STOW_UNLINK = $(STOW) --delete --verbose=5
 
 # --- Main Targets ---
 
-all: link_config_files link_tools
+all: link_config_files link_tools link_ai
 
 install_homebrew:
 	@echo "Installing Homebrew on Mac..."
@@ -78,6 +79,19 @@ link_tools:
 unlink_tools:
 	@echo "Unlinking tools (dry run)..."
 	@stow --delete tools --dir=$(DOTFILES_DIR) --target=$(HOME) --verbose=5 --simulate
+
+# --- AI agent config (Claude Code, agy/gemini, shared skills) ---
+# --no-folding is essential: these dirs also hold credentials, sessions and
+# caches, so only individual files may be links - never the whole directory.
+link_ai:
+	@echo "Linking AI agent config..."
+	@mkdir -p $(HOME)/.claude $(HOME)/.gemini $(HOME)/.agents
+	$(STOW_LINK) --no-folding claude gemini agents
+	@[[ -e $(HOME)/.gemini/skills ]] || ln -s $(HOME)/.agents/skills $(HOME)/.gemini/skills
+
+unlink_ai:
+	@echo "Unlinking AI agent config..."
+	$(STOW_UNLINK) claude gemini agents
 
 # --- NeoVim Package Management ---
 init_nvim:

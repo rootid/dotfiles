@@ -1126,7 +1126,109 @@ Use the package to capture the notes
    (setq consult-notes-file-dir-sources
          `(("Denote Notes"  ?d ,(denote-directory))
            ("Web"  ?w "~/Dropbox/plain_docs/publish/web/")))
+
+   ;; Consult follows the Denote silo you're in.
+   ;; Inside a silo listed in `vs/denote-silos' (or a subfolder), consult and
+   ;; denote use that silo; everywhere else they use the global
+   ;; `denote-directory' (the notes dir). The web silo's .dir-locals.el sets
+   ;; `denote-directory' for denote; this makes consult do the same.
+   (defvar vs/denote-silos '("~/Dropbox/plain_docs/publish/web/")
+     "Extra Denote silos besides the global `denote-directory'.")
+
+   (defun vs/denote-current-silo ()
+     "Silo containing `default-directory', else the global notes directory."
+     (let ((here (expand-file-name default-directory)))
+       (or (seq-find (lambda (silo) (file-in-directory-p here silo))
+                     (mapcar #'expand-file-name vs/denote-silos))
+           (file-name-as-directory (default-value 'denote-directory)))))
+
+   (defun vs/consult-find-silo (&optional arg)
+     "`consult-find' in the current silo. With C-u, prompt for a directory."
+     (interactive "P")
+     (consult-find (if arg t (vs/denote-current-silo))))
+
+   (defun vs/consult-grep-silo (&optional arg)
+     "`consult-grep' in the current silo. With C-u, prompt for a directory."
+     (interactive "P")
+     (consult-grep (if arg t (vs/denote-current-silo))))
+
+   (global-set-key (kbd "M-s M-f") #'vs/consult-find-silo)
+   (global-set-key (kbd "M-s M-g") #'vs/consult-grep-silo)
     #+end_src
+
+** Web Silo Templates
+Create notes in the web silo (~/Dropbox/plain_docs/publish/web/) with the
+ox-hugo front matter for each part of the site. =publish.el= exports them.
+
+- =C-c n w= opens a menu: =w= Writing, =p= Project, =m= Misc, =a= Page
+- =M-x vs/denote-web-new= asks for the type instead
+
+Each command prompts for the title and keywords (as =denote= does), then
+asks whether to start as a draft. Denote writes =#+title=, =#+date=,
+=#+filetags= and =#+identifier=; the template adds the ox-hugo lines below
+them. The URL slug comes from the title (=publish.el= derives it); a Page
+asks for its slug because it becomes a top-level URL such as =/aboutme/=.
+
+#+begin_src emacs-lisp
+  (defvar vs/web-note-types
+    '((writing "posts"    "Blog post, listed on the home page (Writing)")
+      (project "projects" "Entry on the Project page")
+      (misc    "misc"     "Note on the Misc page")
+      (page    "/"        "Standalone page at the site root, e.g. /aboutme/"))
+    "Web silo note types: (TYPE HUGO-SECTION DESCRIPTION).")
+
+  (defun vs/web-front-matter (type slug draft)
+    "ox-hugo keywords for a TYPE note, inserted below Denote's front matter.
+  SLUG, when non-nil, sets the exported file name; DRAFT keeps it unpublished."
+    (concat (format "#+hugo_section: %s\n" (nth 1 (assq type vs/web-note-types)))
+            (when slug (format "#+export_file_name: %s\n" slug))
+            (when draft "#+hugo_draft: true\n")
+            "\n"))
+
+  (defun vs/web-read-type ()
+    "Ask for a key of `vs/web-note-types', showing each type's description."
+    (let ((completion-extra-properties
+           (list :annotation-function
+                 (lambda (c) (concat "  " (nth 2 (assq (intern c) vs/web-note-types)))))))
+      (intern (completing-read "Web note type: "
+                               (mapcar (lambda (e) (symbol-name (car e))) vs/web-note-types)
+                               nil t))))
+
+  (defun vs/denote-web-new (type)
+    "Create a TYPE note in the web silo with its ox-hugo front matter.
+  TYPE is a key of `vs/web-note-types'."
+    (interactive (list (vs/web-read-type)))
+    (let* ((denote-directory (car vs/denote-silos))
+           ;; Suggest only keywords already used in the web silo (Hugo tags),
+           ;; not the notes vocabulary in the global `denote-known-keywords'.
+           (denote-known-keywords nil)
+           (denote-infer-keywords t)
+           (title (denote-title-prompt))
+           (keywords (denote-keywords-prompt))
+           (slug (when (eq type 'page)
+                   (read-string "URL slug: " (denote-sluggify 'title title))))
+           (draft (y-or-n-p "Start as a draft (remove #+hugo_draft to publish)? "))
+           (denote-templates `((web . ,(vs/web-front-matter type slug draft)))))
+      (denote title keywords 'org denote-directory nil 'web)))
+
+  (defhydra hydra-web-note (:color blue :hint nil)
+    "
+    ^New web note^
+    ^------------^
+    _w_: Writing (blog post)
+    _p_: Project
+    _m_: Misc
+    _a_: Page (About, …)
+    _q_: Quit
+    "
+    ("w" (vs/denote-web-new 'writing))
+    ("p" (vs/denote-web-new 'project))
+    ("m" (vs/denote-web-new 'misc))
+    ("a" (vs/denote-web-new 'page))
+    ("q" nil))
+
+  (global-set-key (kbd "C-c n w") 'hydra-web-note/body)
+#+end_src
 
 ** Org-Config for Calender Workflow
 

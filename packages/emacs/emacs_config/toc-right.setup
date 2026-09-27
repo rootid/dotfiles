@@ -1,0 +1,50 @@
+#+HTML_HEAD: <style>
+#+HTML_HEAD: /* Overall Page Layout */
+#+HTML_HEAD: body {
+#+HTML_HEAD:     margin: 0;
+#+HTML_HEAD:     padding: 0;
+#+HTML_HEAD:     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+#+HTML_HEAD:     line-height: 1.6;
+#+HTML_HEAD:     color: #333;
+#+HTML_HEAD:     background-color: #fefefe;
+#+HTML_HEAD: }
+#+HTML_HEAD: 
+#+HTML_HEAD: /* Main Content (Left Side) */
+#+HTML_HEAD: #content {
+#+HTML_HEAD:     max-width: 800px;
+#+HTML_HEAD:     margin: 0 auto;
+#+HTML_HEAD:     padding: 20px;
+#+HTML_HEAD: }
+#+HTML_HEAD: 
+#+HTML_HEAD: /* Desktop Layout: Reserve space for fixed TOC */
+#+HTML_HEAD: @media (min-width: 769px) {
+#+HTML_HEAD:     body {
+#+HTML_HEAD:         padding-right: 300px; /* Exact width of the TOC to prevent overlap */
+#+HTML_HEAD:     }
+#+HTML_HEAD:     #table-of-contents {
+#+HTML_HEAD:         position: fixed;
+#+HTML_HEAD:         top: 0;
+#+HTML_HEAD:         right: 0;
+#+HTML_HEAD:         width: 300px;
+#+HTML_HEAD:         height: 100vh;
+#+HTML_HEAD:         padding: 20px;
+#+HTML_HEAD:         background: #f9f9f9;
+#+HTML_HEAD:         border-left: 1px solid #ddd;
+#+HTML_HEAD:         overflow-y: auto;
+#+HTML_HEAD:         box-sizing: border-box;
+#+HTML_HEAD:         z-index: 100;
+#+HTML_HEAD:     }
+#+HTML_HEAD: }
+#+HTML_HEAD: 
+#+HTML_HEAD: /* Mobile Responsiveness: Stack them on small screens */
+#+HTML_HEAD: @media (max-width: 768px) {
+#+HTML_HEAD:     #table-of-contents {
+#+HTML_HEAD:         position: static;
+#+HTML_HEAD:         width: 100%;
+#+HTML_HEAD:         height: auto;
+#+HTML_HEAD:         border-bottom: 2px solid #ddd;
+#+HTML_HEAD:         padding-bottom: 20px;
+#+HTML_HEAD:         margin-bottom: 20px;
+#+HTML_HEAD:     }
+#+HTML_HEAD: }
+#+HTML_HEAD: </style>

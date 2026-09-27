@@ -227,7 +227,28 @@ Shortcuts to Open Browser
   (open-web-page "https://music.youtube.com"))
 
   (global-set-key (kbd "C-c y") 'go_open_ymusic)
-#+END_SRC 
+#+END_SRC
+
+Collapse Blank Lines
+Squeeze every run of blank lines into a single blank line, in the region or
+the whole buffer. Lines holding only spaces/tabs count as blank.
+#+begin_src emacs-lisp
+  (defun vs_utils/collapse_blank_lines (beg end)
+    "Replace each run of blank lines between BEG and END with one blank line.
+  Without an active region, act on the whole buffer."
+    (interactive (if (use-region-p)
+                     (list (region-beginning) (region-end))
+                   (list (point-min) (point-max))))
+    (let ((count 0))
+      (save-excursion
+        (save-restriction
+          (narrow-to-region beg end)
+          (goto-char (point-min))
+          (while (re-search-forward "^[ \t]*\n\\([ \t]*\n\\)+" nil t)
+            (replace-match "\n")
+            (setq count (1+ count)))))
+      (message "Collapsed %d run%s of blank lines" count (if (= count 1) "" "s"))))
+#+end_src
 
 Org Mode Helper Script
 Set the tabs to 2 spaces
@@ -254,7 +275,6 @@ Set the tabs to 2 spaces
          (interactive)
          (setq org-refile-targets '((vs_org/opened_buffer_files :maxlevel . 9)))
          (setq org-refile-use-outline-path 'file))
-
 
   (defun vs_org/archive_cancelled_tasks ()
     "Archive all cancelled tasks in the current buffer or region. A cancelled task is one with a CANCELLED keyword state."
@@ -374,7 +394,6 @@ Hydra is a prereq
   ;; Bind it to C-c m
   (global-set-key (kbd "C-c m") 'hydra-registers/body)
 
-
   (defhydra hydra-bookmarks (:color blue :hint nil)
     "
     ^Bookmarks^
@@ -429,7 +448,11 @@ Use of Corfu package for autocompletion
 
 #+begin_src emacs-lisp
   (use-package org
-    :ensure t)
+    :ensure t
+    :custom
+    ;; Require {} for sub/superscripts to prevent paths with underscores from breaking
+    (org-export-with-sub-superscripts '{})
+    (org-use-sub-superscripts '{}))
 
   (use-package ox-twbs
     :ensure t
@@ -472,7 +495,6 @@ Use of Corfu package for autocompletion
   (use-package ox-epub
     :after org
     :commands (org-export-dispatch))
-
 
   ;; --- ox-md Configuration ---
   (with-eval-after-load 'ox-md
@@ -564,6 +586,27 @@ Use of Corfu package for autocompletion
   (global-set-key (kbd "C-c a") 'org-agenda)
   (define-key org-mode-map (kbd "C-c o") 'org-open-at-point)
 
+  (defun vs_org/link_pdf ()
+    "Insert an Org link to a PDF, asking for the book title as its description.
+  If the current line is just a path to an existing PDF, turn it into the link;
+  otherwise prompt for the PDF file."
+    (interactive)
+    (let* ((line (string-trim (buffer-substring-no-properties
+                               (line-beginning-position) (line-end-position))))
+           (on-path (and (string-suffix-p ".pdf" line t)
+                         (file-exists-p (expand-file-name line))))
+           (file (if on-path
+                     (expand-file-name line)
+                   (read-file-name "PDF: " "~/Dropbox/plain_docs/area/" nil t nil
+                                   (lambda (f) (or (file-directory-p f)
+                                                   (string-suffix-p ".pdf" f t))))))
+           (title (read-string "Book title: "
+                               (capitalize (replace-regexp-in-string
+                                            "[_-]" " " (file-name-base file))))))
+      (when on-path
+        (delete-region (line-beginning-position) (line-end-position)))
+      (insert (org-link-make-string (concat "pdf:" (abbreviate-file-name file)) title))))
+
   (evil-define-key 'normal org-mode-map (kbd "TAB") 'org-cycle) ;; C-h k <TAB> to confirm override
 
   (setq org-log-into-drawer t) ;; C-c C-z - start notes
@@ -571,7 +614,6 @@ Use of Corfu package for autocompletion
   (setq org-log-reschedule 'time) ;; To disable - (setq org-log-reschedule nil)
   (setq org-log-done 'note) ;; To disable - (setq org-log-done nil)
   (setq org-clock-sound t)
-
 
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
@@ -756,7 +798,8 @@ Use this package to log the journal and review entries in descending date order
     (org-refile)))
 
 ;; Bind the custom refile function to a key
-;;(global-set-key (kbd "C-c r") 'my/org-refile-within-file)
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c r") #'vs_org/go_use_same_refile))
 #+END_SRC 
 
 ** Yasnippet 
@@ -844,7 +887,6 @@ Verify the sub directory path to copy the path
                 ("o" . pdf-outline)
                 ("C-c a" . hydra-pdf-annot/body))
 
-
     :config
     ;; This line forces Emacs to compile the engine and use it as the default
     (pdf-tools-install :no-query)
@@ -852,21 +894,44 @@ Verify the sub directory path to copy the path
     ;; Automatically fit the PDF to your window size
     (setq-default pdf-view-display-size 'fit-page)
 
+    ;; Show the outline (o) in a side window on the right, not a split below
+    (setq pdf-outline-display-buffer-action
+          '(display-buffer-in-side-window
+            (side . right)
+            (window-width . 0.3)))
+
+    ;; Show the annotation list on the far right; *Contents* opens below it.
+    ;; Not a side window: tablist splits the list window for *Contents*, and
+    ;; side windows can't be split.
+    (setq pdf-annot-list-display-buffer-action
+          '(display-buffer-in-direction
+            (direction . rightmost)
+            (window-width . 0.35)))
+
     ;; What it does? if change to nill will the relative rectanlge will go away?
     (setq pdf-annot-activate-created-annotations t)
     ;; Automatically update the buffer if the PDF changes on disk
     (add-to-list 'revert-without-query ".pdf")
 
     ;; Another way to configure the hook w/o omitting the -hook suffix
-    (add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1))))
+    (add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1)))
+
+    ;; Evil re-applies its state cursor and undoes pdf-view's hidden cursor;
+    ;; with a box cursor the whole page image blinks.
+    (add-hook 'pdf-view-mode-hook
+              (lambda ()
+                (setq-local evil-emacs-state-cursor '(nil))
+                (setq-local evil-normal-state-cursor '(nil)))))
 
   (use-package org-pdftools
     :ensure t
-    ;; Force Emacs to wait until both dependencies are fully loaded
-    :after (org pdf-tools)
-    ;;:hook (org-mode . org-pdftools-setup-link)
+    ;; Load with org, not pdf-tools: pdf-tools only loads when a PDF is first
+    ;; opened, so pdf: links would fail ("No match") until then.
+    ;; org-pdftools requires pdf-tools itself.
+    :after org
     :config
-    (add-hook 'org-mode-hook #'org-pdftools-setup-link)
+    ;; Registers the pdf: link type globally, so a one-off call is enough
+    (org-pdftools-setup-link)
     ;; Use isearch string in link if no annotation found under point
     (setq org-pdftools-use-isearch-link t)
     ;; Use free-pointer annotation when inserting precise notes
@@ -964,6 +1029,12 @@ Use the package to capture the notes
   (setq denote-directory (expand-file-name "~/Dropbox/plain_docs/area/v1/denote/notes"))
   (setq denote-save-buffer-after-creation nil)
   (setq denote-known-keywords '("emacs" "philosophy" "economics" "orgmode" "functionalProgramming" "project"))
+  ;; org-archive files keep their source note's identifier; hide them from
+  ;; Denote prompts, links and `denote-directory-files'.
+  (setq denote-excluded-files-regexp "\\.org_archive\\'")
+  ;; org LaTeX previews in ltximg/ are named after their note, so they carry
+  ;; its identifier too.
+  (setq denote-excluded-directories-regexp "\\`ltximg\\'")
 
   (add-hook 'dired-mode-hook #'denote-dired-mode)
 
@@ -979,13 +1050,11 @@ Use the package to capture the notes
   ;;        (signature . denote-sluggify-signature)
   ;;        (keyword . identity)))
 
-
   ;;;; Our variant of the above, which does the same thing except from
   ;;;; downcasing the string.
   ;;(defun my-denote-sluggify-title (str)
   ;;  "Make STR an appropriate slug for title."
   ;;  (denote--slug-hyphenate (denote--slug-no-punct str)))
-
 
   (defun vs_denote/dired_open ()
     "Short cut to open the notes folder in dired."
@@ -1156,6 +1225,33 @@ Use the package to capture the notes
    (global-set-key (kbd "M-s M-g") #'vs/consult-grep-silo)
     #+end_src
 
+- **Tag Search**
+  #+begin_src emacs-lisp
+    (defun vs/denote-list-files-by-tag (tag)
+      "Create an org-mode buffer listing all denote files with the given TAG.
+    When called interactively, prompts for the tag."
+      (interactive (list (read-string "Tag to list: " "system")))
+      ;; TODO: replace the "_%s\\b" regexp so TAG only matches a whole
+      ;; keyword (followed by another keyword or the extension).
+      (let* ((files (denote-directory-files (format "_%s\\b" tag)))
+             (buf (get-buffer-create (format "*Denote Tag: %s*" tag))))
+        (with-current-buffer buf
+          (erase-buffer)
+          (org-mode)
+          (insert (format "#+TITLE: Denote files tagged with '%s'\n\n" tag))
+          (if files
+              (dolist (file files)
+                (let ((title (denote-retrieve-title-or-filename file 'org))
+                      (id (denote-retrieve-filename-identifier file)))
+                  (insert (format "- [[denote:%s][%s]]\n" id title))))
+            (insert "No files found with this tag.\n"))
+          (goto-char (point-min)))
+        (pop-to-buffer buf)))
+
+    (let ((map global-map))
+      (define-key map (kbd "C-c n t") #'vs/denote-list-files-by-tag))
+  #+end_src
+
 ** Web Silo Templates
 Create notes in the web silo (~/Dropbox/plain_docs/publish/web/) with the
 ox-hugo front matter for each part of the site. =publish.el= exports them.
@@ -1261,12 +1357,31 @@ asks for its slug because it becomes a top-level URL such as =/aboutme/=.
     (org-download-timestamp "%Y%m%d-%H%M%S_")
     (org-download-backend 'url-retrieve)
     (org-download-screenshot-method "/opt/homebrew/bin/pngpaste %s")
+    ;; Absolute image links, so exports outside the note's dir (/tmp) find them
+    (org-download-abbreviate-filename-function #'expand-file-name)
     :bind
 ;Ctrl-Option-y
     ("C-M-y" . org-download-screenshot) 
     :config
     (require 'org-download))
 
+#+end_src
+
+Older notes still have relative image links (=file:../../area/images/...=).
+They resolve from the note in Emacs, but an HTML export to /tmp resolves them
+from /tmp and the images break. Rewrite them to absolute paths in the export
+copy only; the note itself is untouched.
+#+begin_src emacs-lisp
+  (defun vs_org/export_absolute_file_links (backend)
+    "In an HTML export, turn relative file: links into absolute paths.
+  Runs on the export copy of the buffer, whose `default-directory' is the note's."
+    (when (org-export-derived-backend-p backend 'html)
+      (goto-char (point-min))
+      (while (re-search-forward "\\[\\[file:\\(\\.\\.?/[^]]+\\)\\]" nil t)
+        (replace-match (expand-file-name (match-string 1)) t t nil 1))))
+
+  (with-eval-after-load 'ox
+    (add-hook 'org-export-before-parsing-functions #'vs_org/export_absolute_file_links))
 #+end_src
 
 ** Tikz packages
@@ -1328,7 +1443,6 @@ PreReq to run the workflow
  ;; (org-heatmap-db-location "/tmp/org-heatmap.db")
  ;; :config
  ;; (org-heatmap-mode))
-
 
 ;;#+END_SRC
 ** TODO Clean up org capture templates

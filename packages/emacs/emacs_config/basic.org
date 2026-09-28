@@ -370,6 +370,7 @@ Set the tabs to 2 spaces
     ("c" (lambda () (interactive) (find-file "~/emacs_config/basic.org")) "Open Config file")
     ("i" (lambda () (interactive) (find-file "~/beorg/inbox.org")) "Open Inbox")
     ("a" (lambda () (interactive) (find-file "~/4dx/4dx.org")) "Open 4DX")
+    ("f" (lambda () (interactive) (find-file "~/emacs_config/feeds.org")) "Open Feeds")
     ("q" nil "quit"))
 
   (global-set-key (kbd "C-c g") 'go-open-files/body)
@@ -1014,9 +1015,193 @@ Verify the sub directory path to copy the path
         (kbd "g l") #'vs/extract-pdf-annots-to-links)
 
       ;; 2. Bind 'g l' in Evil Normal mode when looking at the Annotations list
-      (evil-define-key 'normal pdf-annot-list-mode-map 
+      (evil-define-key 'normal pdf-annot-list-mode-map
         (kbd "g l") #'vs/extract-pdf-annots-to-links)))
 
+#+end_src
+
+* RSS Reader (elfeed)
+- Why?
+  Read engineering blogs in Emacs, side by side with the entry list.
+- How?
+  - Feeds live in =~/emacs_config/feeds.org= (elfeed-org); tags come from its headings
+  - =C-c s= opens the menu: =o= open, =u= update, =a= add feed, =f= edit feeds, tag filters
+  - In the list: =RET= entry in the right pane, =e= eww (reader view), =b= web browser, =q= save and quit
+  - In an entry: =n= / =p= next/previous, =e= eww, =b= web browser, =M-v= follow a link by hint
+- DB is in Dropbox (=~/Dropbox/projects/elfeed=). It is read on open and
+  written on quit, so don't keep elfeed open on two machines at once:
+  Dropbox would create a conflicted copy of =index=.
+
+#+begin_src emacs-lisp
+  (defvar vs_elfeed/feeds-file "~/emacs_config/feeds.org"
+    "elfeed-org file with the feed subscriptions.")
+
+  (defvar vs_elfeed/default-filter "@2-weeks-ago +unread "
+    "Filter the search buffer starts with; tag filters are added to it.")
+
+  (use-package elfeed
+    :ensure t
+    :commands (elfeed)
+    :init
+    ;; Must be set before the DB is first loaded
+    (setq elfeed-db-directory (expand-file-name "~/Dropbox/projects/elfeed"))
+    :config
+    (setq-default elfeed-search-filter vs_elfeed/default-filter)
+    (define-key elfeed-search-mode-map (kbd "j") #'next-line)
+    (define-key elfeed-search-mode-map (kbd "k") #'previous-line)
+    (define-key elfeed-search-mode-map (kbd "q") #'vs_elfeed/quit)
+    (define-key elfeed-search-mode-map (kbd "e") #'vs_elfeed/open-eww)
+    (define-key elfeed-show-mode-map (kbd "e") #'vs_elfeed/open-eww))
+
+  ;; elfeed's and eww's single-letter keys (l back, q quit, ...) only work
+  ;; outside Evil normal state
+  (with-eval-after-load 'evil
+    (evil-set-initial-state 'elfeed-search-mode 'emacs)
+    (evil-set-initial-state 'elfeed-show-mode 'emacs)
+    (evil-set-initial-state 'eww-mode 'emacs))
+
+  (use-package elfeed-org
+    :ensure t
+    :after elfeed
+    :config
+    (setq rmh-elfeed-org-files (list vs_elfeed/feeds-file))
+    (elfeed-org))
+
+  (use-package elfeed-goodies
+    :ensure t
+    :after elfeed
+    :config
+    (setq elfeed-goodies/entry-pane-position 'right
+          elfeed-goodies/entry-pane-size 0.55
+          elfeed-goodies/feed-source-column-width 22
+          elfeed-goodies/tag-column-width 16)
+    ;; elfeed 4 dropped the intro header that goodies draws for an empty DB
+    (unless (fboundp 'elfeed-search--intro-header)
+      (defalias 'elfeed-search--intro-header #'elfeed-search--header))
+    (elfeed-goodies/setup))
+
+  (use-package elfeed-webkit
+    :ensure t
+    :after elfeed
+    :bind (:map elfeed-show-mode-map
+                ("%" . elfeed-webkit-toggle))
+    :config
+    (setq elfeed-webkit-auto-enable t))
+
+  (defun vs_elfeed/open ()
+    "Open elfeed, reloading the DB from Dropbox unless elfeed is already open."
+    (interactive)
+    (require 'elfeed)
+    (if (get-buffer "*elfeed-search*")
+        (elfeed)
+      (elfeed-db-load)
+      (elfeed)
+      (elfeed-search-update :force)))
+
+  (defun vs_elfeed/quit ()
+    "Save the DB to Dropbox and close elfeed."
+    (interactive)
+    (elfeed-db-save)
+    (when (get-buffer "*elfeed-entry*")
+      (ignore-errors (elfeed-goodies/delete-pane)))
+    (quit-window t))
+
+  (defun vs_elfeed/update ()
+    "Re-read `vs_elfeed/feeds-file' and fetch all feeds."
+    (interactive)
+    (require 'elfeed)
+    (rmh-elfeed-org-process-advice)
+    (elfeed-update))
+
+  (defun vs_elfeed/filter (tags)
+    "Show `vs_elfeed/default-filter' narrowed to TAGS, e.g. \"+eng\"."
+    (vs_elfeed/open)
+    (elfeed-search-set-filter (concat vs_elfeed/default-filter tags)))
+
+  (defun vs_elfeed/entry-link ()
+    "Link of the entry at point in the search list, or of the shown entry."
+    (let ((entry (if (derived-mode-p 'elfeed-show-mode)
+                     elfeed-show-entry
+                   (elfeed-search-selected :ignore-region))))
+      (when entry
+        (elfeed-untag entry 'unread)
+        (when (derived-mode-p 'elfeed-search-mode)
+          (elfeed-search-update-entry entry))
+        (elfeed-entry-link entry))))
+
+  (defun vs_elfeed/open-eww ()
+    "Open the current entry's link in eww, in the right pane, in reader view.
+  Use `&' in eww to send the page on to the web browser."
+    (interactive)
+    (let ((url (or (vs_elfeed/entry-link) (user-error "No entry here")))
+          (buf (get-buffer-create "*eww*")))
+      (save-window-excursion
+        (with-current-buffer buf
+          (eww url)))
+      ;; Reader view only for pages opened from elfeed
+      (with-current-buffer buf
+        (add-hook 'eww-after-render-hook #'eww-readable nil t))
+      (elfeed-goodies/switch-pane buf)))
+
+  (defun vs_elfeed/edit-feeds ()
+    "Open the feed list."
+    (interactive)
+    (find-file vs_elfeed/feeds-file))
+
+  (defun vs_elfeed/feed-categories ()
+    "Category headings (level 2) of the elfeed tree in `vs_elfeed/feeds-file'."
+    (with-current-buffer (find-file-noselect vs_elfeed/feeds-file)
+      ;; TODO(human): return the category names as a list of strings
+      ))
+
+  (defun vs_elfeed/add-feed (url title category)
+    "Add feed URL as TITLE under CATEGORY in `vs_elfeed/feeds-file', then fetch it."
+    (interactive
+     (let ((clip (ignore-errors (current-kill 0 t))))
+       (list (read-string "Feed URL: "
+                          (or (thing-at-point 'url t)
+                              (and clip (string-match-p "\\`https?://" clip) clip)))
+             (read-string "Title: ")
+             (completing-read "Category: " (vs_elfeed/feed-categories) nil t))))
+    (with-current-buffer (find-file-noselect vs_elfeed/feeds-file)
+      (save-excursion
+        (goto-char (or (org-find-exact-headline-in-buffer category)
+                       (user-error "No heading %s in %s" category vs_elfeed/feeds-file)))
+        (org-end-of-subtree t t)
+        (unless (bolp) (insert "\n"))
+        (insert (format "*** %s\n" (org-link-make-string url title))))
+      (save-buffer))
+    (require 'elfeed)
+    (rmh-elfeed-org-process-advice)
+    (elfeed-update-feed url)
+    (message "Added %s under %s" title category))
+
+  (defhydra hydra-elfeed (:color blue :hint nil)
+    "
+    ^Feeds^              ^Filter^
+    ^-----^              ^------^
+    _o_: Open            _e_: Engineering
+    _u_: Update all      _i_: AI / Research
+    _a_: Add feed        _d_: Data
+    _f_: Edit feeds      _t_: Tech & AI
+    _q_: Quit            _m_: Emacs
+    ^ ^                  _U_: Unread (2 weeks)
+    ^ ^                  _A_: All entries
+    "
+    ("o" vs_elfeed/open)
+    ("u" vs_elfeed/update)
+    ("a" vs_elfeed/add-feed)
+    ("f" vs_elfeed/edit-feeds)
+    ("e" (vs_elfeed/filter "+eng"))
+    ("i" (vs_elfeed/filter "+ai"))
+    ("d" (vs_elfeed/filter "+data"))
+    ("t" (vs_elfeed/filter "+tech"))
+    ("m" (vs_elfeed/filter "+emacs"))
+    ("U" (vs_elfeed/filter ""))
+    ("A" (progn (vs_elfeed/open) (elfeed-search-set-filter "")))
+    ("q" nil))
+
+  (global-set-key (kbd "C-c s") 'hydra-elfeed/body)
 #+end_src
 
 * Note Taking Packages

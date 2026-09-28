@@ -1178,12 +1178,12 @@ Verify the sub directory path to copy the path
 
   (defhydra hydra-elfeed (:color blue :hint nil)
     "
-    ^Feeds^              ^Filter^
-    ^-----^              ^------^
-    _o_: Open            _e_: Engineering
-    _u_: Update all      _i_: AI / Research
-    _a_: Add feed        _d_: Data
-    _f_: Edit feeds      _t_: Tech & AI
+    ^Feeds^              ^Filter^                 ^Review (eww / entry)^
+    ^-----^              ^------^                 ^--------------------^
+    _o_: Open            _e_: Engineering         _s_: Summarize
+    _u_: Update all      _i_: AI / Research       _?_: Ask a question
+    _a_: Add feed        _d_: Data                _r_: Open reviews
+    _f_: Edit feeds      _t_: Tech & AI           _b_: Backend: %`vs_review/backend
     _q_: Quit            _m_: Emacs
     ^ ^                  _U_: Unread (2 weeks)
     ^ ^                  _A_: All entries
@@ -1199,9 +1199,191 @@ Verify the sub directory path to copy the path
     ("m" (vs_elfeed/filter "+emacs"))
     ("U" (vs_elfeed/filter ""))
     ("A" (progn (vs_elfeed/open) (elfeed-search-set-filter "")))
+    ("s" vs_review/summarize)
+    ("?" vs_review/ask)
+    ("r" vs_review/open)
+    ("b" vs_review/toggle-backend)
     ("q" nil))
 
   (global-set-key (kbd "C-c s") 'hydra-elfeed/body)
+#+end_src
+
+** Feed review with Claude Code / agy
+- Why?
+  Summarize or question the article I'm reading, and keep the answers.
+- How?
+  - Open an article in eww (=e=) or the entry pane (=RET=), then =C-c s s= to
+    summarize or =C-c s ?= to ask a question
+  - The CLI runs headless in the background; a message says when the answer
+    is saved in =~/Dropbox/projects/elfeed/feed_review.org= (=C-c s r=)
+  - One =*= heading per article (matched by =:URL:=), one =**= per prompt
+  - =C-c s b= switches between Claude Code (=claude -p=) and agy (=agy -p=)
+- The page text is sent with the prompt: claude gets it on stdin, agy (which
+  doesn't read stdin) as its prompt argument. Answers start from that text;
+  claude may also use WebSearch/WebFetch for context the article lacks and
+  must link those sources. Bash, Edit and Write stay denied, so text in a
+  page can't run commands or change files. Both run in an empty temp
+  directory so no project CLAUDE.md or workspace is picked up.
+
+#+begin_src emacs-lisp
+  (defvar vs_review/file "~/Dropbox/projects/elfeed/feed_review.org"
+    "Org file collecting prompts and answers about feed articles.")
+
+  (defvar vs_review/backend 'claude
+    "Backend used by `vs_review/summarize' and `vs_review/ask', a key of `vs_review/backends'.")
+
+  (defvar vs_review/backends
+    '((claude :command ("claude" "-p" "--no-session-persistence"
+                        ;; Headless mode can't answer permission prompts,
+                        ;; so web tools must be allowed explicitly
+                        "--allowedTools" "WebSearch" "WebFetch"
+                        "--disallowedTools" "Bash" "Edit" "Write")
+              :input stdin)
+      (agy :command ("agy" "--output-format" "text" "--print-timeout" "180s" "-p")
+           :input arg))
+    "Headless CLIs: (BACKEND :command ARGV :input stdin|arg).
+  With :input arg the page text is appended to ARGV as the prompt.")
+
+  (defvar vs_review/max-chars 60000
+    "Page text beyond this many characters is cut before it is sent.")
+
+  (defvar vs_review/instructions
+    "I'm reading the article below. Base your answer on its text; use the web
+  only for context the article lacks, and link every outside source.
+  Write in Org-mode markup (- lists, *bold*, /italic/, =code=, [[url][links]]), not Markdown.
+  Don't use headings."
+    "Sent before every prompt.")
+
+  ;; Tune this to the kind of summary you want
+  (defvar vs_review/summary-prompt
+    "Summarize this article: a one-sentence gist, then 3-5 bullets with the key
+  ideas or techniques, then one line on who should read it."
+    "Prompt used by `vs_review/summarize'.")
+
+  (defun vs_review/page-context ()
+    "Title, URL and text of the article in the current eww or elfeed entry buffer."
+    (let ((text (buffer-substring-no-properties (point-min) (point-max))))
+      (cond
+       ((derived-mode-p 'eww-mode)
+        (let ((url (plist-get eww-data :url))
+              (title (plist-get eww-data :title)))
+          (list :title (if (string-empty-p (or title "")) url title) :url url :text text)))
+       ((derived-mode-p 'elfeed-show-mode)
+        (list :title (elfeed-entry-title elfeed-show-entry)
+              :url (elfeed-entry-link elfeed-show-entry)
+              :text text))
+       (t (user-error "Open an article in eww or the elfeed entry pane first")))))
+
+  (defun vs_review/input (ctx prompt)
+    "Text sent to the CLI: instructions, PROMPT and the article in CTX."
+    (let ((text (plist-get ctx :text)))
+      (when (> (length text) vs_review/max-chars)
+        (setq text (concat (substring text 0 vs_review/max-chars) "\n[... article truncated]")))
+      (format "%s\n\nPrompt: %s\n\nTitle: %s\nURL: %s\n\nArticle:\n%s"
+              vs_review/instructions prompt
+              (plist-get ctx :title) (plist-get ctx :url) text)))
+
+  (defun vs_review/run (label prompt)
+    "Send PROMPT about the current article to `vs_review/backend' in the background.
+  The answer is saved under LABEL in `vs_review/file'."
+    (let* ((ctx (vs_review/page-context))
+           (backend vs_review/backend)
+           (spec (alist-get backend vs_review/backends))
+           (input (vs_review/input ctx prompt))
+           (stdin (eq (plist-get spec :input) 'stdin))
+           (default-directory (file-name-as-directory
+                               (make-temp-file "vs_review" t)))
+           (err (generate-new-buffer (format " *vs_review %s stderr*" backend)))
+           (proc (make-process
+                  :name (format "vs_review-%s" backend)
+                  :buffer (generate-new-buffer (format " *vs_review %s*" backend))
+                  :stderr err
+                  :command (append (plist-get spec :command) (unless stdin (list input)))
+                  :connection-type 'pipe
+                  :coding 'utf-8
+                  :noquery t
+                  :sentinel #'vs_review/sentinel)))
+      ;; This file has no lexical-binding, so a lambda sentinel wouldn't
+      ;; capture these; keep them on the process instead.
+      (process-put proc 'request (list :ctx ctx :label label :prompt prompt :backend backend
+                                       :start (float-time) :workdir default-directory
+                                       :stderr err))
+      (when stdin
+        (process-send-string proc input)
+        (process-send-eof proc))
+      (message "Asking %s: %s — \"%s\"" backend label (plist-get ctx :title))))
+
+  (defun vs_review/sentinel (proc _event)
+    "Save PROC's answer when it exits 0, otherwise report its stderr."
+    (unless (process-live-p proc)
+      (let* ((req (process-get proc 'request))
+             (backend (plist-get req :backend))
+             (out (process-buffer proc))
+             (err (plist-get req :stderr)))
+        (unwind-protect
+            (if (zerop (process-exit-status proc))
+                (vs_review/save (plist-get req :ctx) (plist-get req :label) (plist-get req :prompt)
+                                backend
+                                (with-current-buffer out (string-trim (buffer-string)))
+                                (- (float-time) (plist-get req :start)))
+              (message "vs_review: %s failed (exit %d): %s" backend (process-exit-status proc)
+                       (with-current-buffer err
+                         (string-trim (buffer-substring (max (point-min) (- (point-max) 300))
+                                                        (point-max))))))
+          (let ((kill-buffer-query-functions nil))
+            (kill-buffer out)
+            (when (buffer-live-p err) (kill-buffer err)))
+          (ignore-errors (delete-directory (plist-get req :workdir) t))))))
+
+  (defun vs_review/save (ctx label prompt backend answer seconds)
+    "Append ANSWER to PROMPT (headed LABEL) under CTX's article in `vs_review/file'."
+    (let ((url (plist-get ctx :url))
+          (now (format-time-string "[%Y-%m-%d %a %H:%M]")))
+      (with-current-buffer (find-file-noselect vs_review/file)
+        (save-excursion
+          (save-restriction
+            (widen)
+            (let ((pos (org-find-property "URL" url)))
+              (if pos
+                  (progn (goto-char pos) (org-end-of-subtree t t))
+                (goto-char (point-max))
+                (unless (bolp) (insert "\n"))
+                (insert (format "* %s\n:PROPERTIES:\n:URL: %s\n:ADDED: %s\n:END:\n"
+                                (plist-get ctx :title) url now))))
+            (unless (bolp) (insert "\n"))
+            ;; Indent the answer so a stray "* " in it can't become a heading
+            (insert (format "** %s\n:PROPERTIES:\n:BACKEND: %s\n:ASKED: %s\n:SECONDS: %d\n:PROMPT: %s\n:END:\n%s\n"
+                            label backend now seconds
+                            (replace-regexp-in-string "[ \t\n]+" " " prompt)
+                            (replace-regexp-in-string "^\\(.\\)" "  \\1" answer)))))
+        (save-buffer))
+      (message "Saved %s answer for \"%s\" (%ds) — C-c s r to open"
+               backend (plist-get ctx :title) seconds)))
+
+  (defun vs_review/summarize ()
+    "Summarize the current article with `vs_review/backend'."
+    (interactive)
+    (vs_review/run "Summary" vs_review/summary-prompt))
+
+  (defun vs_review/ask (question)
+    "Ask QUESTION about the current article with `vs_review/backend'."
+    (interactive
+     (progn (vs_review/page-context)   ; fail before prompting
+            (list (read-string (format "Ask %s: " vs_review/backend)))))
+    (vs_review/run question question))
+
+  (defun vs_review/toggle-backend ()
+    "Switch `vs_review/backend' between the entries of `vs_review/backends'."
+    (interactive)
+    (let* ((keys (mapcar #'car vs_review/backends))
+           (next (or (cadr (memq vs_review/backend keys)) (car keys))))
+      (setq vs_review/backend next)
+      (message "Feed review backend: %s" next)))
+
+  (defun vs_review/open ()
+    "Open `vs_review/file'."
+    (interactive)
+    (find-file vs_review/file))
 #+end_src
 
 * Note Taking Packages

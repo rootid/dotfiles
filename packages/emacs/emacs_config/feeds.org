@@ -59,4 +59,4 @@ Site gone; no feed found.
 *** [[https://protesilaos.com/codelog.xml][Protesilaos Stavrou (Prot)]]
 *** [[https://emacsredux.com/atom.xml][Emacs Redux]]
 *** [[https://nullprogram.com/feed/][Null Program (Chris Wellons)]]
-*** [[http://pragmaticemacs.com/feed/][Pragmatic Emacs]]
+*** [[https://pragmaticemacs.wordpress.com/feed/][Pragmatic Emacs]]

@@ -1183,8 +1183,10 @@ Verify the sub directory path to copy the path
     _o_: Open            _e_: Engineering
     _u_: Update all      _i_: AI / Research
     _a_: Add feed        _d_: Data
-    _f_: Edit feeds      _U_: Unread (2 weeks)
-    _q_: Quit            _A_: All entries
+    _f_: Edit feeds      _t_: Tech & AI
+    _q_: Quit            _m_: Emacs
+    ^ ^                  _U_: Unread (2 weeks)
+    ^ ^                  _A_: All entries
     "
     ("o" vs_elfeed/open)
     ("u" vs_elfeed/update)
@@ -1193,6 +1195,8 @@ Verify the sub directory path to copy the path
     ("e" (vs_elfeed/filter "+eng"))
     ("i" (vs_elfeed/filter "+ai"))
     ("d" (vs_elfeed/filter "+data"))
+    ("t" (vs_elfeed/filter "+tech"))
+    ("m" (vs_elfeed/filter "+emacs"))
     ("U" (vs_elfeed/filter ""))
     ("A" (progn (vs_elfeed/open) (elfeed-search-set-filter "")))
     ("q" nil))

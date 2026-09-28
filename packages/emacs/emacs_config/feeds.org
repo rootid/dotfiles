@@ -1,0 +1,62 @@
+#+TITLE: Elfeed Feeds
+#+STARTUP: overview
+
+Feed list for elfeed-org (see "RSS Reader (elfeed)" in basic.org).
+- One feed per heading: =[[FEED-URL][Title]]=; the description becomes the feed title.
+- Tags are inherited from parent headings and become elfeed tags (filter with =+eng=).
+- Feeds under a heading tagged =:ignore:= are kept here but not fetched.
+- Add a feed with =C-c s a= (=vs_elfeed/add-feed=) or edit this file, then =C-c s u=.
+
+* Feeds                                                              :elfeed:
+** Engineering                                                          :eng:
+*** [[https://code.flickr.net/feed/][Flickr Engineering]]
+*** [[https://blog.heroku.com/feed][Heroku Blog]]
+*** [[https://engineering.fb.com/feed/][Meta Engineering]]
+*** [[https://www.etsy.com/codeascraft/rss][Etsy Engineering]]
+*** [[https://dropbox.tech/feed][Dropbox Tech Blog]]
+*** [[https://eng.lyft.com/feed][Lyft Engineering]]
+*** [[https://engineering.indeedblog.com/feed/][Indeed Engineering]]
+*** [[https://engineering.squarespace.com/blog?format=rss][Squarespace Engineering]]
+*** [[https://github.blog/engineering/feed/][GitHub Engineering]]
+*** [[https://engineering.atspotify.com/feed/][Spotify Engineering]]
+*** [[https://medium.engineering/feed][Medium Engineering]]
+*** [[https://redditinc.com/blog/rss.xml][Reddit Blog]]
+*** [[https://shopify.engineering/blog.atom][Shopify Engineering]]
+*** [[https://slack.engineering/feed/][Slack Engineering]]
+*** [[https://stripe.com/blog/feed.rss][Stripe Engineering]]
+*** [[https://word.bitly.com/rss][Bitly Engineering]]
+*** [[https://medium.com/feed/paypal-tech][PayPal Engineering]]
+*** [[https://www.twilio.com/blog/feed][Twilio]]
+*** [[https://yahooeng.tumblr.com/rss][Yahoo Engineering]]
+*** [[https://blog.youtube/rss/][YouTube Blog]]
+** AI / Research                                                         :ai:
+*** [[https://research.google/blog/rss/][Google Research Blog]]
+** Data                                                                :data:
+*** [[https://www.confluent.io/rss.xml][Confluent Blog]]
+*** [[https://www.databricks.com/feed][Databricks Blog]]
+** Needs fixing                                                      :ignore:
+No working feed URL found yet (checked 2026-09-28).
+*** [[https://www.uber.com/blog/engineering/rss/][Uber Engineering]]
+406 Not Acceptable to curl.
+*** [[https://engineeringblog.yelp.com/feed.xml][Yelp Engineering]]
+403 Forbidden to curl.
+*** [[https://blog.x.com/engineering/en_us/blog.rss][Twitter Engineering]]
+403 Forbidden to curl.
+*** [[https://www.linkedin.com/blog/engineering/feed][LinkedIn Engineering]]
+Returns an HTML page, not a feed.
+*** [[https://robinhood.engineering/][Robinhood Engineering]]
+Site gone; no feed found.
+
+** Tech & AI (Simon Willison & Friends)                         :tech:
+*** [[https://simonwillison.net/atom/everything/][Simon Willison (Everything)]]
+*** [[https://jvns.ca/atom.xml][Julia Evans (jvns)]]
+*** [[https://waxy.org/feed/][Waxy.org (Andy Baio)]]
+
+** Emacs Resources (Top 7)                                     :emacs:
+*** [[https://planet.emacslife.com/atom.xml][Planet Emacslife (Community Aggregator)]]
+*** [[https://sachachua.com/blog/feed/][Sacha Chua (Emacs News)]]
+*** [[https://irreal.org/blog/?feed=rss2][Irreal]]
+*** [[https://protesilaos.com/codelog.xml][Protesilaos Stavrou (Prot)]]
+*** [[https://emacsredux.com/atom.xml][Emacs Redux]]
+*** [[https://nullprogram.com/feed/][Null Program (Chris Wellons)]]
+*** [[http://pragmaticemacs.com/feed/][Pragmatic Emacs]]

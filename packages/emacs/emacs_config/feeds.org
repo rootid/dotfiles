@@ -63,4 +63,4 @@ Site gone; no feed found.
 
 ** News                                                                :news:
 *** [[https://hnrss.org/frontpage?points=100][Hacker News (100+)]]
-*** [[https://tdd.cat/rss.xml][The Daily Diff (Arpit Bhayani)]]
+*** [[https://tdd.cat/rss.xml][The Daily Diff - TDD]]

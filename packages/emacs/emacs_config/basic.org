@@ -1185,6 +1185,7 @@ Verify the sub directory path to copy the path
     _a_: Add feed        _d_: Data                _r_: Open reviews
     _f_: Edit feeds      _t_: Tech & AI           _b_: Backend: %`vs_review/backend
     _q_: Quit            _m_: Emacs
+    ^ ^                  _n_: News
     ^ ^                  _U_: Unread (2 weeks)
     ^ ^                  _A_: All entries
     "
@@ -1197,6 +1198,7 @@ Verify the sub directory path to copy the path
     ("d" (vs_elfeed/filter "+data"))
     ("t" (vs_elfeed/filter "+tech"))
     ("m" (vs_elfeed/filter "+emacs"))
+    ("n" (vs_elfeed/filter "+news"))
     ("U" (vs_elfeed/filter ""))
     ("A" (progn (vs_elfeed/open) (elfeed-search-set-filter "")))
     ("s" vs_review/summarize)

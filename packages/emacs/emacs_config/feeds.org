@@ -60,3 +60,7 @@ Site gone; no feed found.
 *** [[https://emacsredux.com/atom.xml][Emacs Redux]]
 *** [[https://nullprogram.com/feed/][Null Program (Chris Wellons)]]
 *** [[https://pragmaticemacs.wordpress.com/feed/][Pragmatic Emacs]]
+
+** News                                                                :news:
+*** [[https://hnrss.org/frontpage?points=100][Hacker News (100+)]]
+*** [[https://tdd.cat/rss.xml][The Daily Diff - TDD]]

@@ -9,7 +9,25 @@ function _go_podman_pick() {
     echo "$name"
     return 0
   fi
-  # TODO(human)
+  local -a ps_args
+  case $filter in
+    running) ps_args=() ;;
+    # Repeated --filter on the same key is OR'd by podman.
+    stopped) ps_args=(-a --filter status=exited --filter status=created) ;;
+    all)     ps_args=(-a) ;;
+    *) echo "Error: unknown filter '$filter' (running|stopped|all)" >&2; return 1 ;;
+  esac
+  local rows
+  rows=$(podman ps "${ps_args[@]}" --format '{{.Names}}\t{{.Image}}\t{{.Status}}') || return 1
+  if [[ -z "$rows" ]]; then
+    echo "No $filter containers" >&2
+    return 1
+  fi
+  # fzf exits non-zero on ESC/Ctrl-C, so a cancelled pick aborts the caller.
+  echo "$rows" \
+    | fzf --delimiter '\t' --header "Pick a $filter container" --select-1 \
+    | cut -f1
+  return ${pipestatus[2]}
 }
 
 # Ask a y/N question; succeeds only on "y".

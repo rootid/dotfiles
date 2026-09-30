@@ -453,7 +453,9 @@ Use of Corfu package for autocompletion
     :custom
     ;; Require {} for sub/superscripts to prevent paths with underscores from breaking
     (org-export-with-sub-superscripts '{})
-    (org-use-sub-superscripts '{}))
+    (org-use-sub-superscripts '{})
+    ;; Allow manual #+ATTR_ORG tags to work, but don't enforce a global default
+    (org-image-actual-width nil))
 
   (use-package ox-twbs
     :ensure t
@@ -1734,6 +1736,24 @@ asks for its slug because it becomes a top-level URL such as =/aboutme/=.
     :config
     (require 'org-download))
 
+  ;; Org reads the FIRST :width among the image's #+ATTR_* lines, so a
+  ;; second tag stacked under an old one is ignored. Update in place instead.
+  ;; Needs `org-image-actual-width' nil (set in the org use-package above).
+  (defun vs_org/set-image-width (width)
+    "Set the #+ATTR_ORG: :width of the image at point and redisplay it."
+    (interactive "sImage width (e.g., 400 or 50%%): ")
+    (let ((par (org-element-lineage (org-element-context) '(paragraph) t)))
+      (unless par (user-error "Point is not on an image link"))
+      (save-excursion
+        (goto-char (org-element-property :begin par))
+        ;; Point is now on the first #+ATTR_* line (or the link if none).
+        (if (re-search-forward "^[ \t]*#\\+attr_org:.*?:width +\\(\\S-+\\)"
+                               (org-element-property :post-affiliated par) t)
+            (replace-match width t t nil 1)
+          ;; Insert on top, ahead of any #+ATTR_HTML :width, so it wins.
+          (insert (format "#+ATTR_ORG: :width %s\n" width))))
+      (org-redisplay-inline-images)))
+
 #+end_src
 
 Older notes still have relative image links (=file:../../area/images/...=).
@@ -1767,7 +1787,13 @@ PreReq to run the workflow
     (setq texfrag-org-add-to-header "\\usepackage{amsmath,amssymb}")
     
     ;; Optional: Adjust scaling factor for previews
-    (setq texfrag-scale 1.5))
+    (setq texfrag-scale 1.5)
+    ;; texfrag-mode forces `org-html-with-latex' to dvipng in every Org buffer,
+    ;; so HTML export shells out to latex+dvipng per fragment and fails on any
+    ;; fragment it can't render. Keep texfrag for in-buffer previews, but
+    ;; export math with MathJax (the Org default) instead.
+    (add-hook 'texfrag-mode-hook
+              (lambda () (setq-local org-html-with-latex t))))
 
   (setq org-latex-create-formula-image-program 'imagemagick)
   (add-to-list 'org-latex-packages-alist '("" "tikz" t))

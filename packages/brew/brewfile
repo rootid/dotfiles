@@ -48,6 +48,9 @@ brew 'sqlite3'
 
 brew 'autoenv'
 
+# Container Tools
+brew 'podman'
+
 # Security Tools
 brew 'git-crypt'
 brew 'gpg2'

@@ -71,6 +71,11 @@ go_sh_workflow_source $ROOT_DIR/utils/functions.sh
 # Nix
 go_sh_workflow_source $ROOT_DIR/nix/functions.sh
 
+# Podman
+go_sh_workflow_source $ROOT_DIR/podman/env.sh
+go_sh_workflow_source $ROOT_DIR/podman/functions.sh
+go_sh_workflow_source $ROOT_DIR/podman/aliases.sh
+
 # Cursor
 go_sh_workflow_source $ROOT_DIR/cursor/env.sh
 go_sh_workflow_source $ROOT_DIR/cursor/functions.sh

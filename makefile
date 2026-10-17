@@ -15,6 +15,7 @@ SHELL := /bin/zsh
 	link_config_files unlink_config_files \
 	link_tools unlink_tools \
 	link_ai unlink_ai \
+	link_terminal unlink_terminal \
 	init_nvim \
 	init_vim_packages link_vim unlink_vim \
 	link_org_sys unlink_org_sys \
@@ -29,7 +30,7 @@ STOW_UNLINK = $(STOW) --delete --verbose=5
 
 # --- Main Targets ---
 
-all: link_config_files link_tools link_ai
+all: link_config_files link_tools link_ai link_terminal
 
 install_homebrew:
 	@echo "Installing Homebrew on Mac..."
@@ -97,6 +98,18 @@ link_ai:
 unlink_ai:
 	@echo "Unlinking AI agent config..."
 	$(STOW_UNLINK) claude gemini agents
+
+# --- Terminal (Ghostty + herdr) ---
+# --no-folding: ~/.config/herdr also holds herdr's socket and session state,
+# so only config files may be links - never the whole directory.
+link_terminal:
+	@echo "Linking terminal config (ghostty, herdr)..."
+	@mkdir -p $(HOME)/.config/herdr $(HOME)/.config/ghostty
+	$(STOW_LINK) --no-folding herdr ghostty
+
+unlink_terminal:
+	@echo "Unlinking terminal config..."
+	$(STOW_UNLINK) herdr ghostty
 
 # --- NeoVim Package Management ---
 init_nvim:

@@ -1,0 +1,26 @@
+# Ghostty configuration
+# Linked to ~/.config/ghostty/config by `make link_terminal`.
+# Validate: ghostty +validate-config   Reload: cmd+shift+,
+
+# White background with a palette built for it. Ghostty's default palette
+# targets dark backgrounds, so on white minimum-contrast had to darken every
+# ANSI color (zsh's cyan dir, green arrow) to near-black. Modus Operandi
+# (port of Emacs' modus-operandi) is #ffffff and every ANSI color is >= 7:1
+# (WCAG AAA) on it, so prompt colors stay distinct.
+theme = Modus Operandi
+# Safety net for apps that pick their own faint colors (herdr's gray labels);
+# a no-op for the theme's palette. 4.5 = WCAG AA contrast.
+minimum-contrast = 4.5
+faint-opacity = 0.8
+font-size = 16
+
+# herdr needs Option to act as Alt (alt chords, alt+left/right word jumps).
+macos-option-as-alt = true
+
+# Cmd shortcuts that drive herdr by sending its prefix (ctrl+b = \x02) + key.
+# Only useful inside herdr; in a plain shell they type a stray ctrl+b.
+# Avoid ctrl+alt+arrows - Ghostty owns them.
+keybind = cmd+d=text:\x02v
+keybind = cmd+shift+d=text:\x02-
+keybind = cmd+g=text:\x02g
+keybind = cmd+shift+z=text:\x02z

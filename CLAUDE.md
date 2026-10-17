@@ -30,6 +30,10 @@ new file into the wrong root means it won't get linked correctly.
 `packages/nvim` is stowed separately into `~/.config` (see `init_nvim`
 target), not `~/`.
 
+`packages/herdr` and `packages/ghostty` (`make link_terminal`) mirror
+`~/.config/...` and are stowed with `--no-folding`: `~/.config/herdr` also
+holds herdr's socket and session state, so only the config file is a link.
+
 ## Shell function/alias workflow (`packages/zsh/.my_sh_workflow`)
 
 The `.zshrc` deliberately stays minimal — it just sources
@@ -73,6 +77,8 @@ locked checkout.
   `packages/vim/.vim/pack/...` dirs and vim-plug, then link/unlink the vim
   package.
 - `make init_nvim` — stow `packages/nvim` into `~/.config`.
+- `make link_terminal` / `make unlink_terminal` — stow `herdr` and `ghostty`
+  config (no-folding) into `~/.config`.
 - `make install_homebrew` / `make install_omz` — run the corresponding
   function in `bin/install.sh`.
 - `make update_brew_bundle` — `brew bundle --file=packages/brew/brewfile`.

@@ -91,7 +91,7 @@ unlink_tools:
 # caches, so only individual files may be links - never the whole directory.
 link_ai:
 	@echo "Linking AI agent config..."
-	@mkdir -p $(HOME)/.claude $(HOME)/.gemini $(HOME)/.agents
+	@mkdir -p $(HOME)/.claude $(HOME)/.gemini $(HOME)/.gemini/antigravity-cli $(HOME)/.agents
 	$(STOW_LINK) --no-folding claude gemini agents
 	@[[ -e $(HOME)/.gemini/skills ]] || ln -s $(HOME)/.agents/skills $(HOME)/.gemini/skills
 

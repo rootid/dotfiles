@@ -924,7 +924,34 @@ Verify the sub directory path to copy the path
     (add-hook 'pdf-view-mode-hook
               (lambda ()
                 (setq-local evil-emacs-state-cursor '(nil))
-                (setq-local evil-normal-state-cursor '(nil)))))
+                (setq-local evil-normal-state-cursor '(nil))))
+
+    ;; Moving through the annotation list marks the selected annotation with
+    ;; a hardcoded white wash and blue outline over the text, which hides it.
+    ;; Draw a thin bar in the left margin instead, spanning all its lines.
+    ;; EDGES is the annotation's list of (LEFT TOP RIGHT BOT), one per line,
+    ;; as fractions of the page (0.0-1.0). Use the leftmost line: the first
+    ;; line may start mid-page.
+    (defun vs/pdf-annot-marker-edges (edges)
+      (let ((left (apply #'min (mapcar #'car edges)))
+            (top  (apply #'min (mapcar #'cadr edges)))
+            (bot  (apply #'max (mapcar #'cadddr edges))))
+        (list (list (max 0.0 (- left 0.015)) top
+                    (max 0.0 (- left 0.008)) bot))))
+
+    (defun vs/pdf-annot-show-with-marker (orig a &optional highlight-p window)
+      (if (not highlight-p)
+          (funcall orig a highlight-p window)
+        (let ((render (symbol-function 'pdf-cache-renderpage-highlight)))
+          (cl-letf (((symbol-function 'pdf-cache-renderpage-highlight)
+                     (lambda (page width &rest _)
+                       (funcall render page width
+                                `("steel blue" "steel blue" 0.8
+                                  ,@(vs/pdf-annot-marker-edges
+                                     (pdf-annot-get-display-edges a)))))))
+            (funcall orig a highlight-p window)))))
+    (advice-add 'pdf-annot-show-annotation :around
+                #'vs/pdf-annot-show-with-marker))
 
   (use-package org-pdftools
     :ensure t

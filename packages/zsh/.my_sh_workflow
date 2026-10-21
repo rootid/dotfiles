@@ -60,6 +60,7 @@ go_sh_workflow_source $ROOT_DIR/ssh/functions.sh
 
 # Tmux
 go_sh_workflow_source $ROOT_DIR/tmux/aliases.sh
+go_sh_workflow_source $ROOT_DIR/tmux/functions.sh
 
 # Herdr (agent-aware multiplexer, alongside tmux)
 go_sh_workflow_source $ROOT_DIR/herdr/functions.sh

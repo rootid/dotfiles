@@ -897,6 +897,12 @@ Verify the sub directory path to copy the path
     ;; Automatically fit the PDF to your window size
     (setq-default pdf-view-display-size 'fit-page)
 
+    ;; Vim-style j/k in the outline too (it only binds n/p). Evil leaves this
+    ;; buffer in Emacs state, so j/k would otherwise try to insert text.
+    (with-eval-after-load 'pdf-outline
+      (define-key pdf-outline-buffer-mode-map (kbd "j") #'next-line)
+      (define-key pdf-outline-buffer-mode-map (kbd "k") #'previous-line))
+
     ;; Show the outline (o) in a side window on the right, not a split below
     (setq pdf-outline-display-buffer-action
           '(display-buffer-in-side-window
@@ -951,7 +957,21 @@ Verify the sub directory path to copy the path
                                      (pdf-annot-get-display-edges a)))))))
             (funcall orig a highlight-p window)))))
     (advice-add 'pdf-annot-show-annotation :around
-                #'vs/pdf-annot-show-with-marker))
+                #'vs/pdf-annot-show-with-marker)
+
+    ;; pdf-tools bug: after cropping (s b), pdf-view-image-size passes the
+    ;; ((slice ...) IMAGE) display property to image-size, which fails with
+    ;; "Invalid image specification" and breaks selecting and highlighting.
+    ;; Measure the image inside the slice instead.
+    (defun vs/pdf-view-image-size-sliced (orig &optional displayed-p window page)
+      (let ((prop (and (not displayed-p)
+                       (not pdf-view-roll-minor-mode)
+                       (image-get-display-property))))
+        (if (eq (car-safe (car-safe prop)) 'slice)
+            (image-size (assq 'image prop) t)
+          (funcall orig displayed-p window page))))
+    (advice-add 'pdf-view-image-size :around
+                #'vs/pdf-view-image-size-sliced))
 
   (use-package org-pdftools
     :ensure t

@@ -31,6 +31,25 @@ Feed list for elfeed-org (see "RSS Reader (elfeed)" in basic.org).
 *** [[https://blog.youtube/rss/][YouTube Blog]]
 ** AI / Research                                                         :ai:
 *** [[https://research.google/blog/rss/][Google Research Blog]]
+*** [[https://alphasignalai.substack.com/feed][AlphaSignal]]
+Substack feed; last post 2026-07-13 (checked 2026-11-04). No feed on alphasignal.ai itself.
+*** [[https://importai.substack.com/feed][Import AI (Jack Clark)]]
+*** [[https://www.latent.space/feed][Latent Space]]
+*** [[https://news.smol.ai/rss.xml][AINews (smol.ai)]]
+*** [[https://nlp.elvissaravia.com/feed][AI Newsletter (DAIR.AI, Elvis Saravia)]]
+*** [[https://www.interconnects.ai/feed][Interconnects (Nathan Lambert)]]
+*** [[https://magazine.sebastianraschka.com/feed][Ahead of AI (Sebastian Raschka)]]
+*** [[https://www.oneusefulthing.org/feed][One Useful Thing (Ethan Mollick)]]
+*** [[https://tldr.tech/api/rss/ai][TLDR AI]]
+*** [[https://thesequence.substack.com/feed][TheSequence]]
+*** [[https://openai.com/news/rss.xml][OpenAI News]]
+*** [[https://deepmind.google/blog/rss.xml][Google DeepMind]]
+*** [[https://huggingface.co/blog/feed.xml][Hugging Face Blog]]
+*** [[https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml][Anthropic News (community feed)]]
+Anthropic has no official RSS; this is a scraped community feed (github.com/Olshansk/rss-feeds).
+*** [[https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_engineering.xml][Anthropic Engineering (community feed)]]
+*** [[https://bair.berkeley.edu/blog/feed.xml][Berkeley AI Research (BAIR)]]
+*** [[https://hnrss.org/newest?q=LLM+OR+Claude+OR+GPT&points=100][HN: LLM/Claude/GPT (100+)]]
 ** Data                                                                :data:
 *** [[https://www.confluent.io/rss.xml][Confluent Blog]]
 *** [[https://www.databricks.com/feed][Databricks Blog]]

@@ -1108,6 +1108,10 @@ Verify the sub directory path to copy the path
   - Feeds live in =~/emacs_config/feeds.org= (elfeed-org); tags come from its headings
   - =C-c s= opens the menu: =o= open, =u= update, =a= add feed, =f= edit feeds, tag filters
   - In the list: =RET= entry in the right pane, =e= eww (reader view), =b= web browser, =q= save and quit
+  - =b= opens the browser in the background (macOS =open -g=) and marks the entry read, so
+    =j b j b= queues several articles without leaving Emacs; =B= uses the normal browser behaviour
+  - Many feeds (OpenAI, Hugging Face, TLDR AI) only send a one-line summary, so the entry pane
+    looks empty: that is the feed, not a bug. Use =b= (or =e= for reader view)
   - In an entry: =n= / =p= next/previous, =e= eww, =b= web browser, =M-v= follow a link by hint
 - DB is in Dropbox (=~/Dropbox/projects/elfeed=). It is read on open and
   written on quit, so don't keep elfeed open on two machines at once:
@@ -1224,6 +1228,15 @@ Verify the sub directory path to copy the path
         (add-hook 'eww-after-render-hook #'eww-readable nil t))
       (elfeed-goodies/switch-pane buf)))
 
+  (defun vs_elfeed/browse-in-background (orig url secondary)
+    "Open URL with macOS `open -g' so the browser doesn't take focus from Emacs.
+  Only for elfeed's `b'; the secondary browser (`B') and non-macOS use ORIG."
+    (if (or secondary (not (eq system-type 'darwin)))
+        (funcall orig url secondary)
+      (message "Sent to browser (background): %s" url)
+      (call-process "open" nil 0 nil "-g" url)))
+  (advice-add 'elfeed-browse-url :around #'vs_elfeed/browse-in-background)
+
   (defun vs_elfeed/edit-feeds ()
     "Open the feed list."
     (interactive)
@@ -1259,8 +1272,8 @@ Verify the sub directory path to copy the path
 
   (defhydra hydra-elfeed (:color blue :hint nil)
     "
-    ^Feeds^              ^Filter^                 ^Review (eww / entry)^
-    ^-----^              ^------^                 ^--------------------^
+    ^Feeds^              ^Filter^                 ^Review (list / eww / entry)^
+    ^-----^              ^------^                 ^---------------------------^
     _o_: Open            _e_: Engineering         _s_: Summarize
     _u_: Update all      _i_: AI / Research       _?_: Ask a question
     _a_: Add feed        _d_: Data                _r_: Open reviews
@@ -1295,8 +1308,10 @@ Verify the sub directory path to copy the path
 - Why?
   Summarize or question the article I'm reading, and keep the answers.
 - How?
-  - Open an article in eww (=e=) or the entry pane (=RET=), then =C-c s s= to
-    summarize or =C-c s ?= to ask a question
+  - Put point on an entry in the list, or open it in eww (=e=) or the entry
+    pane (=RET=), then =C-c s s= to summarize or =C-c s ?= to ask a question
+  - From the list, or when the entry is only a short feed summary, the CLI is
+    told to fetch the article from its URL (whether agy can is untested)
   - The CLI runs headless in the background; a message says when the answer
     is saved in =~/Dropbox/projects/elfeed/feed_review.org= (=C-c s r=)
   - One =*= heading per article (matched by =:URL:=), one =**= per prompt
@@ -1343,8 +1358,13 @@ Verify the sub directory path to copy the path
   ideas or techniques, then one line on who should read it."
     "Prompt used by `vs_review/summarize'.")
 
+  (defvar vs_review/thin-chars 800
+    "An elfeed entry with less text than this is only the feed's summary.
+  The CLI is then told to fetch the article from its URL.")
+
   (defun vs_review/page-context ()
-    "Title, URL and text of the article in the current eww or elfeed entry buffer."
+    "Title, URL and text of the article at point: eww, elfeed entry pane or search list.
+  :thin is non-nil when the text is only a feed summary, not the article."
     (let ((text (buffer-substring-no-properties (point-min) (point-max))))
       (cond
        ((derived-mode-p 'eww-mode)
@@ -1354,17 +1374,29 @@ Verify the sub directory path to copy the path
        ((derived-mode-p 'elfeed-show-mode)
         (list :title (elfeed-entry-title elfeed-show-entry)
               :url (elfeed-entry-link elfeed-show-entry)
-              :text text))
-       (t (user-error "Open an article in eww or the elfeed entry pane first")))))
+              :text text
+              :thin (< (length text) vs_review/thin-chars)))
+       ;; Straight from the list: no need to open the entry first
+       ((derived-mode-p 'elfeed-search-mode)
+        (let ((entry (or (elfeed-search-selected :ignore-region)
+                         (user-error "No entry here"))))
+          (list :title (elfeed-entry-title entry)
+                :url (elfeed-entry-link entry)
+                :text ""
+                :thin t)))
+       (t (user-error "Open an article in eww, the entry pane or the elfeed list first")))))
 
   (defun vs_review/input (ctx prompt)
     "Text sent to the CLI: instructions, PROMPT and the article in CTX."
-    (let ((text (plist-get ctx :text)))
+    (let ((text (plist-get ctx :text))
+          (note (if (plist-get ctx :thin)
+                    "\nThe text below is only the feed's short summary, not the article. Fetch the URL above for the full text.\n"
+                  "")))
       (when (> (length text) vs_review/max-chars)
         (setq text (concat (substring text 0 vs_review/max-chars) "\n[... article truncated]")))
-      (format "%s\n\nPrompt: %s\n\nTitle: %s\nURL: %s\n\nArticle:\n%s"
+      (format "%s\n\nPrompt: %s\n\nTitle: %s\nURL: %s\n%s\nArticle:\n%s"
               vs_review/instructions prompt
-              (plist-get ctx :title) (plist-get ctx :url) text)))
+              (plist-get ctx :title) (plist-get ctx :url) note text)))
 
   (defun vs_review/run (label prompt)
     "Send PROMPT about the current article to `vs_review/backend' in the background.

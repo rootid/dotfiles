@@ -971,7 +971,39 @@ Verify the sub directory path to copy the path
             (image-size (assq 'image prop) t)
           (funcall orig displayed-p window page))))
     (advice-add 'pdf-view-image-size :around
-                #'vs/pdf-view-image-size-sliced))
+                #'vs/pdf-view-image-size-sliced)
+
+    ;; Ask before leaving a PDF with unsaved annotations. Adding or deleting
+    ;; an annotation marks the buffer modified; saving writes it to the file.
+    ;; Returns nil if you cancel. DISCARD runs when you choose to drop them.
+    (defun vs/pdf-ask-save (discard)
+      (if (not (buffer-modified-p))
+          t
+        (pcase (car (read-multiple-choice
+                     (format "%s has unsaved annotations" (buffer-name))
+                     '((?s "save" "write annotations to the PDF")
+                       (?d "discard" "drop the unsaved annotations")
+                       (?c "cancel" "stay in the PDF"))))
+          (?s (save-buffer) t)
+          (?d (funcall discard) t)
+          (_ nil))))
+
+    ;; q hides the PDF (quit-window). Discarding reloads the file so the
+    ;; dropped annotations don't reappear when you come back to it.
+    (defun vs/pdf-quit ()
+      (interactive)
+      (when (vs/pdf-ask-save (lambda () (revert-buffer nil t)))
+        (quit-window)))
+    (define-key pdf-view-mode-map (kbd "q") #'vs/pdf-quit)
+
+    ;; Covers every way a buffer gets killed: C-x k, kill-current-buffer,
+    ;; kill-matching-buffers... It runs before Emacs' own "modified; kill
+    ;; anyway?" prompt, and leaves the buffer unmodified so that never shows.
+    (defun vs/pdf-kill-query ()
+      (vs/pdf-ask-save (lambda () (set-buffer-modified-p nil))))
+    (add-hook 'pdf-view-mode-hook
+              (lambda ()
+                (add-hook 'kill-buffer-query-functions #'vs/pdf-kill-query nil t))))
 
   (use-package org-pdftools
     :ensure t

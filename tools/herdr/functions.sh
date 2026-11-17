@@ -45,14 +45,26 @@ function _go_herdr_start_agent() {
   fi
 }
 
-# Open (or focus) a workspace for a git repo, labelled after the repo.
-# The per-project counterpart of `ts <name>`.  go_herdr_ws [dir]
+# Open (or focus) a workspace for a git repo, labelled after the repo, and
+# attach to it. Starts the headless server if needed, like `ts <name>` does for
+# tmux.  go_herdr_ws [dir]
 function go_herdr_ws() {
-  local dir=${1:-$PWD} root label id
+  local dir=${1:-$PWD} root label id i
+  if [[ ! -d "$dir" ]]; then
+    echo "go_herdr_ws: '$dir' is not a directory (takes a path, not a name)." >&2
+    return 1
+  fi
   root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || root=${dir:A}
   label=${root:t}
   if ! herdr workspace list >/dev/null 2>&1; then
-    echo "No herdr server running - run 'hd' first." >&2
+    nohup herdr server >/dev/null 2>&1 &!
+    for i in {1..20}; do
+      herdr workspace list >/dev/null 2>&1 && break
+      sleep 0.25
+    done
+  fi
+  if ! herdr workspace list >/dev/null 2>&1; then
+    echo "herdr: server failed to start - see ~/.config/herdr/herdr-server.log" >&2
     return 1
   fi
   id=$(herdr workspace list \
@@ -63,6 +75,8 @@ function go_herdr_ws() {
   else
     herdr workspace create --cwd "$root" --label "$label" --focus >/dev/null
   fi
+  # Outside herdr: attach the client (inside herdr, focus above is enough).
+  [[ -z "$HERDR_PANE_ID" ]] && herdr
 }
 
 # Pick a workspace with fzf and focus it.

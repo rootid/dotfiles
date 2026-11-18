@@ -102,6 +102,17 @@ Includes modeline configuration, file save configuration, 2 spaces
 
 #+END_SRC
 
+** Emacs server (one Emacs, many frames)
+- Why? Separate Emacs processes each keep their own copy of the same org
+  files and their own org clock, and locking is off (create-lockfiles nil).
+- How? Open more windows with =C-x 5 2= or =ec= from the shell
+  (tools/emacs/aliases.sh). Close one frame with =C-x 5 0=.
+#+BEGIN_SRC emacs-lisp
+  ;; Only the first Emacs starts the server; later ones skip it.
+  (require 'server)
+  (unless (server-running-p) (server-start))
+#+END_SRC
+
 * Basic Key Bindings
 Use key strokes economically. Refer - [[https://sites.google.com/site/steveyegge2/effective-emacs][Efffective Emacs From Yegge]] 
 Note - kbd is a macro that converts a human-readable string into the internal representation Emacs uses for keys.
@@ -615,8 +626,13 @@ Use of Corfu package for autocompletion
   (setq org-log-into-drawer t) ;; C-c C-z - start notes
   (setq org-clock-into-drawer "CLOCKING")
   (setq org-log-reschedule 'time) ;; To disable - (setq org-log-reschedule nil)
-  (setq org-log-done 'note) ;; To disable - (setq org-log-done nil)
+  (setq org-log-done 'time) ;; 'note asks for a note on every DONE; use C-c C-z to add one. To disable - (setq org-log-done nil)
   (setq org-clock-sound t)
+  ;; Keep a running clock across Emacs restarts/crashes (~/.emacs.d/org-clock-save.el)
+  (setq org-clock-persist t)
+  (org-clock-persistence-insinuate)
+  ;; After 10 min away from the Mac, ask whether to keep or drop that time
+  (setq org-clock-idle-time 10)
 
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
@@ -655,6 +671,55 @@ Use of Corfu package for autocompletion
               (lambda (&rest _)
                 (gtd-save-org-buffers)))
 
+#+end_src
+
+** Today agenda view (=C-c a w=)
+- Why? One screen in the morning: today's tasks for each time block, nothing else.
+- How? =C-c a w=. On a task: =I= clock in, =t d= done (also clocks out).
+  When the session passes the task's =Effort=, Org shows a macOS notification and beeps.
+#+begin_src emacs-lisp
+  ;; Count only the current session against Effort. The default counts all
+  ;; sessions, so a task worked over two days would notify as soon as day 2 starts.
+  (setq org-clock-mode-line-total 'current)
+
+  (defun vs_org/gtd-files (&rest names)
+    "Full paths of NAMES inside ~/gtd."
+    (mapcar (lambda (n) (file-truename (expand-file-name n "~/gtd/"))) names))
+
+  (with-eval-after-load 'org-agenda
+    (add-to-list 'org-agenda-custom-commands
+                 '("w" "Today: one block per lead measure"
+                   ((agenda "" ((org-agenda-overriding-header "05:15  Coding")
+                                (org-agenda-files (vs_org/gtd-files "coding-prep.org" "coding-problems.org"))))
+                    (agenda "" ((org-agenda-overriding-header "06:00  System design")
+                                (org-agenda-files (vs_org/gtd-files "staff-system-design-prep.org" "problems.org" "resources.org"))
+                                (org-agenda-format-date "")))
+                    (agenda "" ((org-agenda-overriding-header "07:00  English + behavioral")
+                                (org-agenda-files (vs_org/gtd-files "english_4dx.org" "behavioral-story-inventory.org"))
+                                (org-agenda-format-date "")))
+                    (agenda "" ((org-agenda-overriding-header "19:30  AI tooling / outreach")
+                                (org-agenda-files (vs_org/gtd-files "outreach.org"))
+                                (org-agenda-format-date ""))))
+                   ((org-agenda-span 'day)
+                    (org-agenda-use-time-grid nil)
+                    (org-deadline-warning-days 2)
+                    ;; effort first, so each block shows its planned minutes
+                    (org-agenda-prefix-format '((agenda . "  %-6e%?-12t% s")))))))
+#+end_src
+
+** Clock status outside Emacs (tmux)
+- Why? See the running task in every terminal, not only in an Emacs mode line.
+- How? tmux status-right calls =go_emacs_clock_status= (tools/emacs/functions.sh),
+  which asks the Emacs server for =vs_org/clock-status=.
+#+begin_src emacs-lisp
+  (defun vs_org/clock-status ()
+    "Running clock as plain text, e.g. \"0:12/0:25 Pattern: Two pointers\". Empty when idle."
+    (if (and (fboundp 'org-clocking-p) (org-clocking-p))
+        (format "%s%s %s"
+                (org-duration-from-minutes (org-clock-get-clocked-time))
+                (if org-clock-effort (concat "/" org-clock-effort) "")
+                (truncate-string-to-width (or org-clock-current-task "") 30 nil nil "..."))
+      ""))
 #+end_src
 
 * Org Mode Helper Functions

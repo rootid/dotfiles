@@ -100,6 +100,10 @@ Includes modeline configuration, file save configuration, 2 spaces
   (save-place-mode 1) ; Do not loose the cursor after restart
   (recentf-mode 1) ; to reopen the last files using M-x recentf-open-files
 
+  ;; Only the first Emacs starts the server; later ones skip it.
+  (require 'server)
+  (unless (server-running-p) (server-start))
+
 #+END_SRC
 
 * Basic Key Bindings
